@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>J Empire Process Server Study</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin: 0; padding: 0; background: #1A1209; }
+  #root { min-height: 100vh; }
+  input { font-family: inherit; }
+  button { font-family: inherit; }
+</style>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+const C = {
+  gold:"#C9A84C",goldLight:"#F0D080",goldDark:"#9A7530",
+  cream:"#FAF6EE",dark:"#1A1209",charcoal:"#2D2416",
+  green:"#2A7A4F",greenBg:"#E8F5EE",red:"#B83232",redBg:"#FAE8E8",
+  blue:"#1A4F8A",blueBg:"#E8F0FA",purple:"#6B3FA0",purpleBg:"#F0E8FA",
+  orange:"#C4714F",orangeBg:"#FAF0EB",teal:"#1A7A6E",tealBg:"#E8F5F3",
+  pink:"#A03F6B",pinkBg:"#FAE8F0",card:"#FFFFFF",border:"#E8DFC8",
+};
+
+// ── MODULES ──────────────────────────────────────────────────────────────────
+const MODULES = [
+  {
+    id:1,emoji:"⚖️",title:"What Is Process Serving?",subtitle:"The Foundation",color:C.blue,bg:C.blueBg,readTime:"5 min",
+    lessons:[
+      {title:"What Is 'Process'?",icon:"📄",content:`Process is any official court document that commands a person to do something — or stop doing something. Think of it as the court's way of tapping someone on the shoulder and saying "Hey, you're involved in a legal case!"
+
+COMMON TYPES OF PROCESS:
+• SUMMONS — tells someone they've been sued and must respond
+• COMPLAINT — describes what the lawsuit is about
+• SUBPOENA — orders someone to appear in court or produce documents
+• WRITS — court orders commanding specific actions
+• INJUNCTIONS — orders requiring someone to stop doing something
+
+🔑 KEY RULE: Due process under the U.S. Constitution guarantees NO ONE can be taken to court without being properly notified first. Service of process is how that notification happens. Without it, a case can be thrown out entirely!`},
+      {title:"Who Can Serve Process in Florida?",icon:"👤",content:`Florida law (§48.021) says process must be served by authorized people only:
+
+1. 🏛️ THE SHERIFF — the default server in every county.
+
+2. ⭐ SPECIAL PROCESS SERVER — appointed by the sheriff for a specific county. Must be 18+, Florida resident, pass background check and exam.
+
+3. 🎓 CERTIFIED PROCESS SERVER (CPS) — that's YOU! Certified by the Chief Judge of the Judicial Circuit. Can serve anywhere within that circuit.
+
+🔑 A CPS serves initial nonenforceable CIVIL process — NOT criminal warrants or judgment enforcement.
+
+❌ WHO CANNOT SERVE: Parties to the case, anyone under 18, anyone with a legal disability.
+
+🚨 §48.021(4) — Making a FALSE RETURN of service is a FELONY OF THE THIRD DEGREE. Permanent bar from serving in Florida. This is serious!`},
+      {title:"The 9th Circuit — YOUR Circuit",icon:"🗺️",content:`The 9th Judicial Circuit covers ORANGE COUNTY and OSCEOLA COUNTY. One certification covers BOTH counties!
+
+HOW TO GET CERTIFIED (§48.29):
+1. ✅ Complete the 16-hour FAPPS education course ($180)
+2. ✅ Pass the written exam — minimum 80% to pass
+3. ✅ Submit application to the Chief Judge
+4. ✅ Background check through FDLE
+5. ✅ Certificate of Good Conduct
+6. ✅ Post a $5,000 surety bond
+7. ✅ Take oath of office
+8. ✅ Get your photo ID card
+
+🔁 RENEWAL: Annual — 4-hour continuing education course each year.
+
+🔑 There is NO statewide process server license in Florida. You must be certified in EACH circuit. The 9th Circuit = Orange AND Osceola — two counties, one certification!`},
+    ],
+    quiz:[
+      {q:"What does 'process' mean in legal terms?",options:["A court fine","Official court documents commanding action","A police report","A judge's ruling"],correct:1,explain:"Process = official court documents (summons, complaints, subpoenas, writs) that command someone to take action or appear in court."},
+      {q:"Making a false return of service in Florida is classified as what?",options:["A civil violation","A misdemeanor","A felony of the third degree","Just unethical, not criminal"],correct:2,explain:"§48.021(4) — false return of service is a FELONY OF THE THIRD DEGREE. You'll also be permanently barred from serving process in Florida."},
+      {q:"The 9th Judicial Circuit covers which counties?",options:["Orange & Seminole","Osceola & Polk","Orange & Osceola","Orange & Lake"],correct:2,explain:"The 9th Judicial Circuit = Orange County + Osceola County. One certification, two counties!"},
+      {q:"What is the minimum passing score on the FAPPS exam?",options:["70%","75%","80%","85%"],correct:2,explain:"You must score at least 80% to pass the FAPPS written exam and receive your certificate."},
+      {q:"Is there a statewide process server license in Florida?",options:["Yes — issued by the Supreme Court","Yes — through FDLE","No — must certify in each circuit","Yes — covers South Florida"],correct:2,explain:"NO statewide license exists. You must be certified separately in each judicial circuit where you want to serve process."},
+    ]
+  },
+  {
+    id:2,emoji:"🚪",title:"Methods of Service",subtitle:"Chapter 48 Core Rules",color:C.purple,bg:C.purpleBg,readTime:"7 min",
+    lessons:[
+      {title:"Personal Service — The Gold Standard",icon:"🤝",content:`Personal service means handing the documents DIRECTLY to the person named. This is the BEST form of service — courts love it most.
+
+HOW IT WORKS (§48.031):
+Hand a copy of the process AND complaint directly to the named person. Simple and clean.
+
+✅ EMPLOYER RULE: If serving someone at work, the EMPLOYER must allow service in a PRIVATE area. Employer who refuses = noncriminal violation, fine up to $1,000!
+
+🔑 WHAT TO DOCUMENT:
+• Exact date and time
+• Exact address  
+• Full name of person served
+• Physical description
+• How you confirmed their identity
+
+🚨 DISINTERESTED: You cannot serve in cases where you are a party or have a financial interest.`},
+      {title:"Substitute Service — When They're Not Home",icon:"🏠",content:`When you can't find the person at their home, Florida allows substitute service — leaving papers with someone else.
+
+THE 3 REQUIREMENTS (§48.031(1)(a)) — ALL THREE must be met:
+
+1. 📍 USUAL PLACE OF ABODE — where defendant actually LIVES right now. One person, one abode at a time.
+
+2. 👥 QUALIFIED PERSON — must RESIDE there AND be AT LEAST 15 YEARS OLD. A visitor doesn't count! A 14-year-old doesn't count!
+
+3. 📢 INFORMED OF CONTENTS — you MUST tell them what the documents are about.
+
+SPOUSE SUBSTITUTION (§48.031(2)(a)):
+Serve defendant's spouse ANYWHERE in the county IF they live together and it's not an adversarial proceeding between spouses.
+
+SOLE PROPRIETOR (§48.031(2)(b)):
+After TWO failed attempts at place of business → leave with person in charge during business hours.
+
+⚠️ Mailbox = NOT valid. Sliding under door = NOT valid.`},
+      {title:"Serving Corporations, LLCs & Special Entities",icon:"🏢",content:`Different entities require different service methods. Know ALL of these for the exam!
+
+👶 MINORS (§48.041): Serve BOTH the minor AND their parent or guardian. TWO people!
+
+🧠 INCOMPETENT PERSONS (§48.042): Serve the court-appointed guardian.
+
+🏢 CORPORATIONS (§48.081):
+1st → Registered Agent
+2nd → President, VP, Cashier, Secretary, Director
+3rd → Person in charge during business hours (after 2 failed attempts)
+
+🤝 LLC (§48.062):
+1st → Registered Agent  
+2nd → Any member or manager
+
+👥 PARTNERSHIPS (§48.061): Any general partner first.
+
+🏦 FINANCIAL INSTITUTIONS (§48.092): Registered agent or any officer/manager at a branch.
+
+🏛️ STATE AGENCY (§48.111): Head of the agency or designated agent.
+
+🔑 GOLDEN RULE: Always try the REGISTERED AGENT first for any business entity!`},
+      {title:"Sunday Service & Time Rules",icon:"📅",content:`Florida has strict rules about WHEN you can serve. Get this wrong and service is void!
+
+☀️ NO SUNDAY SERVICE (§48.20):
+PROHIBITED on Sundays — PERIOD. Only exception is a court order specifically authorizing it. Urgency doesn't count. Client pressure doesn't count.
+
+⏰ THE 120-DAY RULE (Florida Rule of Civil Procedure 1.070):
+In FLORIDA STATE court, service must be completed within 120 days of filing. Miss this → case can be dismissed.
+
+⏰ THE 90-DAY RULE (Federal Rule of Civil Procedure 4(m)):
+In FEDERAL court, service must be completed within 90 days of filing.
+
+🔑 KNOW THIS FOR THE EXAM:
+• Florida state court = 120 DAYS
+• Federal court = 90 DAYS
+This is the #1 most tested comparison!
+
+⚠️ When approaching a deadline, ALWAYS notify the attorney so they can request an extension!`},
+    ],
+    quiz:[
+      {q:"For substitute service, the person receiving must be at least how old?",options:["13 years old","16 years old","15 years old","18 years old"],correct:2,explain:"§48.031(1)(a) — substitute service can be left with any person RESIDING at the address who is at least 15 years old."},
+      {q:"When serving a MINOR, who must be served?",options:["The minor only","The parent only","Both the minor AND the parent/guardian","The school or caregiver"],correct:2,explain:"§48.041 — you must serve BOTH the minor AND their parent or guardian. Serving only one is incomplete."},
+      {q:"When serving a corporation, who do you serve FIRST?",options:["The president","The secretary","The registered agent","Any employee"],correct:2,explain:"§48.081 — always attempt the registered agent FIRST for corporations. Then go to officers if unavailable."},
+      {q:"In Florida STATE court, how many days to complete service after filing?",options:["60 days","90 days","120 days","180 days"],correct:2,explain:"Florida Rule 1.070 — 120 days to complete service in state court. Federal court is 90 days — know the difference!"},
+      {q:"Can you serve process on a Sunday in Florida?",options:["Yes, anytime","Yes, but only before noon","No — prohibited unless court orders it","Yes, for urgent matters"],correct:2,explain:"§48.20 — Sunday service is PROHIBITED unless a court order specifically authorizes it. No exceptions for urgency."},
+      {q:"An employer who refuses to let you serve an employee at work faces what penalty?",options:["Nothing","A civil fine up to $500","A noncriminal violation, fine up to $1,000","Criminal charges"],correct:2,explain:"§48.031(1)(b) — employers MUST allow service in a private area. Refusal = noncriminal violation, up to $1,000 fine."},
+    ]
+  },
+  {
+    id:3,emoji:"📋",title:"Return of Service & Non-Service",subtitle:"Proper vs. Improper Affidavits",color:C.green,bg:C.greenBg,readTime:"6 min",
+    lessons:[
+      {title:"The Return of Service",icon:"📝",content:`After serving someone, you MUST file a Return of Service with the court. This is your official proof that service happened.
+
+WHAT MUST BE IN A VALID RETURN (§48.21):
+• Date and time of service
+• Address where service was made
+• Name of person served
+• Manner of service (personal, substitute, etc.)
+• For substitute: name, age, relationship of person who received it
+• Your signature under oath
+• Your CPS ID number
+
+✅ VALID RETURN: All fields complete, accurate, proper form, signed under oath.
+
+❌ INVALID RETURN: Missing date/time, wrong address, no signature, wrong person described, manner of service missing.
+
+🔑 Courts presume a facially valid return is correct — but evidence can rebut that presumption. ACCURACY MATTERS!
+
+For substitute service courts check:
+1. Was it defendant's USUAL place of abode?
+2. Was the person 15+ years old?
+3. Did they RESIDE there?
+4. Were they INFORMED of contents?`},
+      {title:"Non-Service & Due Diligence",icon:"🔍",content:`Sometimes you cannot complete service. That's okay — but you MUST document everything and show DUE DILIGENCE.
+
+DUE DILIGENCE = multiple reasonable attempts before giving up. Courts look at:
+• Number of attempts (generally 3+ minimum)
+• Different TIMES of day
+• Different DAYS of the week
+• Investigation steps taken
+
+YOUR NON-SERVICE AFFIDAVIT must include:
+• Every attempt: exact date, time, address
+• What you observed (lights, car, mail)
+• Why service could not be completed
+• Information gathered about defendant's whereabouts
+
+⚠️ Attempting only at the SAME time every day = NOT sufficient diligence!
+
+AFTER NON-SERVICE — notify attorney immediately! They may:
+→ Do a skip trace to find defendant
+→ Request service by publication (Chapter 49)
+→ Request more time from court
+
+🚨 NEVER mark service complete if it was NOT done. False return = felony!`},
+      {title:"Service by Publication — Chapter 49",icon:"📰",content:`When you've done EVERYTHING and still can't find the defendant, the court may allow Service by Publication. This is Chapter 49 of Florida Statutes — NOT Chapter 48!
+
+WHEN IS IT USED?
+• Defendant's whereabouts completely unknown
+• Defendant actively evading service
+• Property rights cases, divorce, quiet title
+
+THE PROCESS:
+1. Attorney files Diligent Search Affidavit
+2. Court approves service by publication
+3. Legal notice published in designated newspaper
+4. Published once per week for required number of weeks
+5. Proof of publication filed with court
+
+🔑 KEY FACTS:
+• Chapter 49 — NOT Chapter 48!
+• Requires proof of diligent search FIRST
+• Your non-service records feed into this process
+• Attorney handles the publication — your job is the documentation
+• LAST RESORT only
+
+Your thorough non-service documentation is what makes service by publication possible!`},
+    ],
+    quiz:[
+      {q:"What document does a process server file with the court after service?",options:["Proof of Delivery","Return of Service","Service Affidavit","Notice of Completion"],correct:1,explain:"The Return of Service is the official document filed with the court detailing when, where, how, and to whom service was made."},
+      {q:"For substitute service, the person receiving must be informed of what?",options:["Their right to refuse","The contents of the documents","The court date","Their attorney's information"],correct:1,explain:"§48.031 — the person receiving substitute service MUST be informed of the contents. This is one of 4 key elements courts examine."},
+      {q:"Service by Publication is governed by which Florida Statute chapter?",options:["Chapter 47","Chapter 48","Chapter 49","Chapter 50"],correct:2,explain:"Service by Publication = Chapter 49 — NOT Chapter 48. Chapter 48 covers regular service of process."},
+      {q:"What is 'due diligence' in process serving?",options:["Serving on the first try","Multiple attempts at different times/days before non-service","Waiting 30 days","Hiring a skip tracer"],correct:1,explain:"Due diligence = multiple attempts at different times and days, plus documenting all observations, before filing non-service."},
+      {q:"A false return of service in Florida is:",options:["A civil infraction","Grounds for suspension only","A felony of the third degree","An administrative violation"],correct:2,explain:"§48.021(4) — false return of service = FELONY OF THE THIRD DEGREE + permanent bar from serving process in Florida."},
+    ]
+  },
+  {
+    id:4,emoji:"📜",title:"Florida Rules of Civil Procedure",subtitle:"Rules 1.070, 1.808 & 7.070",color:C.orange,bg:C.orangeBg,readTime:"5 min",
+    lessons:[
+      {title:"Rule 1.070 — The 120-Day Rule",icon:"⏱️",content:`Florida Rule of Civil Procedure 1.070 is one of the MOST tested rules. It governs how process is issued and served in Florida state courts.
+
+ISSUANCE: The clerk issues the summons upon filing the complaint. Must be signed by clerk, bear court seal, identify parties.
+
+⏰ THE 120-DAY RULE (Rule 1.070(j)):
+Service must be completed within 120 days of filing. If not done in time:
+• Court notifies plaintiff
+• Case can be DISMISSED without prejudice
+• Plaintiff can ask for more time by showing "good cause"
+
+WHO CAN SERVE (Rule 1.070(b)):
+• The sheriff
+• Special process servers
+• Certified process servers (§§48.25-48.31)
+• Anyone appointed by court by motion and order
+
+🔑 PROCESS RUNS STATEWIDE: Under §48.011, summons runs throughout the ENTIRE state of Florida. Issued in Orange County → can be served anywhere in Florida!`},
+      {title:"Rule 1.808 — Certified Process Servers",icon:"🎓",content:`Florida Rule of Civil Procedure 1.808 specifically governs Certified Process Servers — YOUR rule!
+
+AUTHORIZATION: A CPS serves initial nonenforceable civil process within their certified circuit.
+• "Initial" = first papers in a case
+• "Nonenforceable" = delivering notice, not enforcing judgments
+
+✅ WHAT A CPS CAN SERVE:
+• Summons and complaints
+• Civil subpoenas
+• Criminal witness subpoenas
+• Criminal summonses
+
+❌ WHAT A CPS CANNOT SERVE:
+• Arrest warrants
+• Writs of execution
+• Writs of possession (evictions — sheriff only)
+
+🆔 ID CARD REQUIREMENT:
+Carry your CPS ID card ALWAYS. It includes your ID number, name, signature, photo, court seal, and expiration date.
+
+Annual renewal required — expired card = no longer authorized!`},
+      {title:"Rule 7.070 — Small Claims Court",icon:"💰",content:`Florida Small Claims Rule 7.070 governs service in SMALL CLAIMS COURT — cases of $8,000 or less.
+
+WHY THIS MATTERS: As a process server, you'll handle LOTS of small claims cases — landlord/tenant disputes, small debts, minor damages.
+
+SERVICE OPTIONS IN SMALL CLAIMS:
+• Personal service (same as regular civil)
+• Substitute service (same rules apply — 15+ resident, informed of contents)
+• Certified mail — the CLERK of court can mail process in small claims!
+• Sheriff's service
+
+🔑 KEY DIFFERENCE FROM REGULAR CIVIL:
+In regular circuit court, personal/substitute service is standard. In small claims, the CLERK can mail process — more flexible!
+
+SAME RULES STILL APPLY:
+• Sunday prohibition still in effect
+• Return of service requirements same
+• 120-day rule still applies
+• Substitute service age requirement (15+) same
+
+⚠️ Small claims cases are very common — you will see these constantly!`},
+    ],
+    quiz:[
+      {q:"Under Florida Rule 1.070, how many days to complete service after filing?",options:["60 days","90 days","120 days","150 days"],correct:2,explain:"Rule 1.070(j) — service in Florida state court must be completed within 120 DAYS of filing the complaint."},
+      {q:"Which Florida Rule specifically governs Certified Process Servers?",options:["Rule 1.070","Rule 1.808","Rule 7.070","Rule 4.010"],correct:1,explain:"Rule 1.808 specifically authorizes and governs Certified Process Servers in Florida."},
+      {q:"What does 'initial nonenforceable civil process' mean for a CPS?",options:["Serving arrest warrants","Serving the first papers in a case — not enforcing judgments","Serving writs of execution","Serving eviction writs"],correct:1,explain:"A CPS serves INITIAL (first papers) NONENFORCEABLE (notice only) civil process. No arrest warrants, no writs of execution."},
+      {q:"Rule 7.070 governs service in what type of court?",options:["Circuit court","Appellate court","Small claims court","Federal court"],correct:2,explain:"Rule 7.070 = Florida Small Claims Rules. Small claims handles cases of $8,000 or less."},
+      {q:"Process issued in one Florida county can be served:",options:["Only in that county","Only in adjacent counties","Anywhere in the state of Florida","Only in that judicial circuit"],correct:2,explain:"§48.011 — process runs throughout the ENTIRE STATE of Florida. Issued in Orange County → can be served anywhere in Florida."},
+    ]
+  },
+  {
+    id:5,emoji:"🇺🇸",title:"Federal Rules — FRCP Rule 4",subtitle:"Federal Service of Process",color:C.teal,bg:C.tealBg,readTime:"6 min",
+    lessons:[
+      {title:"Federal Rule 4 — The Basics",icon:"🏛️",content:`Federal Rule of Civil Procedure Rule 4 governs service of process in FEDERAL COURT — a must-know for the FAPPS exam!
+
+WHAT MUST A FEDERAL SUMMONS INCLUDE (Rule 4(a)):
+• Court name
+• Names of all parties
+• Plaintiff's attorney name and address
+• Time defendant must appear and respond
+• Warning that failure to appear = DEFAULT JUDGMENT
+• Clerk's signature and court seal
+
+WHO CAN SERVE IN FEDERAL COURT (Rule 4(c)):
+Any person AT LEAST 18 YEARS OLD and NOT a party to the case.
+
+🔑 KEY DIFFERENCE:
+• FLORIDA STATE: Must be sheriff, special PS, or Certified PS
+• FEDERAL: Any non-party who is 18+
+
+Federal court is MORE flexible about who can serve — but attorneys still usually hire certified servers for professionalism and reliability.`},
+      {title:"Federal Rule 4 — Deadlines & Waiver",icon:"⏰",content:`THE 90-DAY FEDERAL DEADLINE (Rule 4(m)):
+Service must be completed within 90 DAYS of filing. If missed → court dismisses without prejudice unless plaintiff shows GOOD CAUSE.
+
+METHODS OF SERVICE UNDER RULE 4:
+FOR INDIVIDUALS (Rule 4(e)):
+1. Follow state law where federal court sits (in Florida → use Florida methods)
+2. Personal delivery
+3. Leave at dwelling with person of suitable age and discretion
+
+FOR CORPORATIONS (Rule 4(h)):
+1. Follow state law, OR
+2. Deliver to officer, managing agent, or authorized agent
+
+WAIVER OF SERVICE (Rule 4(d)) — FEDERAL COURT ONLY!
+• Plaintiff MAILS a waiver request to defendant
+• If defendant signs and returns the form → no personal service needed
+• Defendant gets MORE TIME to respond: 60 days domestic, 90 days international
+• If defendant REFUSES without good cause → must PAY costs of service
+
+🔑 Waiver of service = FEDERAL COURT ONLY. Does NOT exist in Florida state court!`},
+      {title:"Florida vs. Federal — Side by Side",icon:"⚡",content:`This comparison is GOLD for the exam — know it cold!
+
+SERVICE DEADLINE:
+• Florida State → 120 DAYS (Rule 1.070)
+• Federal → 90 DAYS (Rule 4(m))
+
+WHO CAN SERVE:
+• Florida State → Sheriff, Special PS, or Certified PS only
+• Federal → Any non-party who is 18+
+
+WAIVER OF SERVICE:
+• Florida State → Does NOT exist
+• Federal → YES — mail form to defendant
+
+SUBSTITUTE SERVICE AGE:
+• Florida State → 15 years old minimum
+• Federal → "Suitable age and discretion" (no specific age)
+
+SUNDAY PROHIBITION:
+• Florida State → YES, prohibited (§48.20)
+• Federal → No specific Sunday prohibition
+
+SMALL CLAIMS:
+• Florida State → Rule 7.070, clerk can mail process
+• Federal → No small claims equivalent
+
+PROOF OF SERVICE:
+• Florida State → Return of Service filed with clerk
+• Federal → Affidavit of service (unless waived)
+
+🚨 #1 TEST TRAP: Mixing up 120 days (Florida) vs 90 days (federal). Florida = 120, Federal = 90!`},
+    ],
+    quiz:[
+      {q:"In FEDERAL court, how many days to complete service after filing?",options:["60 days","90 days","120 days","180 days"],correct:1,explain:"Federal Rule 4(m) — 90 DAYS in federal court. Florida state court = 120 days. Know the difference!"},
+      {q:"In federal court, who is allowed to serve process?",options:["Only U.S. Marshals","Only certified process servers","Any non-party who is at least 18 years old","Only attorneys"],correct:2,explain:"Rule 4(c) — any person who is NOT a party to the case AND is at least 18 years old can serve in federal court."},
+      {q:"'Waiver of service' exists in which court system?",options:["Florida state court only","Both Florida and federal","Federal court only","Neither — it doesn't exist"],correct:2,explain:"Waiver of service (Rule 4(d)) = FEDERAL COURT ONLY. Plaintiff mails form to defendant. Does NOT exist in Florida state court."},
+      {q:"If a federal defendant refuses to waive service without good cause, they must:",options:["Nothing happens","Case is dismissed","Pay the costs of service","Be served twice"],correct:2,explain:"Rule 4(d) — if a defendant unreasonably refuses to waive service, they must PAY the costs of making service."},
+      {q:"What is the correct comparison of service deadlines?",options:["Florida=90 days, Federal=120 days","Florida=60 days, Federal=90 days","Florida=120 days, Federal=90 days","Both=120 days"],correct:2,explain:"CRITICAL: Florida state = 120 DAYS. Federal = 90 DAYS. This is a favorite test question — don't mix them up!"},
+    ]
+  },
+  {
+    id:6,emoji:"📨",title:"Subpoenas, Writs & Special Documents",subtitle:"Types of Process You'll Serve",color:C.pink,bg:C.pinkBg,readTime:"5 min",
+    lessons:[
+      {title:"Subpoenas — Two Types",icon:"📋",content:`A subpoena is a court order requiring someone to appear or produce documents. You'll serve these CONSTANTLY as a process server!
+
+📋 SUBPOENA AD TESTIFICANDUM (Witness Subpoena):
+Commands a person to appear and TESTIFY in court or at a deposition.
+• Must be served personally in most cases
+• Witness fee may be required at time of service
+
+📄 SUBPOENA DUCES TECUM (Document Subpoena):
+Commands a person to PRODUCE documents, records, or evidence.
+• Very common in civil litigation
+• Used to get bank records, phone records, business documents
+
+CRIMINAL WITNESS SUBPOENAS:
+In misdemeanor/traffic cases → can be served by U.S. MAIL at least 7 DAYS before the required appearance date (§48.031(3)).
+
+🔑 KEY RULE: A witness cannot be required to appear without being properly served AND receiving their witness fee (where applicable). No fee when required = potentially invalid service!`},
+      {title:"Writs — Sheriff vs. CPS",icon:"⚡",content:`Writs are court orders commanding specific actions. Know what a CPS CAN and CANNOT serve!
+
+❌ SHERIFF ONLY — CPS CANNOT SERVE:
+• WRIT OF POSSESSION — landlord takes back property after eviction judgment
+• WRIT OF EXECUTION — seizing debtor's property to satisfy a judgment
+• ARREST WARRANTS — criminal enforcement
+
+✅ CPS CAN BE INVOLVED WITH:
+• WRIT OF GARNISHMENT — serving initial notice to employer/bank
+• INJUNCTIONS — delivering notice of restraining order (service is critical — order doesn't bind defendant until served!)
+• NOTICE TO APPEAR — small claims court (CPS can serve)
+
+🔑 RULE OF THUMB:
+ENFORCING a judgment (seizing property, arrests) → SHERIFF ONLY
+DELIVERING NOTICE of legal action → CPS can serve
+
+INJUNCTIONS ARE TIME-SENSITIVE: A restraining order doesn't protect anyone until the defendant is properly served. This is why injunction service is urgent!`},
+      {title:"Evictions & The Nail and Mail Rule",icon:"🏘️",content:`Eviction cases are EXTREMELY common in Orange and Osceola County — you WILL see these as a process server!
+
+THE EVICTION PROCESS:
+
+📬 3-DAY NOTICE: Landlord gives tenant notice to pay or vacate before filing in court. Not a court document but landlords often hire process servers to deliver it.
+
+🏛️ EVICTION SUMMONS (§48.183):
+When landlord files in court, you may serve the eviction summons.
+
+🔑 THE NAIL AND MAIL RULE (§48.183):
+For possession of premises cases — if you can't find the tenant:
+1. POST (nail/tape) a copy to the FRONT DOOR
+2. MAIL a copy to the defendant at that address
+
+This is an EXCEPTION to normal substitute service rules — normally you can't just leave papers at a door!
+
+AFTER JUDGMENT: The sheriff serves the Writ of Possession — NOT the CPS. Your job ends at the summons stage.
+
+⚠️ Nail and mail only applies to POSSESSION cases (evictions). Don't use this method for regular civil cases!`},
+    ],
+    quiz:[
+      {q:"What is a 'subpoena duces tecum'?",options:["A warrant for arrest","A command to appear and testify","A command to produce documents or records","A court order to pay money"],correct:2,explain:"Subpoena duces tecum = produce documents/records. Subpoena ad testificandum = appear and testify."},
+      {q:"Can a Certified Process Server serve a Writ of Execution?",options:["Yes, always","Yes, if court approves","No — writs of execution are served by the sheriff","Yes, in small claims cases"],correct:2,explain:"Writs of execution ENFORCE judgments by seizing property — that's the sheriff's job. A CPS serves INITIAL, NONENFORCEABLE process only."},
+      {q:"What is the 'nail and mail' rule used for?",options:["Serving corporations","Eviction summons when no one is home (§48.183)","Substitute service for minors","Service by publication"],correct:1,explain:"§48.183 — for eviction/possession cases, if no one is home you can POST on the door AND MAIL to defendant. Unique to possession cases!"},
+      {q:"Criminal witness subpoenas in misdemeanor cases served by mail require how much advance notice?",options:["3 days","5 days","7 days","14 days"],correct:2,explain:"§48.031(3) — criminal witness subpoenas served by mail must be mailed at least 7 DAYS before required appearance."},
+      {q:"An injunction takes effect against a defendant:",options:["When judge signs it","When filed with clerk","Only after defendant is properly served","When published in a newspaper"],correct:2,explain:"An injunction doesn't bind the defendant until they are properly SERVED. This is why injunction service is critical and time-sensitive!"},
+    ]
+  },
+  {
+    id:7,emoji:"⏳",title:"Time Limits & Diligence",subtitle:"Statutory Deadlines You Must Know",color:C.goldDark,bg:"#FFF8E8",readTime:"5 min",
+    lessons:[
+      {title:"Master Deadline List",icon:"📅",content:`Deadlines are HEAVILY tested on the FAPPS exam. Memorize ALL of these!
+
+⏰ SERVICE DEADLINES:
+• Florida state court → 120 DAYS from filing (Rule 1.070)
+• Federal court → 90 DAYS from filing (FRCP Rule 4(m))
+
+⏰ RESPONSE DEADLINES (good background knowledge):
+• Defendant response in state court → 20 days after service
+• Federal court default → 21 days after service
+• Federal waiver of service → 60 days to respond (90 days if outside US)
+
+⏰ SPECIFIC DEADLINES:
+• Criminal witness subpoena by mail → at least 7 DAYS before appearance
+• Waiver of service request → give defendant at least 30 days to return form
+• Affidavit of compliance (§48.161) after SOS substituted service → 40 DAYS
+
+🔑 MASTER CHEAT SHEET:
+120 days = Florida state court deadline
+90 days = Federal court deadline
+7 days = Mail service criminal witness subpoena
+40 days = Affidavit of compliance after SOS service
+30 days = Min time for federal waiver response`},
+      {title:"Reasonable Diligence — The Standard",icon:"🔍",content:`"Reasonable diligence" is one of the MOST IMPORTANT concepts you'll use every day as a process server.
+
+COURTS LOOK FOR:
+
+1. 📍 MULTIPLE LOCATION ATTEMPTS:
+• Tried known address multiple times
+• Checked with neighbors
+• Verified address through records
+
+2. ⏰ VARIED ATTEMPTS — THIS IS CRITICAL:
+• Different TIMES of day (morning, afternoon, evening)
+• Weekdays AND weekends
+• At least 3-4 attempts minimum
+• Attempting at same time every day = NOT sufficient!
+
+3. 📋 THOROUGH DOCUMENTATION:
+• Every attempt: exact date AND time
+• What you observed (lights on, car in driveway, mail in box)
+• Any conversations with neighbors or building staff
+
+4. 🔎 INVESTIGATION STEPS:
+• Checked employer if known
+• Spoke with family if available
+• Skip trace if authorized by attorney
+
+⚠️ COURT RULING: Simply going to the same address at the same time of day multiple times is NOT sufficient diligent search. You MUST vary your approach!`},
+      {title:"Gated Communities & Access Challenges",icon:"🏰",content:`Gated communities are a REAL challenge in Orange and Osceola Counties — there are MANY here in Central Florida!
+
+THE PROBLEM: Security guards sometimes refuse entry, claiming residents requested no visitors.
+
+THE TRUTH: A gated community CANNOT legally prevent service of court process. Security guards have no authority to permanently block lawful service.
+
+YOUR STEPS AT A GATED COMMUNITY:
+1. Identify yourself as a process server with a court document
+2. Ask security to contact the resident
+3. Document every interaction — date, time, guard's name
+4. If denied, request to speak with property management
+5. Document all refusals with specifics
+6. Notify the hiring attorney IMMEDIATELY
+7. Keep attempting — don't give up after one refusal
+
+ESCALATION (attorney's job, but know this):
+• Court can issue order specifically authorizing access
+• Sheriff can assist with access
+• Service by publication as absolute last resort
+
+🔑 YOUR JOB: Document EVERYTHING. Make every reasonable attempt. Give the attorney the evidence they need to pursue alternative service if necessary.`},
+    ],
+    quiz:[
+      {q:"How long to serve in Florida STATE court after filing?",options:["60 days","90 days","120 days","180 days"],correct:2,explain:"120 DAYS from the filing of the complaint under Florida Rule of Civil Procedure 1.070."},
+      {q:"Criminal witness subpoenas served by mail require how much advance notice?",options:["3 days","5 days","7 days","14 days"],correct:2,explain:"§48.031(3) — criminal witness subpoenas served by mail must be mailed at least 7 DAYS before the required appearance."},
+      {q:"Affidavit of compliance after SOS substituted service must be filed within:",options:["20 days","30 days","40 days","60 days"],correct:2,explain:"§48.161 — affidavit of compliance must be filed within 40 DAYS after serving the Secretary of State."},
+      {q:"What makes diligent search INSUFFICIENT?",options:["Attempting 3 times total","Attempting only at same time of day each visit","Not carrying ID","Serving on different days"],correct:1,explain:"Courts have held that attempting service only at the same time of day is NOT sufficient diligence. You must VARY times, days, and methods."},
+      {q:"When a gated community security guard refuses access, you should:",options:["Leave and file non-service immediately","Force your way in","Document everything, notify attorney, keep attempting","Call police immediately"],correct:2,explain:"Document every refusal with names/times, notify the attorney, and keep attempting. The attorney can seek court intervention. Never give up after one refusal!"},
+    ]
+  },
+  {
+    id:8,emoji:"🧭",title:"Ethics, Safety & Professionalism",subtitle:"Being a Great Process Server",color:C.charcoal,bg:"#F0EDE8",readTime:"4 min",
+    lessons:[
+      {title:"Ethics & Code of Conduct",icon:"⚖️",content:`As a Certified Process Server, your actions have real legal consequences. Ethics are EVERYTHING.
+
+CORE ETHICAL OBLIGATIONS:
+
+✅ HONESTY: Your return of service is sworn testimony. Every word must be accurate.
+
+✅ DISINTEREST: Cannot serve in cases where you have personal or financial interest. Can't serve your landlord, your ex, or someone you owe money to.
+
+✅ CONFIDENTIALITY: You learn sensitive legal information. Keep it private. Always.
+
+✅ NO FALSE RETURNS: False return = felony + permanent bar. There is NO situation where it's worth it.
+
+✅ PROFESSIONAL CONDUCT: You represent the court. Stay calm, don't argue, don't threaten. If hostile, leave and document.
+
+THE DEFENDANT WHO REFUSES TO TAKE PAPERS:
+They cannot escape service by refusing! Place the papers near them, state what they are, and document exactly what happened. Courts have upheld this as valid service.
+
+FAPPS CODE OF ETHICS covers:
+• Truthfulness in all returns and affidavits
+• Avoiding conflicts of interest
+• Professional conduct at all times
+• Reporting misconduct by other servers`},
+      {title:"Safety While Serving",icon:"🛡️",content:`Safety is a REAL concern. You're often delivering unwanted news to people who may be upset or hostile.
+
+BEFORE YOU GO:
+• Research the area — check if it's high-crime
+• Know your route and backup plan
+• Make sure someone knows where you're going
+• Fully charge your phone
+
+AT THE DOOR:
+• Stand to the SIDE — not directly in front
+• Have ID ready but don't display until you have the right person
+• Don't announce who you are until door opens
+• Keep body language neutral and non-threatening
+• Never put your foot in the door
+
+IF THINGS GET HOSTILE:
+• Stay calm — don't escalate
+• If threatened → LEAVE immediately. Your safety first!
+• Document everything that happened
+• Report to law enforcement if threats were made
+• Notify hiring attorney immediately
+
+🔑 FAPPS VIOLENCE REPORT: FAPPS maintains a database where servers report dangerous situations. Use it — it protects you AND other servers.
+
+⚠️ NEVER enter a private home without permission. You serve at the door. This is both a safety AND legal requirement.`},
+      {title:"Business Practices & Professional Tips",icon:"💼",content:`Running your process serving business professionally is just as important as knowing the law.
+
+RECORD KEEPING:
+• Log EVERY attempt — date, time, address, observations
+• Photograph address when serving (great documentation)
+• Keep copies of ALL returns of service
+• Track mileage for taxes
+• Keep all invoices and payment records
+
+YOUR ID CARD:
+• Carry it ALWAYS while serving
+• Your ID number goes on every return of service
+• If it expires → you are NO longer authorized to serve
+• Renew on time every year!
+
+WORKING WITH ATTORNEYS:
+• Confirm special instructions before going out
+• Communicate promptly — failed service? Notify immediately
+• Ask about deadlines upfront
+• Return completed paperwork quickly
+
+YOUR FEES (§48.29(8)):
+• You ARE entitled to charge a reasonable fee
+• Get your fee schedule in writing
+• Invoice promptly after completion
+
+🔑 PROFESSIONALISM = REPEAT BUSINESS: Attorneys work with servers they trust. Being reliable, accurate, and communicative builds your reputation and your income. This is your business, Jasz — treat it like one! 👑`},
+    ],
+    quiz:[
+      {q:"What does 'disinterested' mean for a process server?",options:["Bored with the job","Not caring about the outcome","Having no personal or financial stake in the case","Being politically neutral"],correct:2,explain:"DISINTERESTED = no personal or financial interest in the case. You cannot serve in cases where you are a party or have a stake in the outcome."},
+      {q:"If a defendant REFUSES to take the papers when you serve them, you should:",options:["Leave and file non-service","Force them to take it","Place papers near them, state what they are, document exactly what happened","Call the police immediately"],correct:2,explain:"A defendant cannot escape service by refusing papers. Place them nearby, state what they are, document everything. Courts have upheld this as valid service."},
+      {q:"FAPPS maintains what resource to protect process servers?",options:["Dept of Justice database","FAPPS Violence Report","FDLE Database","Circuit court registry"],correct:1,explain:"FAPPS maintains a Violence Report database so servers can report and check for dangerous situations associated with addresses or defendants."},
+      {q:"Under §48.29(8), can a Certified Process Server charge for services?",options:["No — service must be free","Only in federal cases","Yes — they may charge a reasonable fee","Only if court approves the fee"],correct:2,explain:"§48.29(8) — a CPS may charge a FEE for their services. Process serving is a profession and you are entitled to be compensated."},
+      {q:"What should you NEVER do when serving at a private home?",options:["Show your ID card","State your purpose","Enter the home without permission","Serve at the front door"],correct:2,explain:"NEVER enter a private home without permission. You serve at the door. Safety and legality both require this."},
+    ]
+  },
+];
+
+// ── KEY TERMS ─────────────────────────────────────────────────────────────────
+const KEY_TERMS = [
+  {term:"SUMMONS",definition:"A court document that tells someone they have been sued and must respond to the complaint."},
+  {term:"SUBPOENA",definition:"A court order commanding a person to appear in court or produce documents."},
+  {term:"PROCESS",definition:"Official court documents that command a person to take action — the foundation of service of process."},
+  {term:"PLAINTIFF",definition:"The person or party who files a lawsuit and initiates the legal action."},
+  {term:"DEFENDANT",definition:"The person or party who is being sued or served with legal process."},
+  {term:"AFFIDAVIT",definition:"A written statement made under oath, sworn to be true — your return of service is an affidavit."},
+  {term:"INJUNCTION",definition:"A court order requiring someone to stop a specific action or behavior."},
+  {term:"WRIT",definition:"A court order commanding a specific action, such as seizing property or releasing someone."},
+  {term:"GARNISHMENT",definition:"A court order directing a third party (employer or bank) to hold a debtor's money or property."},
+  {term:"DILIGENCE",definition:"The standard of making multiple reasonable attempts to serve process before declaring non-service."},
+  {term:"ABODE",definition:"A person's usual place of residence — where they actually live. One person can only have one abode at a time."},
+  {term:"REGISTERED AGENT",definition:"A person or entity designated to receive legal documents on behalf of a corporation or LLC."},
+  {term:"INDEMNIFY",definition:"To protect against or compensate for loss, damage, or liability — relevant to your surety bond."},
+  {term:"JURISDICTION",definition:"The legal authority of a court or process server to act within a defined geographic area."},
+  {term:"CIRCUIT",definition:"A judicial district — the 9th Circuit covers Orange County and Osceola County."},
+  {term:"SURETY BOND",definition:"A $5,000 bond required for CPS certification that guarantees your faithful performance of duties."},
+  {term:"CERTIORARI",definition:"A higher court's order to review a lower court's decision — a type of writ you may be asked to serve."},
+  {term:"AD TESTIFICANDUM",definition:"Latin term for a subpoena commanding someone to appear and TESTIFY in court."},
+  {term:"DUCES TECUM",definition:"Latin term for a subpoena commanding someone to PRODUCE documents or records."},
+  {term:"NON-SERVICE",definition:"When service cannot be completed — must be documented with all attempts and filed with the court."},
+];
+
+// ── SCENARIOS ─────────────────────────────────────────────────────────────────
+const SCENARIOS = [
+  {title:"🏠 The 14-Year-Old at the Door",situation:"You arrive to serve John Smith. He isn't home but his 14-year-old daughter answers. She says she lives there full time and offers to take the papers.",question:"Can you leave the documents with her?",options:["Yes — she lives there, that's enough","No — she must be at least 15 years old","Yes — any family member counts","No — only adults 18+ can accept"],correct:1,explain:"§48.031 requires the person accepting substitute service to be AT LEAST 15 years old. At 14, she does NOT qualify. Come back and try again!"},
+  {title:"📅 Sunday Pressure",situation:"It's Sunday at 2 PM. Your client is furious and demands you serve their ex today. You know the defendant is home right now.",question:"What do you do?",options:["Serve them — client is paying, it's urgent","Wait until Monday — Sunday service is prohibited without court order","Leave the docs in the mailbox so you didn't 'serve' them","Call the sheriff to serve on your behalf"],correct:1,explain:"§48.20 — Sunday service is PROHIBITED unless a court order specifically authorizes it. Client pressure doesn't change the law. Monday it is!"},
+  {title:"🏢 Registered Agent Is 'Out of Town'",situation:"You go to serve ABC Corp. The receptionist says the registered agent is out of town for 2 weeks and offers to sign for the documents herself.",question:"What is the correct action?",options:["Accept her offer — better than nothing","Leave and try again tomorrow","Ask if any officers (president, VP, secretary, director) are available","File non-service and move on"],correct:2,explain:"§48.081 — when the registered agent is unavailable, you can serve corporate officers. Ask for them before leaving. Don't give up too early!"},
+  {title:"📝 The False Return Temptation",situation:"After 4 attempts you still can't find the defendant. Your client hints they'll pay double if you just 'mark it as served.' No one would know.",question:"What do you do?",options:["Mark it served — 4 attempts is enough, close enough","Accept — no one will check","Refuse — false return is a felony, document your attempts and file non-service","Have a friend sign as witness"],correct:2,explain:"§48.021(4) — false return of service = FELONY OF THE THIRD DEGREE + permanent bar. Your career and freedom are not worth it. File proper non-service."},
+  {title:"🏰 Gated Community Blocked",situation:"You need to serve a defendant in a gated community. Security refuses entry, saying the resident 'does not accept visitors.'",question:"What do you do?",options:["Give up and file non-service immediately","Force your way past security","Document the refusal with date/time/guard's name, notify the attorney, and keep attempting","Call 911 immediately"],correct:2,explain:"Document everything and notify the attorney. They can seek a court order for access. Never give up after one refusal — courts require diligent effort!"},
+  {title:"👧 Serving a Minor",situation:"You have papers for 16-year-old Emma. Her mother answers the door and says Emma is upstairs. The mother offers to just take the papers for Emma.",question:"What is the correct way to complete service?",options:["Give papers to the mother — she's the adult in charge","Ask Emma to come down and serve only her","Serve BOTH Emma AND her mother","Mail the documents instead"],correct:2,explain:"§48.041 — when serving a minor, you MUST serve BOTH the minor AND their parent or guardian. Serving only one = incomplete service!"},
+  {title:"📬 The Mailbox Shortcut",situation:"After multiple failed attempts, you know the defendant lives at this address. You're tempted to just drop the documents in their mailbox and mark it served.",question:"Is this valid service?",options:["Yes — they'll definitely get it","Yes — if you take a photo","No — mailbox delivery is NOT valid service in Florida","Yes — for civil cases under $1,000"],correct:2,explain:"Dropping documents in a mailbox is NOT valid service of process in Florida. You need actual delivery to a qualified person. Document attempts and file non-service."},
+  {title:"⏰ Approaching the Deadline",situation:"A complaint was filed January 1st. It's now April 20th and you still haven't been able to serve the defendant. The attorney hasn't asked for an update.",question:"What should you be thinking about?",options:["No rush — courts are flexible","You have until December 31st","Rule 1.070 gives 120 days — deadline is May 1st! Alert the attorney immediately","Deadlines only apply in federal court"],correct:2,explain:"Florida Rule 1.070 — 120 days from January 1st = May 1st deadline. You have 10 days! Alert the attorney NOW so they can request an extension if needed."},
+];
+
+// ── FILL IN BLANKS ────────────────────────────────────────────────────────────
+const FILL_INS = [
+  {sentence:"Florida process servers are governed by Chapter ___ of the Florida Statutes.",answer:"48",hint:"Chapter 4-?"},
+  {sentence:"There is NO ___ license for process servers in Florida.",answer:"statewide",hint:"You need one per jurisdiction"},
+  {sentence:"Substitute service requires the recipient to be at least ___ years old.",answer:"15",hint:"Below driving age but above..."},
+  {sentence:"Service on a Sunday is prohibited unless authorized by a ___ ___.",answer:"court order",hint:"Only a judge can override this"},
+  {sentence:"The FAPPS new process server course is ___ hours long.",answer:"16",hint:"Two full 8-hour days"},
+  {sentence:"The minimum passing score on the FAPPS exam is ___.",answer:"80%",hint:"B or better!"},
+  {sentence:"The 9th Judicial Circuit covers Orange County and ___ County.",answer:"Osceola",hint:"Where Kissimmee is located!"},
+  {sentence:"When serving a corporation, you first attempt to serve the ___ ___.",answer:"registered agent",hint:"Their official legal contact"},
+  {sentence:"After completing service, you must file a ___ of service with the court.",answer:"return",hint:"Think 'return receipt'"},
+  {sentence:"Service by publication is governed by Chapter ___ of the Florida Statutes.",answer:"49",hint:"One more than Chapter 48"},
+  {sentence:"When serving a minor, you must serve BOTH the minor AND their ___ or guardian.",answer:"parent",hint:"Who's legally responsible for them?"},
+  {sentence:"Florida Rule of Civil Procedure ___ governs the 120-day deadline for service.",answer:"1.070",hint:"Rule one-point-zero-seven-zero"},
+  {sentence:"In federal court, service must be completed within ___ days of filing.",answer:"90",hint:"Less than Florida's 120"},
+  {sentence:"A CPS in the 9th Circuit must renew their certification ___.",answer:"annually",hint:"Every year!"},
+  {sentence:"A false return of service is a felony of the ___ degree.",answer:"third",hint:"Not first, not second..."},
+  {sentence:"For eviction cases, the ___ and ___ rule allows posting on the door plus mailing.",answer:"nail and mail",hint:"Two things you do with a hammer and post office"},
+  {sentence:"The surety bond required for CPS certification is $___.",answer:"5,000",hint:"Five thousand dollars"},
+  {sentence:"Subpoena ___ ___ means commanding someone to produce documents.",answer:"duces tecum",hint:"Latin — two words"},
+];
+
+// ── CHECKLISTS ─────────────────────────────────────────────────────────────────
+const CHECKLISTS = [
+  {title:"✅ Before You Go Out to Serve",color:C.blue,items:["Verify defendant's name is spelled correctly on all documents","Confirm the service address — cross-reference if possible","Know what type of service is required","Check for special instructions from the attorney","Make sure you're within your certified jurisdiction (9th Circuit)","Have your CPS ID card with you","Charge your phone fully","Know the entity type you're serving (individual, LLC, corp, minor, etc.)"]},
+  {title:"✅ At the Door — Personal Service",color:C.green,items:["Identify yourself as a process server","Ask if you are speaking to [defendant's full name]","Confirm their identity before handing documents","Hand ALL copies directly to the named person","Note the exact time, date, and location","Note a physical description of the person served","Stay calm and professional regardless of their reaction","Do NOT force entry or create a scene"]},
+  {title:"✅ At the Door — Substitute Service",color:C.purple,items:["Confirm defendant is NOT present at their usual place of abode","Verify the person at the door LIVES there (not just visiting)","Verify the person is AT LEAST 15 years old","INFORM them of the contents of the documents","Leave copies of ALL documents with that person","Note their name, approximate age, relationship to defendant","Note exact time, date, and address","Document why personal service was not possible"]},
+  {title:"✅ Completing Your Return of Service",color:C.orange,items:["Record exact date and time of service","Record exact address where service was made","Record full name of person served","Record manner of service (personal, substitute, etc.)","Include physical description if required","Sign and swear to the return under oath","File the return with the clerk of court promptly","Keep a copy for your own records"]},
+  {title:"✅ When You Cannot Complete Service",color:C.red,items:["Document EVERY attempt — date, time, observations","Make attempts at different times of day","Make attempts on different days of the week","Note vehicles, lights, mail, or signs of activity","Note any neighbor information gathered","Do NOT mark as served if service was NOT completed","File a proper Non-Service with all attempt documentation","Notify the attorney immediately"]},
+  {title:"✅ 9th Circuit CPS Application",color:C.goldDark,items:["Complete the FAPPS 16-hour education course","Pass the FAPPS written exam with 80% or higher","Obtain your course completion certificate","Submit to FDLE background investigation","Complete the 9th Circuit CPS application","Pay the application fee","Execute a $5,000 surety bond","Submit passport photos as required","Attend swearing-in ceremony","Plan for annual 4-hour CE renewal"]},
+];
+
+// ── FLASHCARD DATA ────────────────────────────────────────────────────────────
+const FLASHCARDS = [
+  {q:"What is 'Service of Process'?",a:"The legal procedure of officially delivering court documents to notify a person they're involved in legal action. Required by due process — no one goes to court without proper notification.",cat:"Basics"},
+  {q:"What chapter governs Florida process servers?",a:"Chapter 48 — specifically §§48.25–48.31 are the Florida Certified Process Servers Act.",cat:"Statutes"},
+  {q:"Who can serve process in Florida?",a:"1) Sheriff  2) Special Process Server (appointed by sheriff)  3) Certified Process Server (certified by Chief Judge of the circuit).",cat:"Basics"},
+  {q:"What is the 9th Judicial Circuit?",a:"The judicial circuit covering Orange County AND Osceola County, Florida. One certification covers both counties!",cat:"9th Circuit"},
+  {q:"What is Personal Service?",a:"Handing documents DIRECTLY to the named person — the gold standard of service.",cat:"Methods"},
+  {q:"What is Substitute Service?",a:"Leaving documents with a person 15+ years old who RESIDES at defendant's usual place of abode, after informing them of the contents.",cat:"Methods"},
+  {q:"What is 'usual place of abode'?",a:"Where the defendant actually LIVES at the time of service. A person can only have ONE at a time.",cat:"Methods"},
+  {q:"Can you do substitute service with a 14-year-old?",a:"NO! The person must be at LEAST 15 years old. (§48.031)",cat:"Methods"},
+  {q:"Can you serve on a Sunday in Florida?",a:"NO — §48.20 prohibits Sunday service UNLESS a court order specifically authorizes it.",cat:"Rules"},
+  {q:"Florida state court service deadline?",a:"120 DAYS from filing the complaint — Florida Rule 1.070.",cat:"Deadlines"},
+  {q:"Federal court service deadline?",a:"90 DAYS from filing — FRCP Rule 4(m). Don't mix up with Florida's 120 days!",cat:"Deadlines"},
+  {q:"What is a Return of Service?",a:"Official document filed with the court recording when, where, how, and to whom service was made. Signed under oath.",cat:"Returns"},
+  {q:"What is a false return of service?",a:"A FELONY OF THE THIRD DEGREE — plus permanent bar from serving process. Never do this.",cat:"Ethics"},
+  {q:"When serving a MINOR, who do you serve?",a:"BOTH the minor AND their parent or guardian — two people required! (§48.041)",cat:"Special"},
+  {q:"When serving a CORPORATION, who is first?",a:"The REGISTERED AGENT first. Then officers (president, VP, secretary, director) if agent unavailable. (§48.081)",cat:"Special"},
+  {q:"When serving an LLC, who is first?",a:"The REGISTERED AGENT first. Then any member or manager. (§48.062)",cat:"Special"},
+  {q:"What is Service by Publication?",a:"Publishing legal notice in a newspaper when defendant can't be found. Governed by Chapter 49 — not Chapter 48!",cat:"Methods"},
+  {q:"What is 'due diligence'?",a:"Multiple reasonable attempts at DIFFERENT times and days before declaring non-service. Same time every day = NOT enough.",cat:"Diligence"},
+  {q:"What is FRCP Rule 4?",a:"Federal Rule governing service of summons in federal court. Key: 90-day deadline, anyone 18+ non-party can serve, waiver of service option.",cat:"Federal"},
+  {q:"What is 'waiver of service'?",a:"FEDERAL COURT ONLY — plaintiff mails waiver form to defendant. If signed, personal service isn't needed. Does NOT exist in Florida state court.",cat:"Federal"},
+  {q:"What is 'disinterested' for a process server?",a:"Having NO personal or financial stake in the case. Cannot serve in cases where you are a party.",cat:"Ethics"},
+  {q:"What does Rule 1.808 authorize?",a:"Certified Process Servers to serve initial nonenforceable civil process within their certified circuit.",cat:"Rules"},
+  {q:"What is Subpoena Ad Testificandum?",a:"A subpoena commanding a person to APPEAR and TESTIFY in court or at a deposition.",cat:"Documents"},
+  {q:"What is Subpoena Duces Tecum?",a:"A subpoena commanding a person to PRODUCE DOCUMENTS, records, or evidence.",cat:"Documents"},
+  {q:"What is the 'nail and mail' rule?",a:"§48.183 — for eviction/possession cases, if no one home: post on the door AND mail a copy. Exception to normal substitute service rules.",cat:"Special"},
+  {q:"What is the FAPPS passing score?",a:"80% minimum. You must score at least 80% to receive your certificate.",cat:"9th Circuit"},
+  {q:"Criminal witness subpoena by mail — advance notice required?",a:"At least 7 DAYS before the required appearance date. (§48.031(3))",cat:"Deadlines"},
+  {q:"Affidavit of compliance after SOS service deadline?",a:"40 DAYS after serving the Secretary of State. (§48.161)",cat:"Deadlines"},
+  {q:"What is Rule 7.070?",a:"Florida Small Claims Rule — governs service in cases of $8,000 or less. Clerk can mail process in small claims.",cat:"Rules"},
+  {q:"Can a CPS serve a Writ of Execution?",a:"NO — writs of execution enforce judgments by seizing property. That's the SHERIFF's job only.",cat:"Documents"},
+];
+
+// ── CONFETTI ──────────────────────────────────────────────────────────────────
+function Confetti({active}){
+  const ref=React.useRef(null);
+  React.useEffect(()=>{
+    if(!active)return;
+    const c=ref.current;if(!c)return;
+    const ctx=c.getContext("2d");
+    c.width=window.innerWidth;c.height=window.innerHeight;
+    const pieces=Array.from({length:90},()=>({
+      x:Math.random()*c.width,y:Math.random()*-c.height,
+      r:Math.random()*8+4,
+      color:[C.gold,C.goldLight,"#fff",C.green,C.purple,C.blue][Math.floor(Math.random()*6)],
+      speed:Math.random()*3+2,swing:Math.random()*3-1.5,angle:0,
+    }));
+    let frame;
+    function draw(){
+      ctx.clearRect(0,0,c.width,c.height);
+      pieces.forEach(p=>{
+        ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.angle);
+        ctx.fillStyle=p.color;ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r);
+        ctx.restore();
+        p.y+=p.speed;p.x+=p.swing;p.angle+=0.05;
+        if(p.y>c.height){p.y=-10;p.x=Math.random()*c.width;}
+      });
+      frame=requestAnimationFrame(draw);
+    }
+    draw();
+    const t=setTimeout(()=>cancelAnimationFrame(frame),3500);
+    return()=>{cancelAnimationFrame(frame);clearTimeout(t);};
+  },[active]);
+  if(!active)return null;
+  return <canvas ref={ref} style={{position:"fixed",top:0,left:0,pointerEvents:"none",zIndex:9999}}/>;
+}
+
+function PBar({value,max,color}){
+  return(
+    <div style={{background:"#E8DFC8",borderRadius:99,height:8,overflow:"hidden"}}>
+      <div style={{height:"100%",width:`${Math.min(100,max>0?(value/max)*100:0)}%`,background:color,borderRadius:99,transition:"width 0.5s ease"}}/>
+    </div>
+  );
+}
+
+// ── HOME ──────────────────────────────────────────────────────────────────────
+function Home({completed,scores,setView,setMod}){
+  const daysLeft=Math.max(0,Math.ceil((new Date("2026-07-17")-new Date())/(1000*60*60*24)));
+  const totalQ=MODULES.reduce((a,m)=>a+m.quiz.length,0);
+  const totalC=Object.values(scores).reduce((a,s)=>a+(s.correct||0),0);
+  const pct=totalQ>0?Math.round((totalC/totalQ)*100):0;
+  const allDone=completed.length===MODULES.length;
+
+  return(
+    <div style={{background:C.cream,minHeight:"100vh",paddingBottom:32}}>
+      <div style={{background:`linear-gradient(160deg,${C.dark} 0%,#3D2410 50%,#1A1209 100%)`,padding:"28px 20px 24px",textAlign:"center"}}>
+        <div style={{fontSize:11,letterSpacing:4,color:C.goldLight,textTransform:"uppercase",marginBottom:6}}>J Empire Study System 👑</div>
+        <div style={{fontSize:24,fontWeight:900,color:C.goldLight,lineHeight:1.1}}>Process Server</div>
+        <div style={{fontSize:24,fontWeight:900,color:C.gold,lineHeight:1.1,marginBottom:12}}>Certification Prep</div>
+        <div style={{fontSize:11,color:"#C8B88A"}}>9th Judicial Circuit · Orange & Osceola Counties</div>
+        <div style={{margin:"14px auto 0",background:"rgba(201,168,76,0.15)",border:`2px solid ${C.gold}`,borderRadius:16,padding:"12px 20px",maxWidth:260}}>
+          <div style={{color:C.goldLight,fontSize:10,letterSpacing:2,textTransform:"uppercase"}}>Days Until Exam</div>
+          <div style={{color:C.goldLight,fontSize:52,fontWeight:900,lineHeight:1}}>{daysLeft}</div>
+          <div style={{color:"#C8B88A",fontSize:11}}>July 17, 2026 · You got this! 💪🏽</div>
+        </div>
+      </div>
+
+      <div style={{padding:"16px 16px 0"}}>
+        <div style={{background:C.card,borderRadius:16,padding:16,border:`2px solid ${C.border}`,marginBottom:16}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+            <div style={{fontSize:13,fontWeight:800,color:C.charcoal}}>📊 Overall Progress</div>
+            <div style={{fontSize:20,fontWeight:900,color:pct>=80?C.green:pct>=60?C.orange:C.red}}>{pct}%</div>
+          </div>
+          <PBar value={totalC} max={totalQ} color={pct>=80?C.green:pct>=60?C.orange:C.gold}/>
+          <div style={{display:"flex",justifyContent:"space-between",marginTop:6,fontSize:11,color:"#888"}}>
+            <span>{completed.length}/{MODULES.length} modules done</span>
+            <span>{totalC}/{totalQ} correct</span>
+          </div>
+          {pct>=80&&<div style={{marginTop:8,fontSize:12,color:C.green,fontWeight:700,textAlign:"center"}}>🏆 Above passing threshold!</div>}
+        </div>
+
+        {allDone&&(
+          <button onClick={()=>{setView("reset");}} style={{width:"100%",background:`linear-gradient(135deg,${C.gold},${C.goldDark})`,border:"none",borderRadius:16,padding:16,cursor:"pointer",textAlign:"center",marginBottom:14}}>
+            <div style={{fontSize:20}}>🔄</div>
+            <div style={{fontSize:14,fontWeight:800,color:C.dark,marginTop:4}}>Reset & Start Over</div>
+            <div style={{fontSize:11,color:C.charcoal,marginTop:2}}>All 8 modules complete! Run it again to lock it in 👑</div>
+          </button>
+        )}
+
+        <div style={{fontSize:11,fontWeight:800,color:"#888",letterSpacing:2,textTransform:"uppercase",marginBottom:10}}>📚 8 Study Modules</div>
+        {MODULES.map((mod,i)=>{
+          const done=completed.includes(mod.id);
+          const score=scores[mod.id];
+          const p=score?Math.round((score.correct/score.total)*100):null;
+          const locked=i>0&&!completed.includes(MODULES[i-1].id);
+          return(
+            <button key={mod.id} onClick={()=>{if(!locked){setMod(mod.id);setView("module");}}}
+              style={{width:"100%",background:C.card,border:`2px solid ${done?mod.color:locked?"#ddd":C.border}`,borderRadius:16,padding:"14px 16px",marginBottom:10,display:"flex",alignItems:"center",gap:12,cursor:locked?"not-allowed":"pointer",opacity:locked?0.5:1,textAlign:"left"}}>
+              <div style={{width:46,height:46,borderRadius:12,background:done?mod.color:locked?"#eee":mod.bg,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>
+                {locked?"🔒":done?"✅":mod.emoji}
+              </div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:13,fontWeight:800,color:done?mod.color:locked?"#aaa":C.charcoal}}>Module {mod.id}: {mod.title}</div>
+                <div style={{fontSize:11,color:"#888",marginTop:2}}>{mod.subtitle} · {mod.readTime}</div>
+                {score&&<div style={{marginTop:5}}><PBar value={score.correct} max={score.total} color={p>=80?C.green:p>=60?C.orange:C.red}/></div>}
+                {score&&<div style={{fontSize:10,color:p>=80?C.green:C.orange,fontWeight:700,marginTop:2}}>{p}% · {score.correct}/{score.total} correct</div>}
+              </div>
+              {!locked&&<div style={{fontSize:22,color:mod.color}}>›</div>}
+            </button>
+          );
+        })}
+
+        <div style={{fontSize:11,fontWeight:800,color:"#888",letterSpacing:2,textTransform:"uppercase",marginBottom:10,marginTop:8}}>⚡ Quick Practice</div>
+        {[
+          {id:"flashcards",icon:"🃏",label:"Flashcards",desc:"30 cards — flip to reveal answers",color:C.blue},
+          {id:"fillin",icon:"✏️",label:"Fill in the Blank",desc:"Type the missing word — answer key shown",color:C.orange},
+          {id:"scenarios",icon:"🎭",label:"Real Scenarios",desc:"8 real-world situations with explanations",color:C.green},
+          {id:"checklists",icon:"✅",label:"Checklists",desc:"Step-by-step tap-to-check lists",color:C.purple},
+          {id:"keyterms",icon:"🔤",label:"Key Terms Challenge",desc:"Definition shown — type the legal term",color:C.pink},
+          {id:"finalquiz",icon:"🎯",label:"Final Exam Practice",desc:"All modules · 40 questions · need 80%",color:C.charcoal},
+        ].map(b=>(
+          <button key={b.id} onClick={()=>setView(b.id)} style={{width:"100%",background:C.card,border:`2px solid ${b.color}`,borderRadius:14,padding:"14px 16px",marginBottom:10,display:"flex",alignItems:"center",gap:12,cursor:"pointer",textAlign:"left"}}>
+            <div style={{fontSize:26,width:40,textAlign:"center"}}>{b.icon}</div>
+            <div><div style={{fontSize:13,fontWeight:800,color:b.color}}>{b.label}</div><div style={{fontSize:11,color:"#888",marginTop:2}}>{b.desc}</div></div>
+            <div style={{marginLeft:"auto",fontSize:20,color:b.color}}>›</div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── MODULE VIEW ───────────────────────────────────────────────────────────────
+function ModView({moduleId,completed,setCompleted,scores,setScores,setView,setConfetti}){
+  const mod=MODULES.find(m=>m.id===moduleId);
+  const [stage,setStage]=React.useState("lessons");
+  const [lessonIdx,setLessonIdx]=React.useState(0);
+  const [qIdx,setQIdx]=React.useState(0);
+  const [selected,setSelected]=React.useState(null);
+  const [score,setScore]=React.useState(0);
+
+  const lesson=mod.lessons[lessonIdx];
+  const question=mod.quiz[qIdx];
+
+  function nextLesson(){if(lessonIdx+1<mod.lessons.length)setLessonIdx(l=>l+1);else setStage("quiz");}
+
+  function pick(i){
+    if(selected!==null)return;
+    setSelected(i);
+    if(i===question.correct)setScore(s=>s+1);
+  }
+
+  function nextQ(){
+    const isLast=qIdx+1>=mod.quiz.length;
+    if(isLast){
+      const finalScore=score+(selected===question.correct?1:0);
+      const p=Math.round((finalScore/mod.quiz.length)*100);
+      setScores(prev=>({...prev,[mod.id]:{correct:finalScore,total:mod.quiz.length}}));
+      if(!completed.includes(mod.id))setCompleted(prev=>[...prev,mod.id]);
+      if(p>=80){setConfetti(true);setTimeout(()=>setConfetti(false),3500);}
+      setStage("result");
+    }else{setQIdx(q=>q+1);setSelected(null);}
+  }
+
+  if(stage==="result"){
+    const s=scores[mod.id]||{correct:score,total:mod.quiz.length};
+    const p=Math.round((s.correct/s.total)*100);
+    return(
+      <div style={{background:C.cream,minHeight:"100vh",padding:24,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
+        <div style={{fontSize:64}}>{p>=80?"🏆":p>=60?"📚":"💪🏽"}</div>
+        <div style={{fontSize:36,fontWeight:900,color:p>=80?C.green:C.orange,marginTop:8}}>{p}%</div>
+        <div style={{fontSize:16,fontWeight:700,color:C.charcoal,marginTop:4}}>Module {mod.id} Complete!</div>
+        <div style={{fontSize:14,color:"#666",marginTop:4}}>{s.correct}/{s.total} correct</div>
+        <div style={{fontSize:13,color:p>=80?C.green:C.orange,fontWeight:700,marginTop:8,textAlign:"center"}}>
+          {p>=80?"🎉 Passing score! Next module unlocked!":"Keep going — retake until you hit 80%!"}
+        </div>
+        <div style={{fontSize:11,color:"#888",marginTop:4}}>Real exam requires 80% minimum</div>
+        <div style={{display:"flex",gap:10,marginTop:24,width:"100%",maxWidth:320}}>
+          <button onClick={()=>{setStage("quiz");setQIdx(0);setSelected(null);setScore(0);}} style={{flex:1,padding:14,borderRadius:12,border:`2px solid ${mod.color}`,background:"transparent",color:mod.color,fontWeight:800,cursor:"pointer",fontSize:13}}>Retry 🔄</button>
+          <button onClick={()=>setView("home")} style={{flex:1,padding:14,borderRadius:12,border:"none",background:mod.color,color:"#fff",fontWeight:800,cursor:"pointer",fontSize:13}}>Home 🏠</button>
+        </div>
+      </div>
+    );
+  }
+
+  if(stage==="quiz"){
+    return(
+      <div style={{background:C.cream,minHeight:"100vh"}}>
+        <div style={{background:mod.color,padding:"14px 16px 12px",display:"flex",alignItems:"center",gap:12}}>
+          <button onClick={()=>setView("home")} style={{background:"rgba(255,255,255,0.2)",border:"none",borderRadius:8,padding:"6px 10px",color:"#fff",cursor:"pointer",fontSize:16}}>←</button>
+          <div><div style={{fontSize:10,color:"rgba(255,255,255,0.8)",letterSpacing:1}}>MODULE {mod.id} QUIZ</div><div style={{fontSize:14,fontWeight:800,color:"#fff"}}>{mod.emoji} {mod.title}</div></div>
+          <div style={{marginLeft:"auto",fontSize:12,color:"rgba(255,255,255,0.8)"}}>{qIdx+1}/{mod.quiz.length}</div>
+        </div>
+        <div style={{padding:16}}>
+          <PBar value={qIdx} max={mod.quiz.length} color={mod.color}/>
+          <div style={{background:C.card,borderRadius:16,padding:20,marginTop:14,marginBottom:14,border:`2px solid ${mod.color}`}}>
+            <div style={{fontSize:10,color:mod.color,fontWeight:700,letterSpacing:2,marginBottom:10}}>❓ QUESTION {qIdx+1}</div>
+            <div style={{fontSize:16,fontWeight:700,color:C.charcoal,lineHeight:1.5}}>{question.q}</div>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:10}}>
+            {question.options.map((opt,i)=>{
+              let bg=C.card,border=`2px solid ${C.border}`,color=C.charcoal,fw=500;
+              if(selected!==null){
+                if(i===question.correct){bg=C.greenBg;border=`2px solid ${C.green}`;color=C.green;fw=700;}
+                else if(i===selected){bg=C.redBg;border=`2px solid ${C.red}`;color=C.red;fw=700;}
+              }
+              return(
+                <button key={i} onClick={()=>pick(i)} style={{background:bg,border,borderRadius:12,padding:"14px 16px",textAlign:"left",fontSize:14,color,fontWeight:fw,cursor:selected===null?"pointer":"default",display:"flex",gap:10,alignItems:"flex-start"}}>
+                  <span style={{fontWeight:800,minWidth:20}}>{["A","B","C","D"][i]}.</span><span>{opt}</span>
+                </button>
+              );
+            })}
+          </div>
+          {selected!==null&&(
+            <>
+              <div style={{background:selected===question.correct?C.greenBg:C.redBg,borderRadius:12,padding:14,marginTop:14,border:`1px solid ${selected===question.correct?C.green:C.red}`}}>
+                <div style={{fontSize:13,fontWeight:800,color:selected===question.correct?C.green:C.red,marginBottom:4}}>{selected===question.correct?"✅ That's right!":"❌ Not quite..."}</div>
+                <div style={{fontSize:13,color:C.charcoal,lineHeight:1.6}}>{question.explain}</div>
+              </div>
+              <button onClick={nextQ} style={{width:"100%",marginTop:14,padding:16,borderRadius:12,border:"none",background:mod.color,color:"#fff",fontWeight:800,fontSize:15,cursor:"pointer"}}>
+                {qIdx+1>=mod.quiz.length?"See Results 🏆":"Next Question →"}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return(
+    <div style={{background:C.cream,minHeight:"100vh"}}>
+      <div style={{background:`linear-gradient(135deg,${mod.color},${mod.color}CC)`,padding:"14px 16px 12px"}}>
+        <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:10}}>
+          <button onClick={()=>setView("home")} style={{background:"rgba(255,255,255,0.2)",border:"none",borderRadius:8,padding:"6px 10px",color:"#fff",cursor:"pointer",fontSize:16}}>←</button>
+          <div><div style={{fontSize:10,color:"rgba(255,255,255,0.8)",letterSpacing:1}}>MODULE {mod.id} OF {MODULES.length}</div><div style={{fontSize:14,fontWeight:800,color:"#fff"}}>{mod.emoji} {mod.title}</div></div>
+        </div>
+        <div style={{display:"flex",gap:6}}>
+          {mod.lessons.map((_,i)=>(
+            <div key={i} style={{flex:1,height:4,borderRadius:99,background:i<=lessonIdx?"#fff":"rgba(255,255,255,0.3)",transition:"background 0.3s"}}/>
+          ))}
+        </div>
+      </div>
+      <div style={{padding:16}}>
+        <div style={{background:C.card,borderRadius:20,overflow:"hidden",border:`2px solid ${C.border}`,marginBottom:16}}>
+          <div style={{background:mod.bg,padding:"14px 20px",borderBottom:`2px solid ${C.border}`,display:"flex",alignItems:"center",gap:10}}>
+            <div style={{fontSize:26}}>{lesson.icon}</div>
+            <div>
+              <div style={{fontSize:10,color:mod.color,fontWeight:700,letterSpacing:2,textTransform:"uppercase"}}>Lesson {lessonIdx+1} of {mod.lessons.length}</div>
+              <div style={{fontSize:15,fontWeight:800,color:C.charcoal}}>{lesson.title}</div>
+            </div>
+          </div>
+          <div style={{padding:"16px 20px"}}>
+            {lesson.content.split("\n").map((line,i)=>{
+              if(line.trim()==="")return <div key={i} style={{height:8}}/>;
+              const isBullet=line.trim().startsWith("•");
+              const isUpper=!isBullet&&line.trim()===line.trim().toUpperCase()&&line.trim().length>4&&!line.includes("—");
+              return(
+                <div key={i} style={{fontSize:isBullet?13:isUpper?11:14,fontWeight:isUpper?700:400,color:isUpper?mod.color:"#333",lineHeight:1.75,letterSpacing:isUpper?0.8:0,marginBottom:isBullet?1:0,paddingLeft:isBullet?8:0}}>
+                  {line}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div style={{display:"flex",gap:10}}>
+          {lessonIdx>0&&<button onClick={()=>setLessonIdx(l=>l-1)} style={{flex:1,padding:14,borderRadius:12,border:`2px solid ${mod.color}`,background:"transparent",color:mod.color,fontWeight:700,cursor:"pointer",fontSize:14}}>← Prev</button>}
+          <button onClick={nextLesson} style={{flex:2,padding:14,borderRadius:12,border:"none",background:mod.color,color:"#fff",fontWeight:800,cursor:"pointer",fontSize:15}}>
+            {lessonIdx+1<mod.lessons.length?"Next Lesson →":"Take the Quiz! 🎯"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── FLASHCARDS VIEW ───────────────────────────────────────────────────────────
+function FlashcardsView({setView}){
+  const [idx,setIdx]=React.useState(0);
+  const [flipped,setFlipped]=React.useState(false);
+  const [known,setKnown]=React.useState(new Set());
+  const [filter,setFilter]=React.useState("All");
+  const cats=["All",...new Set(FLASHCARDS.map(c=>c.cat))];
+  const cards=filter==="All"?FLASHCARDS:FLASHCARDS.filter(c=>c.cat===filter);
+  const card=cards[Math.min(idx,cards.length-1)];
+  function next(){setFlipped(false);setTimeout(()=>setIdx(i=>(i+1)%cards.length),80);}
+  function prev(){setFlipped(false);setTimeout(()=>setIdx(i=>(i-1+cards.length)%cards.length),80);}
+  return(
+    <div style={{background:C.cream,minHeight:"100vh"}}>
+      <div style={{background:C.charcoal,padding:"14px 16px",display:"flex",alignItems:"center",gap:10}}>
+        <button onClick={()=>setView("home")} style={{background:"rgba(255,255,255,0.1)",border:"none",borderRadius:8,padding:"6px 10px",color:"#fff",cursor:"pointer",fontSize:16}}>←</button>
+        <div style={{fontSize:15,fontWeight:800,color:C.goldLight}}>🃏 Flashcards</div>
+        <div style={{marginLeft:"auto",fontSize:12,color:"#C8B88A"}}>{idx+1}/{cards.length}</div>
+      </div>
+      <div style={{display:"flex",overflowX:"auto",gap:8,padding:"12px 16px 0"}}>
+        {cats.map(c=>(
+          <button key={c} onClick={()=>{setFilter(c);setIdx(0);setFlipped(false);}} style={{flex:"0 0 auto",padding:"6px 14px",borderRadius:20,border:`2px solid ${C.gold}`,background:filter===c?C.gold:"transparent",color:filter===c?C.dark:C.goldDark,fontSize:11,fontWeight:700,cursor:"pointer"}}>{c}</button>
+        ))}
+      </div>
+      <div style={{padding:16}}>
+        <PBar value={idx+1} max={cards.length} color={C.gold}/>
+        <div onClick={()=>setFlipped(f=>!f)} style={{background:flipped?C.charcoal:C.card,borderRadius:20,padding:28,minHeight:210,display:"flex",flexDirection:"column",justifyContent:"center",alignItems:"center",textAlign:"center",cursor:"pointer",border:`3px solid ${flipped?C.gold:C.border}`,marginTop:14,transition:"all 0.25s"}}>
+          <div style={{fontSize:10,fontWeight:700,letterSpacing:3,textTransform:"uppercase",color:flipped?C.goldLight:C.goldDark,marginBottom:12}}>{flipped?"ANSWER":`${card.cat} · Tap to flip`}</div>
+          <div style={{fontSize:flipped?14:16,fontWeight:flipped?500:700,color:flipped?"#C8B88A":C.charcoal,lineHeight:1.6}}>{flipped?card.a:card.q}</div>
+          {!flipped&&<div style={{marginTop:14,fontSize:28}}>👆</div>}
+        </div>
+        <div style={{display:"flex",gap:10,marginTop:14}}>
+          <button onClick={prev} style={{flex:1,padding:12,borderRadius:12,border:`2px solid ${C.gold}`,background:"transparent",color:C.goldDark,fontWeight:700,cursor:"pointer",fontSize:18}}>‹</button>
+          <button onClick={()=>{setKnown(k=>{const n=new Set(k);n.has(idx)?n.delete(idx):n.add(idx);return n;});next();}} style={{flex:2,padding:12,borderRadius:12,border:"none",background:known.has(idx)?C.green:C.greenBg,color:known.has(idx)?"#fff":C.green,fontWeight:700,cursor:"pointer",fontSize:13}}>
+            {known.has(idx)?"✓ Got It!":"Got It ✓"}
+          </button>
+          <button onClick={next} style={{flex:1,padding:12,borderRadius:12,border:`2px solid ${C.gold}`,background:"transparent",color:C.goldDark,fontWeight:700,cursor:"pointer",fontSize:18}}>›</button>
+        </div>
+        <div style={{textAlign:"center",marginTop:10,fontSize:12,color:C.green,fontWeight:700}}>{known.size}/{cards.length} mastered 🎯</div>
+      </div>
+    </div>
+  );
+}
+
+// ── FILL IN BLANK ─────────────────────────────────────────────────────────────
+function FillInView({setView}){
+  const [answers,setAnswers]=React.useState(Array(FILL_INS.length).fill(""));
+  const [checked,setChecked]=React.useState(Array(FILL_INS.length).fill(false));
+  const [results,setResults]=React.useState(Array(FILL_INS.length).fill(null));
+  const [hints,setHints]=React.useState(Array(FILL_INS.length).fill(false));
+
+  function check(i){
+    const correct=answers[i].trim().toLowerCase()===FILL_INS[i].answer.toLowerCase();
+    const nc=[...checked];nc[i]=true;setChecked(nc);
+    const nr=[...results];nr[i]=correct;setResults(nr);
+  }
+  function toggleHint(i){const h=[...hints];h[i]=!h[i];setHints(h);}
+  const score=results.filter(Boolean).length;
+  const attempted=checked.filter(Boolean).length;
+
+  return(
+    <div style={{background:C.cream,minHeight:"100vh"}}>
+      <div style={{background:C.orange,padding:"14px 16px",display:"flex",alignItems:"center",gap:10}}>
+        <button onClick={()=>setView("home")} style={{background:"rgba(255,255,255,0.2)",border:"none",borderRadius:8,padding:"6px 10px",color:"#fff",cursor:"pointer",fontSize:16}}>←</button>
+        <div style={{fontSize:15,fontWeight:800,color:"#fff"}}>✏️ Fill in the Blank</div>
+        <div style={{marginLeft:"auto",fontSize:12,color:"rgba(255,255,255,0.85)",fontWeight:700}}>✓ {score}/{attempted} correct</div>
+      </div>
+      <div style={{padding:16}}>
+        {FILL_INS.map((q,i)=>(
+          <div key={i} style={{background:C.card,borderRadius:14,padding:16,marginBottom:12,border:`2px solid ${results[i]===true?C.green:results[i]===false?C.red:C.border}`}}>
+            <div style={{fontSize:10,color:C.orange,fontWeight:700,letterSpacing:1,marginBottom:8}}>FILL IN #{i+1}</div>
+            <div style={{fontSize:14,color:C.charcoal,lineHeight:1.9,marginBottom:10}}>
+              {q.sentence.split("___").map((part,pi)=>(
+                <span key={pi}>
+                  {part}
+                  {pi===0&&(
+                    checked[i]?(
+                      <span style={{fontWeight:800,color:results[i]?C.green:C.red,textDecoration:results[i]?"none":"line-through"}}>
+                        {answers[i]||"___"}
+                        {!results[i]&&<span style={{color:C.green,textDecoration:"none"}}> → {q.answer}</span>}
+                      </span>
+                    ):(
+                      <input value={answers[i]} onChange={e=>{const a=[...answers];a[i]=e.target.value;setAnswers(a);}}
+                        onKeyDown={e=>e.key==="Enter"&&!checked[i]&&check(i)}
+                        placeholder="type answer..."
+                        style={{border:"none",borderBottom:`2px solid ${C.orange}`,background:"transparent",fontSize:14,fontWeight:700,color:C.blue,padding:"2px 6px",outline:"none",width:150}}/>
+                    )
+                  )}
+                </span>
+              ))}
+            </div>
+            <div style={{display:"flex",gap:8,alignItems:"center"}}>
+              {!checked[i]&&<>
+                <button onClick={()=>check(i)} style={{padding:"8px 16px",borderRadius:8,border:"none",background:C.orange,color:"#fff",fontWeight:700,fontSize:12,cursor:"pointer"}}>Check ✓</button>
+                <button onClick={()=>toggleHint(i)} style={{padding:"8px 12px",borderRadius:8,border:`1px solid ${C.orange}`,background:"transparent",color:C.orange,fontSize:12,cursor:"pointer"}}>💡 Hint</button>
+              </>}
+              {results[i]===true&&<span style={{color:C.green,fontWeight:700,fontSize:13}}>✅ Correct!</span>}
+              {results[i]===false&&<span style={{color:C.red,fontWeight:700,fontSize:13}}>❌ See answer above ↑</span>}
+            </div>
+            {hints[i]&&!checked[i]&&<div style={{marginTop:8,fontSize:12,color:C.purple,fontStyle:"italic"}}>💡 {q.hint}</div>}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── SCENARIOS ─────────────────────────────────────────────────────────────────
+function ScenariosView({setView}){
+  const [idx,setIdx]=React.useState(0);
+  const [selected,setSelected]=React.useState(null);
+  const [score,setScore]=React.useState(0);
+  const [done,setDone]=React.useState(false);
+  const s=SCENARIOS[idx];
+
+  function pick(i){
+    if(selected!==null)return;
+    setSelected(i);
+    if(i===s.correct)setScore(sc=>sc+1);
+  }
+  function next(){if(idx+1<SCENARIOS.length){setIdx(i=>i+1);setSelected(null);}else setDone(true);}
+  function restart(){setIdx(0);setSelected(null);setScore(0);setDone(false);}
+
+  if(done){
+    const pct=Math.round((score/SCENARIOS.length)*100);
+    return(
+      <div style={{background:C.cream,minHeight:"100vh",padding:24,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
+        <div style={{fontSize:64}}>{pct>=80?"🏆":pct>=60?"📚":"💪🏽"}</div>
+        <div style={{fontSize:36,fontWeight:900,color:pct>=80?C.green:C.orange,marginTop:8}}>{pct}%</div>
+        <div style={{fontSize:14,color:"#666",marginTop:4}}>{score}/{SCENARIOS.length} scenarios correct</div>
+        <div style={{fontSize:13,color:pct>=80?C.green:C.orange,fontWeight:700,marginTop:8,textAlign:"center"}}>
+          {pct>=80?"You handled every situation like a pro! 👑":"Study those scenarios — real life WILL test you!"}
+        </div>
+        <div style={{display:"flex",gap:10,marginTop:24,width:"100%",maxWidth:300}}>
+          <button onClick={restart} style={{flex:1,padding:14,borderRadius:12,border:`2px solid ${C.green}`,background:"transparent",color:C.green,fontWeight:800,cursor:"pointer"}}>Retry 🔄</button>
+          <button onClick={()=>setView("home")} style={{flex:1,padding:14,borderRadius:12,border:"none",background:C.gold,color:C.dark,fontWeight:800,cursor:"pointer"}}>Home 🏠</button>
+        </div>
+      </div>
+    );
+  }
+
+  return(
+    <div style={{background:C.cream,minHeight:"100vh"}}>
+      <div style={{background:`linear-gradient(135deg,${C.green},#1A5035)`,padding:"14px 16px",display:"flex",alignItems:"center",gap:10}}>
+        <button onClick={()=>setView("home")} style={{background:"rgba(255,255,255,0.2)",border:"none",borderRadius:8,padding:"6px 10px",color:"#fff",cursor:"pointer",fontSize:16}}>←</button>
+        <div style={{fontSize:15,fontWeight:800,color:"#fff"}}>🎭 Real Scenarios</div>
+        <div style={{marginLeft:"auto",fontSize:12,color:"rgba(255,255,255,0.85)",fontWeight:700}}>{idx+1}/{SCENARIOS.length} · ✓{score}</div>
+      </div>
+      <div style={{padding:16}}>
+        <div style={{background:`linear-gradient(135deg,${C.charcoal},${C.dark})`,borderRadius:16,padding:20,marginBottom:14,border:`2px solid ${C.gold}`}}>
+          <div style={{fontSize:15,fontWeight:800,color:C.goldLight,marginBottom:10}}>{s.title}</div>
+          <div style={{fontSize:14,color:"#D4C8A8",lineHeight:1.65,marginBottom:14}}>{s.situation}</div>
+          <div style={{background:"rgba(201,168,76,0.2)",borderRadius:10,padding:10,border:`1px solid ${C.gold}`}}>
+            <div style={{fontSize:13,fontWeight:700,color:C.goldLight}}>❓ {s.question}</div>
+          </div>
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:14}}>
+          {s.options.map((opt,i)=>{
+            let bg=C.card,border=`2px solid ${C.border}`,color=C.charcoal,fw=500;
+            if(selected!==null){
+              if(i===s.correct){bg=C.greenBg;border=`2px solid ${C.green}`;color=C.green;fw=700;}
+              else if(i===selected){bg=C.redBg;border=`2px solid ${C.red}`;color=C.red;fw=700;}
+            }
+            return(
+              <button key={i} onClick={()=>pick(i)} style={{background:bg,border,borderRadius:12,padding:"14px 16px",textAlign:"left",fontSize:13,color,fontWeight:fw,cursor:selected===null?"pointer":"default",display:"flex",gap:10,alignItems:"flex-start"}}>
+                <span style={{fontWeight:800,minWidth:20}}>{["A","B","C","D"][i]}.</span><span>{opt}</span>
+              </button>
+            );
+          })}
+        </div>
+        {selected!==null&&(
+          <>
+            <div style={{background:selected===s.correct?C.greenBg:C.redBg,borderRadius:12,padding:14,marginBottom:14,border:`1px solid ${selected===s.correct?C.green:C.red}`}}>
+              <div style={{fontSize:13,fontWeight:800,color:selected===s.correct?C.green:C.red,marginBottom:4}}>{selected===s.correct?"✅ Great call!":"❌ Not the right move..."}</div>
+              <div style={{fontSize:13,color:C.charcoal,lineHeight:1.6}}>{s.explain}</div>
+            </div>
+            <button onClick={next} style={{width:"100%",padding:14,borderRadius:12,border:"none",background:C.green,color:"#fff",fontWeight:800,fontSize:14,cursor:"pointer"}}>
+              {idx+1>=SCENARIOS.length?"See Results 🏆":"Next Scenario →"}
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── CHECKLISTS ────────────────────────────────────────────────────────────────
+function ChecklistsView({setView}){
+  const [checked,setChecked]=React.useState(()=>CHECKLISTS.map(c=>Array(c.items.length).fill(false)));
+  const [open,setOpen]=React.useState(0);
+  function toggle(ci,ii){const n=checked.map((c,ci2)=>ci2===ci?c.map((v,ii2)=>ii2===ii?!v:v):c);setChecked(n);}
+  function reset(ci){const n=checked.map((c,ci2)=>ci2===ci?Array(c.length).fill(false):c);setChecked(n);}
+  return(
+    <div style={{background:C.cream,minHeight:"100vh"}}>
+      <div style={{background:C.purple,padding:"14px 16px",display:"flex",alignItems:"center",gap:10}}>
+        <button onClick={()=>setView("home")} style={{background:"rgba(255,255,255,0.2)",border:"none",borderRadius:8,padding:"6px 10px",color:"#fff",cursor:"pointer",fontSize:16}}>←</button>
+        <div style={{fontSize:15,fontWeight:800,color:"#fff"}}>✅ Checklists</div>
+      </div>
+      <div style={{padding:16}}>
+        {CHECKLISTS.map((list,ci)=>{
+          const done=checked[ci].filter(Boolean).length;
+          const isOpen=open===ci;
+          return(
+            <div key={ci} style={{background:C.card,borderRadius:16,marginBottom:12,overflow:"hidden",border:`2px solid ${list.color}`}}>
+              <button onClick={()=>setOpen(isOpen?-1:ci)} style={{width:"100%",padding:"14px 16px",background:isOpen?list.color:"transparent",border:"none",cursor:"pointer",textAlign:"left",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <div>
+                  <div style={{fontSize:14,fontWeight:800,color:isOpen?"#fff":list.color}}>{list.title}</div>
+                  <div style={{fontSize:11,color:isOpen?"rgba(255,255,255,0.8)":"#999",marginTop:2}}>{done}/{list.items.length} completed</div>
+                </div>
+                <div style={{display:"flex",alignItems:"center",gap:8}}>
+                  <div style={{background:isOpen?"rgba(255,255,255,0.3)":"#eee",borderRadius:20,height:6,width:50,overflow:"hidden"}}>
+                    <div style={{height:"100%",background:isOpen?"#fff":list.color,width:`${(done/list.items.length)*100}%`}}/>
+                  </div>
+                  <span style={{color:isOpen?"#fff":list.color,fontSize:16}}>{isOpen?"▲":"▼"}</span>
+                </div>
+              </button>
+              {isOpen&&(
+                <div style={{padding:"4px 16px 14px"}}>
+                  {list.items.map((item,ii)=>(
+                    <button key={ii} onClick={()=>toggle(ci,ii)} style={{width:"100%",display:"flex",alignItems:"flex-start",gap:12,padding:"10px 0",background:"transparent",border:"none",borderBottom:ii<list.items.length-1?"1px solid #f0e8d8":"none",cursor:"pointer",textAlign:"left"}}>
+                      <div style={{width:22,height:22,borderRadius:6,border:`2px solid ${checked[ci][ii]?list.color:"#ccc"}`,background:checked[ci][ii]?list.color:"transparent",flexShrink:0,marginTop:1,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                        {checked[ci][ii]&&<span style={{color:"#fff",fontSize:12,fontWeight:900}}>✓</span>}
+                      </div>
+                      <span style={{fontSize:13,color:checked[ci][ii]?"#999":C.charcoal,textDecoration:checked[ci][ii]?"line-through":"none",lineHeight:1.5}}>{item}</span>
+                    </button>
+                  ))}
+                  <button onClick={()=>reset(ci)} style={{marginTop:8,padding:"6px 14px",borderRadius:8,border:`1px solid ${list.color}`,background:"transparent",color:list.color,fontSize:11,cursor:"pointer"}}>Reset List</button>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── KEY TERMS ─────────────────────────────────────────────────────────────────
+function KeyTermsView({setView}){
+  const [idx,setIdx]=React.useState(0);
+  const [input,setInput]=React.useState("");
+  const [checked,setChecked]=React.useState(false);
+  const [correct,setCorrect]=React.useState(null);
+  const [score,setScore]=React.useState(0);
+  const [done,setDone]=React.useState(false);
+  const [shuffled]=React.useState(()=>[...KEY_TERMS].sort(()=>Math.random()-0.5));
+  const term=shuffled[idx];
+
+  function checkAnswer(){
+    const isCorrect=input.trim().toLowerCase()===term.term.toLowerCase();
+    setCorrect(isCorrect);
+    setChecked(true);
+    if(isCorrect)setScore(s=>s+1);
+  }
+
+  function next(){
+    if(idx+1>=shuffled.length)setDone(true);
+    else{setIdx(i=>i+1);setInput("");setChecked(false);setCorrect(null);}
+  }
+
+  function restart(){setIdx(0);setInput("");setChecked(false);setCorrect(null);setScore(0);setDone(false);}
+
+  if(done){
+    const pct=Math.round((score/shuffled.length)*100);
+    return(
+      <div style={{background:C.cream,minHeight:"100vh",padding:24,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
+        <div style={{fontSize:64}}>{pct>=80?"🏆":pct>=60?"📖":"✏️"}</div>
+        <div style={{fontSize:36,fontWeight:900,color:pct>=80?C.green:C.orange,marginTop:8}}>{pct}%</div>
+        <div style={{fontSize:14,color:"#666",marginTop:4}}>{score}/{shuffled.length} terms correct</div>
+        <div style={{fontSize:13,color:pct>=80?C.green:C.orange,fontWeight:700,marginTop:8,textAlign:"center"}}>
+          {pct>=80?"Your legal vocabulary is locked in! 👑":"Keep drilling — legal terms matter on the exam!"}
+        </div>
+        <div style={{display:"flex",gap:10,marginTop:24,width:"100%",maxWidth:300}}>
+          <button onClick={restart} style={{flex:1,padding:14,borderRadius:12,border:`2px solid ${C.pink}`,background:"transparent",color:C.pink,fontWeight:800,cursor:"pointer"}}>Retry 🔄</button>
+          <button onClick={()=>setView("home")} style={{flex:1,padding:14,borderRadius:12,border:"none",background:C.gold,color:C.dark,fontWeight:800,cursor:"pointer"}}>Home 🏠</button>
+        </div>
+      </div>
+    );
+  }
+
+  return(
+    <div style={{background:C.cream,minHeight:"100vh"}}>
+      <div style={{background:C.pink,padding:"14px 16px",display:"flex",alignItems:"center",gap:10}}>
+        <button onClick={()=>setView("home")} style={{background:"rgba(255,255,255,0.2)",border:"none",borderRadius:8,padding:"6px 10px",color:"#fff",cursor:"pointer",fontSize:16}}>←</button>
+        <div style={{fontSize:15,fontWeight:800,color:"#fff"}}>🔤 Key Terms Challenge</div>
+        <div style={{marginLeft:"auto",fontSize:12,color:"rgba(255,255,255,0.85)",fontWeight:700}}>{idx+1}/{shuffled.length} · ✓{score}</div>
+      </div>
+      <div style={{padding:16}}>
+        <PBar value={idx} max={shuffled.length} color={C.pink}/>
+        <div style={{background:`linear-gradient(135deg,${C.charcoal},${C.dark})`,borderRadius:20,padding:24,marginTop:14,marginBottom:16,border:`2px solid ${C.gold}`,textAlign:"center"}}>
+          <div style={{fontSize:10,color:C.goldLight,letterSpacing:3,textTransform:"uppercase",marginBottom:10}}>Definition — What is this term?</div>
+          <div style={{fontSize:16,color:"#D4C8A8",lineHeight:1.7,fontStyle:"italic"}}>{term.definition}</div>
+        </div>
+
+        {!checked?(
+          <>
+            <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&input.trim()&&checkAnswer()}
+              placeholder="Type the legal term..."
+              style={{width:"100%",padding:"16px",borderRadius:12,border:`2px solid ${C.pink}`,fontSize:16,fontWeight:700,color:C.charcoal,outline:"none",background:C.card,boxSizing:"border-box",letterSpacing:1}}/>
+            <button onClick={checkAnswer} disabled={!input.trim()} style={{width:"100%",marginTop:12,padding:16,borderRadius:12,border:"none",background:input.trim()?C.pink:"#ddd",color:input.trim()?"#fff":"#999",fontWeight:800,fontSize:15,cursor:input.trim()?"pointer":"not-allowed"}}>
+              Check My Answer ✓
+            </button>
+          </>
+        ):(
+          <>
+            <div style={{background:correct?C.greenBg:C.redBg,borderRadius:16,padding:20,border:`2px solid ${correct?C.green:C.red}`,textAlign:"center",marginBottom:14}}>
+              <div style={{fontSize:13,fontWeight:700,color:correct?C.green:C.red,marginBottom:8}}>{correct?"✅ That's right!":"❌ Not quite..."}</div>
+              <div style={{fontSize:11,color:"#888",marginBottom:4}}>Your answer:</div>
+              <div style={{fontSize:18,fontWeight:800,color:correct?C.green:C.red,textDecoration:correct?"none":"line-through",letterSpacing:1}}>{input}</div>
+              {!correct&&<>
+                <div style={{fontSize:11,color:"#888",marginTop:10,marginBottom:4}}>Correct answer:</div>
+                <div style={{fontSize:20,fontWeight:900,color:C.green,letterSpacing:2}}>{term.term}</div>
+              </>}
+            </div>
+            <button onClick={next} style={{width:"100%",padding:16,borderRadius:12,border:"none",background:C.pink,color:"#fff",fontWeight:800,fontSize:15,cursor:"pointer"}}>
+              {idx+1>=shuffled.length?"See Final Score 🏆":"Next Term →"}
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── FINAL QUIZ ────────────────────────────────────────────────────────────────
+function FinalQuizView({setView,setConfetti}){
+  const allQs=MODULES.flatMap(m=>m.quiz.map(q=>({...q,modColor:m.color,modEmoji:m.emoji,modTitle:m.title})));
+  const [shuffled]=React.useState(()=>[...allQs].sort(()=>Math.random()-0.5));
+  const [idx,setIdx]=React.useState(0);
+  const [selected,setSelected]=React.useState(null);
+  const [score,setScore]=React.useState(0);
+  const [done,setDone]=React.useState(false);
+  const q=shuffled[idx];
+
+  function pick(i){if(selected!==null)return;setSelected(i);if(i===q.correct)setScore(s=>s+1);}
+  function next(){
+    if(idx+1>=shuffled.length){
+      const finalScore=score+(selected===q.correct?1:0);
+      const p=Math.round((finalScore/shuffled.length)*100);
+      if(p>=80){setConfetti(true);setTimeout(()=>setConfetti(false),3500);}
+      setDone(true);
+    }else{setIdx(i=>i+1);setSelected(null);}
+  }
+
+  if(done){
+    const pct=Math.round((score/shuffled.length)*100);
+    return(
+      <div style={{background:C.cream,minHeight:"100vh",padding:24,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
+        <div style={{fontSize:64}}>{pct>=80?"🏆":pct>=60?"📚":"💪🏽"}</div>
+        <div style={{fontSize:42,fontWeight:900,color:pct>=80?C.green:pct>=60?C.orange:C.red,marginTop:8}}>{pct}%</div>
+        <div style={{fontSize:16,fontWeight:700,color:C.charcoal,marginTop:4}}>Final Practice Exam</div>
+        <div style={{fontSize:14,color:"#666",marginTop:4}}>{score}/{shuffled.length} correct</div>
+        <div style={{background:pct>=80?C.greenBg:C.redBg,border:`2px solid ${pct>=80?C.green:C.red}`,borderRadius:12,padding:14,marginTop:14,width:"100%",maxWidth:320,textAlign:"center"}}>
+          <div style={{fontSize:14,fontWeight:800,color:pct>=80?C.green:C.red}}>{pct>=80?"🎉 PASSING SCORE! You're exam-ready!":"Keep studying — 80% needed to pass!"}</div>
+          <div style={{fontSize:11,color:"#666",marginTop:4}}>Real FAPPS exam also requires 80% minimum</div>
+        </div>
+        <div style={{display:"flex",gap:10,marginTop:20,width:"100%",maxWidth:320}}>
+          <button onClick={()=>{setIdx(0);setSelected(null);setScore(0);setDone(false);}} style={{flex:1,padding:14,borderRadius:12,border:`2px solid ${C.purple}`,background:"transparent",color:C.purple,fontWeight:800,cursor:"pointer"}}>Retry 🔄</button>
+          <button onClick={()=>setView("home")} style={{flex:1,padding:14,borderRadius:12,border:"none",background:C.gold,color:C.dark,fontWeight:800,cursor:"pointer"}}>Home 🏠</button>
+        </div>
+      </div>
+    );
+  }
+
+  return(
+    <div style={{background:C.cream,minHeight:"100vh"}}>
+      <div style={{background:`linear-gradient(135deg,${C.purple},#3D1A6B)`,padding:"14px 16px",display:"flex",alignItems:"center",gap:10}}>
+        <button onClick={()=>setView("home")} style={{background:"rgba(255,255,255,0.15)",border:"none",borderRadius:8,padding:"6px 10px",color:"#fff",cursor:"pointer",fontSize:16}}>←</button>
+        <div><div style={{fontSize:10,color:"rgba(255,255,255,0.7)"}}>FINAL EXAM PRACTICE</div><div style={{fontSize:14,fontWeight:800,color:"#fff"}}>🎯 All 8 Modules</div></div>
+        <div style={{marginLeft:"auto",fontSize:12,color:"rgba(255,255,255,0.8)",fontWeight:700}}>{idx+1}/{shuffled.length} · ✓{score}</div>
+      </div>
+      <div style={{padding:16}}>
+        <PBar value={idx} max={shuffled.length} color={C.purple}/>
+        <div style={{marginTop:8,marginBottom:12}}>
+          <span style={{background:q.modColor+"22",color:q.modColor,padding:"3px 10px",borderRadius:99,fontSize:11,fontWeight:700}}>{q.modEmoji} {q.modTitle}</span>
+        </div>
+        <div style={{background:C.card,borderRadius:16,padding:20,marginBottom:14,border:`2px solid ${C.purple}`}}>
+          <div style={{fontSize:16,fontWeight:700,color:C.charcoal,lineHeight:1.5}}>{q.q}</div>
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:10}}>
+          {q.options.map((opt,i)=>{
+            let bg=C.card,border=`2px solid ${C.border}`,color=C.charcoal,fw=500;
+            if(selected!==null){
+              if(i===q.correct){bg=C.greenBg;border=`2px solid ${C.green}`;color=C.green;fw=700;}
+              else if(i===selected){bg=C.redBg;border=`2px solid ${C.red}`;color=C.red;fw=700;}
+            }
+            return(
+              <button key={i} onClick={()=>pick(i)} style={{background:bg,border,borderRadius:12,padding:"14px 16px",textAlign:"left",fontSize:14,color,fontWeight:fw,cursor:selected===null?"pointer":"default",display:"flex",gap:10,alignItems:"flex-start"}}>
+                <span style={{fontWeight:800,minWidth:20}}>{["A","B","C","D"][i]}.</span><span>{opt}</span>
+              </button>
+            );
+          })}
+        </div>
+        {selected!==null&&(
+          <>
+            <div style={{background:selected===q.correct?C.greenBg:C.redBg,borderRadius:12,padding:14,marginTop:14,border:`1px solid ${selected===q.correct?C.green:C.red}`}}>
+              <div style={{fontSize:13,fontWeight:800,color:selected===q.correct?C.green:C.red,marginBottom:4}}>{selected===q.correct?"✅ Correct!":"❌ Not quite..."}</div>
+              <div style={{fontSize:13,color:C.charcoal,lineHeight:1.6}}>{q.explain}</div>
+            </div>
+            <button onClick={next} style={{width:"100%",marginTop:14,padding:16,borderRadius:12,border:"none",background:C.purple,color:"#fff",fontWeight:800,fontSize:15,cursor:"pointer"}}>
+              {idx+1>=shuffled.length?"See Final Score 🏆":"Next →"}
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── RESET CONFIRM ─────────────────────────────────────────────────────────────
+function ResetView({setView,setCompleted,setScores}){
+  return(
+    <div style={{background:C.cream,minHeight:"100vh",padding:32,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
+      <div style={{fontSize:64}}>🔄</div>
+      <div style={{fontSize:22,fontWeight:900,color:C.charcoal,marginTop:12,textAlign:"center"}}>Reset All Progress?</div>
+      <div style={{fontSize:14,color:"#666",marginTop:8,textAlign:"center",lineHeight:1.6}}>You've completed all 8 modules! 🎉{"\n"}Resetting lets you run through everything again to lock in the information.</div>
+      <div style={{display:"flex",gap:12,marginTop:28,width:"100%",maxWidth:300}}>
+        <button onClick={()=>setView("home")} style={{flex:1,padding:14,borderRadius:12,border:`2px solid ${C.gold}`,background:"transparent",color:C.goldDark,fontWeight:800,cursor:"pointer"}}>Cancel</button>
+        <button onClick={()=>{setCompleted([]);setScores({});setView("home");}} style={{flex:1,padding:14,borderRadius:12,border:"none",background:C.gold,color:C.dark,fontWeight:800,cursor:"pointer"}}>Reset 🔄</button>
+      </div>
+    </div>
+  );
+}
+
+// ── MAIN APP ──────────────────────────────────────────────────────────────────
+function App(){
+  const [view,setView]=React.useState("home");
+  const [currentMod,setCurrentMod]=React.useState(1);
+  const [completed,setCompleted]=React.useState([]);
+  const [scores,setScores]=React.useState({});
+  const [confetti,setConfetti]=React.useState(false);
+
+  return(
+    <div style={{fontFamily:"'Segoe UI',system-ui,-apple-system,sans-serif",maxWidth:480,margin:"0 auto",background:C.dark,minHeight:"100vh"}}>
+      <Confetti active={confetti}/>
+      {view==="home"&&<Home completed={completed} scores={scores} setView={setView} setMod={setCurrentMod}/>}
+      {view==="module"&&<ModView moduleId={currentMod} completed={completed} setCompleted={setCompleted} scores={scores} setScores={setScores} setView={setView} setConfetti={setConfetti}/>}
+      {view==="flashcards"&&<FlashcardsView setView={setView}/>}
+      {view==="fillin"&&<FillInView setView={setView}/>}
+      {view==="scenarios"&&<ScenariosView setView={setView}/>}
+      {view==="checklists"&&<ChecklistsView setView={setView}/>}
+      {view==="keyterms"&&<KeyTermsView setView={setView}/>}
+      {view==="finalquiz"&&<FinalQuizView setView={setView} setConfetti={setConfetti}/>}
+      {view==="reset"&&<ResetView setView={setView} setCompleted={setCompleted} setScores={setScores}/>}
+    </div>
+  );
+}
+
+const rootEl = document.getElementById("root");
+const root = ReactDOM.createRoot(rootEl);
+root.render(<App />);
+</script>
+</body>
+</html>
