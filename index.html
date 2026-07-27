@@ -1635,9 +1635,10 @@ function Home({
   completed,
   scores,
   setView,
-  setMod
+  setMod,
+  meta
 }) {
-  const daysLeft = Math.max(0, Math.ceil((new Date("2026-07-17") - new Date()) / (1000 * 60 * 60 * 24)));
+  const daysLeft = Math.max(0, Math.ceil((new Date("2026-08-13") - new Date()) / (1000 * 60 * 60 * 24)));
   const totalQ = MODULES.reduce((a, m) => a + m.quiz.length, 0);
   const totalC = Object.values(scores).reduce((a, s) => a + (s.correct || 0), 0);
   const pct = totalQ > 0 ? Math.round(totalC / totalQ * 100) : 0;
@@ -1716,7 +1717,7 @@ function Home({
             color: "#C8B88A",
             fontSize: 11
           },
-          children: "July 17, 2026 \xB7 You got this! \uD83D\uDCAA\uD83C\uDFFD"
+          children: "August 13, 2026 \xB7 You got this! \uD83D\uDCAA\uD83C\uDFFD"
         })]
       })]
     }), _jsxs("div", {
@@ -1825,6 +1826,10 @@ function Home({
           },
           children: "\uD83C\uDFC6 Above passing threshold!"
         })]
+      }), _jsx(BadgeShelf, {
+        completed: completed,
+        scores: scores,
+        meta: meta
       }), allDone && _jsxs("button", {
         onClick: () => {
           setView("reset");
@@ -1966,6 +1971,12 @@ function Home({
         },
         children: "\u26A1 Quick Practice"
       }), [{
+        id: "speedround",
+        icon: "⚡",
+        label: "Speed Round",
+        desc: "10 random Qs · 20 sec each — beat the clock!",
+        color: C.red
+      }, {
         id: "flashcards",
         icon: "🃏",
         label: "Flashcards",
@@ -3732,7 +3743,8 @@ function KeyTermsView({
 // ── FINAL QUIZ ────────────────────────────────────────────────────────────────
 function FinalQuizView({
   setView,
-  setConfetti
+  setConfetti,
+  onResult
 }) {
   const allQs = MODULES.flatMap(m => m.quiz.map(q => ({
     ...q,
@@ -3755,6 +3767,7 @@ function FinalQuizView({
     if (idx + 1 >= shuffled.length) {
       const finalScore = score + (selected === q.correct ? 1 : 0);
       const p = Math.round(finalScore / shuffled.length * 100);
+      if (onResult) onResult(p);
       if (p >= 80) {
         setConfetti(true);
         setTimeout(() => setConfetti(false), 3500);
@@ -4363,6 +4376,869 @@ function ResetView({
   });
 }
 
+// ── iPAD LANDSCAPE + BADGES + SPEED ROUND (J Empire upgrade) ─────────────────
+var _H = React.createElement;
+
+// Detect iPad landscape (wide) viewport
+function useIsWide() {
+  var query = "(min-width: 900px) and (orientation: landscape)";
+  var get = function () {
+    return typeof window !== "undefined" && window.matchMedia && window.matchMedia(query).matches;
+  };
+  var _a = React.useState(get),
+    wide = _a[0],
+    setWide = _a[1];
+  React.useEffect(function () {
+    if (!window.matchMedia) return;
+    var mq = window.matchMedia(query);
+    var on = function () {
+      setWide(mq.matches);
+    };
+    if (mq.addEventListener) mq.addEventListener("change", on);else mq.addListener(on);
+    window.addEventListener("resize", on);
+    window.addEventListener("orientationchange", on);
+    return function () {
+      if (mq.removeEventListener) mq.removeEventListener("change", on);else mq.removeListener(on);
+      window.removeEventListener("resize", on);
+      window.removeEventListener("orientationchange", on);
+    };
+  }, []);
+  return wide;
+}
+
+// ── STREAK + META (stored locally; never touches the Supabase schema) ─────────
+var META_KEY = "jempire_ps_meta";
+function loadMeta() {
+  try {
+    var raw = localStorage.getItem(META_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    return {};
+  }
+}
+function saveMeta(m) {
+  try {
+    localStorage.setItem(META_KEY, JSON.stringify(m));
+  } catch (e) {}
+}
+function _dateStr(d) {
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+function touchStreak(m) {
+  var today = _dateStr(new Date());
+  var last = m.lastVisit;
+  var streak = m.streak || 0;
+  if (last === today) {
+    streak = streak || 1;
+  } else {
+    var y = new Date();
+    y.setDate(y.getDate() - 1);
+    var yStr = _dateStr(y);
+    streak = last === yStr ? streak + 1 : 1;
+  }
+  var bestStreak = Math.max(m.bestStreak || 0, streak);
+  return Object.assign({}, m, {
+    lastVisit: today,
+    streak: streak,
+    bestStreak: bestStreak
+  });
+}
+
+// ── BADGES ───────────────────────────────────────────────────────────────────
+var BADGES = [{
+  id: "firstStep",
+  emoji: "🥇",
+  name: "First Step",
+  desc: "Finish your first module",
+  test: function (c, s, m) {
+    return (c || []).length >= 1;
+  }
+}, {
+  id: "halfway",
+  emoji: "⚔️",
+  name: "Halfway There",
+  desc: "Finish 4 modules",
+  test: function (c, s, m) {
+    return (c || []).length >= 4;
+  }
+}, {
+  id: "perfect",
+  emoji: "💯",
+  name: "Perfectionist",
+  desc: "Score 100% on any module",
+  test: function (c, s, m) {
+    s = s || {};
+    return Object.keys(s).some(function (k) {
+      return s[k] && s[k].total && s[k].correct === s[k].total;
+    });
+  }
+}, {
+  id: "speed",
+  emoji: "⚡",
+  name: "Speed Demon",
+  desc: "Get 8/10 in a Speed Round",
+  test: function (c, s, m) {
+    return (m.speedBest || 0) >= 8;
+  }
+}, {
+  id: "flawless",
+  emoji: "🌟",
+  name: "Flawless Speed",
+  desc: "Perfect 10/10 Speed Round",
+  test: function (c, s, m) {
+    return (m.speedBest || 0) >= 10;
+  }
+}, {
+  id: "streak3",
+  emoji: "📅",
+  name: "Getting Consistent",
+  desc: "3-day study streak",
+  test: function (c, s, m) {
+    return (m.bestStreak || 0) >= 3;
+  }
+}, {
+  id: "streak7",
+  emoji: "🔥",
+  name: "On Fire",
+  desc: "7-day study streak",
+  test: function (c, s, m) {
+    return (m.bestStreak || 0) >= 7;
+  }
+}, {
+  id: "exam",
+  emoji: "🏆",
+  name: "Exam Ready",
+  desc: "Pass the Final Exam (80%+)",
+  test: function (c, s, m) {
+    return (m.finalBest || 0) >= 80;
+  }
+}, {
+  id: "crown",
+  emoji: "👑",
+  name: "Crowned Scholar",
+  desc: "Finish all 8 modules",
+  test: function (c, s, m) {
+    return (c || []).length >= 8;
+  }
+}];
+function computeBadges(c, s, m) {
+  return BADGES.map(function (b) {
+    return Object.assign({}, b, {
+      earned: !!b.test(c || [], s || {}, m || {})
+    });
+  });
+}
+
+// ── BADGE SHELF (shown on Home) ───────────────────────────────────────────────
+function BadgeShelf({
+  completed,
+  scores,
+  meta
+}) {
+  var badges = computeBadges(completed, scores, meta);
+  var earned = badges.filter(function (b) {
+    return b.earned;
+  }).length;
+  var streak = (meta || {}).streak || 0;
+  return _H("div", {
+    style: {
+      background: C.card,
+      borderRadius: 16,
+      padding: 16,
+      border: `2px solid ${C.border}`,
+      marginBottom: 16
+    }
+  }, _H("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 12
+    }
+  }, _H("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 800,
+      color: C.charcoal
+    }
+  }, "🏅 Your Badges"), _H("div", {
+    style: {
+      fontSize: 12,
+      fontWeight: 800,
+      color: C.goldDark
+    }
+  }, earned, "/", badges.length, streak > 1 ? "  ·  🔥 " + streak + "-day" : "")), _H("div", {
+    style: {
+      display: "flex",
+      flexWrap: "wrap",
+      gap: 8
+    }
+  }, badges.map(function (b) {
+    return _H("div", {
+      key: b.id,
+      title: b.name + " — " + b.desc,
+      style: {
+        flex: "1 1 30%",
+        minWidth: 92,
+        background: b.earned ? "rgba(201,168,76,0.14)" : "#F4F1EA",
+        border: `1.5px solid ${b.earned ? C.gold : "#E2DAC6"}`,
+        borderRadius: 12,
+        padding: "8px 6px",
+        textAlign: "center",
+        opacity: b.earned ? 1 : 0.55
+      }
+    }, _H("div", {
+      style: {
+        fontSize: 22,
+        filter: b.earned ? "none" : "grayscale(1)"
+      }
+    }, b.earned ? b.emoji : "🔒"), _H("div", {
+      style: {
+        fontSize: 10,
+        fontWeight: 800,
+        color: b.earned ? C.goldDark : "#999",
+        marginTop: 2,
+        lineHeight: 1.2
+      }
+    }, b.name));
+  })));
+}
+
+// ── SIDEBAR (iPad landscape only) ─────────────────────────────────────────────
+function Sidebar({
+  completed,
+  scores,
+  meta,
+  setView,
+  setMod,
+  currentView
+}) {
+  var badges = computeBadges(completed, scores, meta);
+  var earned = badges.filter(function (b) {
+    return b.earned;
+  });
+  var tools = [{
+    id: "speedround",
+    icon: "⚡",
+    label: "Speed Round"
+  }, {
+    id: "flashcards",
+    icon: "🃏",
+    label: "Flashcards"
+  }, {
+    id: "fillin",
+    icon: "✏️",
+    label: "Fill in the Blank"
+  }, {
+    id: "scenarios",
+    icon: "🎭",
+    label: "Scenarios"
+  }, {
+    id: "checklists",
+    icon: "✅",
+    label: "Checklists"
+  }, {
+    id: "keyterms",
+    icon: "🔤",
+    label: "Key Terms"
+  }, {
+    id: "finalquiz",
+    icon: "🎯",
+    label: "Final Exam"
+  }];
+  return _H("div", {
+    style: {
+      width: 320,
+      flexShrink: 0,
+      height: "100vh",
+      overflowY: "auto",
+      background: `linear-gradient(180deg,${C.dark} 0%,#2A1B0C 100%)`,
+      borderRight: `1px solid ${C.goldDark}`,
+      WebkitOverflowScrolling: "touch"
+    }
+  },
+  // Brand header
+  _H("button", {
+    onClick: function () {
+      return setView("home");
+    },
+    style: {
+      width: "100%",
+      background: "transparent",
+      border: "none",
+      cursor: "pointer",
+      textAlign: "left",
+      padding: "22px 20px 16px"
+    }
+  }, _H("div", {
+    style: {
+      fontSize: 10,
+      letterSpacing: 4,
+      color: C.goldLight,
+      textTransform: "uppercase"
+    }
+  }, "J Empire 👑"), _H("div", {
+    style: {
+      fontSize: 20,
+      fontWeight: 900,
+      color: C.goldLight,
+      lineHeight: 1.1,
+      marginTop: 4
+    }
+  }, "Process Server"), _H("div", {
+    style: {
+      fontSize: 20,
+      fontWeight: 900,
+      color: C.gold,
+      lineHeight: 1.1
+    }
+  }, "Study System")),
+  // Modules label
+  _H("div", {
+    style: {
+      fontSize: 10,
+      fontWeight: 800,
+      color: "#8A7A55",
+      letterSpacing: 2,
+      textTransform: "uppercase",
+      padding: "6px 20px 8px"
+    }
+  }, "📚 8 Modules"),
+  // Module rows
+  _H("div", {
+    style: {
+      padding: "0 12px"
+    }
+  }, MODULES.map(function (mod, i) {
+    var done = completed.includes(mod.id);
+    var score = scores[mod.id];
+    var p = score ? Math.round(score.correct / score.total * 100) : null;
+    var locked = i > 0 && !completed.includes(MODULES[i - 1].id);
+    return _H("button", {
+      key: mod.id,
+      onClick: function () {
+        if (!locked) {
+          setMod(mod.id);
+          setView("module");
+        }
+      },
+      style: {
+        width: "100%",
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        background: currentView === "module" ? "rgba(201,168,76,0.10)" : "transparent",
+        border: `1px solid ${done ? mod.color : "rgba(201,168,76,0.18)"}`,
+        borderRadius: 12,
+        padding: "9px 10px",
+        marginBottom: 7,
+        cursor: locked ? "not-allowed" : "pointer",
+        opacity: locked ? 0.45 : 1,
+        textAlign: "left"
+      }
+    }, _H("div", {
+      style: {
+        width: 30,
+        height: 30,
+        borderRadius: 8,
+        flexShrink: 0,
+        background: done ? mod.color : "rgba(255,255,255,0.06)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 15
+      }
+    }, locked ? "🔒" : done ? "✅" : mod.emoji), _H("div", {
+      style: {
+        flex: 1,
+        minWidth: 0
+      }
+    }, _H("div", {
+      style: {
+        fontSize: 11.5,
+        fontWeight: 800,
+        color: done ? C.goldLight : "#D8C9A2",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis"
+      }
+    }, "M", mod.id, ": ", mod.title), _H("div", {
+      style: {
+        fontSize: 10,
+        color: p !== null ? p >= 80 ? "#7BC49A" : "#D89A6A" : "#7A6C4C",
+        marginTop: 1
+      }
+    }, locked ? "Locked" : p !== null ? p + "% · " + score.correct + "/" + score.total : "Not started")));
+  })),
+  // Practice label + tools
+  _H("div", {
+    style: {
+      fontSize: 10,
+      fontWeight: 800,
+      color: "#8A7A55",
+      letterSpacing: 2,
+      textTransform: "uppercase",
+      padding: "12px 20px 8px"
+    }
+  }, "⚡ Practice"), _H("div", {
+    style: {
+      padding: "0 12px"
+    }
+  }, tools.map(function (t) {
+    return _H("button", {
+      key: t.id,
+      onClick: function () {
+        return setView(t.id);
+      },
+      style: {
+        width: "100%",
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        background: currentView === t.id ? "rgba(201,168,76,0.16)" : "transparent",
+        border: "none",
+        borderRadius: 10,
+        padding: "8px 10px",
+        marginBottom: 3,
+        cursor: "pointer",
+        textAlign: "left"
+      }
+    }, _H("span", {
+      style: {
+        fontSize: 15,
+        width: 22,
+        textAlign: "center"
+      }
+    }, t.icon), _H("span", {
+      style: {
+        fontSize: 12.5,
+        fontWeight: 700,
+        color: currentView === t.id ? C.goldLight : "#C9BA96"
+      }
+    }, t.label));
+  })),
+  // Badges mini strip
+  _H("div", {
+    style: {
+      margin: "14px 16px 20px",
+      padding: "12px 14px",
+      background: "rgba(201,168,76,0.08)",
+      border: `1px solid rgba(201,168,76,0.25)`,
+      borderRadius: 12
+    }
+  }, _H("div", {
+    style: {
+      fontSize: 10,
+      fontWeight: 800,
+      letterSpacing: 1,
+      textTransform: "uppercase",
+      color: "#8A7A55",
+      marginBottom: 6
+    }
+  }, "🏅 Badges " + earned.length + "/" + badges.length), _H("div", {
+    style: {
+      display: "flex",
+      flexWrap: "wrap",
+      gap: 6,
+      fontSize: 18
+    }
+  }, badges.map(function (b) {
+    return _H("span", {
+      key: b.id,
+      title: b.name + " — " + b.desc,
+      style: {
+        opacity: b.earned ? 1 : 0.3,
+        filter: b.earned ? "none" : "grayscale(1)"
+      }
+    }, b.earned ? b.emoji : "🔒");
+  }))));
+}
+
+// ── SPEED ROUND (10 random questions · 20s each) ──────────────────────────────
+function SpeedRoundView({
+  setView,
+  setConfetti,
+  onResult,
+  restart
+}) {
+  var N = 10,
+    T = 20;
+  var _q = React.useState(function () {
+    var pool = MODULES.flatMap(function (m) {
+      return m.quiz.map(function (q) {
+        return Object.assign({}, q, {
+          modColor: m.color,
+          modEmoji: m.emoji,
+          modTitle: m.title
+        });
+      });
+    });
+    return [...pool].sort(function () {
+      return Math.random() - 0.5;
+    }).slice(0, N);
+  }),
+    qs = _q[0];
+  var _i = React.useState(0),
+    idx = _i[0],
+    setIdx = _i[1];
+  var _s = React.useState(null),
+    selected = _s[0],
+    setSelected = _s[1];
+  var _to = React.useState(false),
+    timedOut = _to[0],
+    setTimedOut = _to[1];
+  var _sc = React.useState(0),
+    score = _sc[0],
+    setScore = _sc[1];
+  var _tl = React.useState(T),
+    timeLeft = _tl[0],
+    setTimeLeft = _tl[1];
+  var _d = React.useState(false),
+    done = _d[0],
+    setDone = _d[1];
+  var q = qs[idx];
+  var answered = selected !== null || timedOut;
+  React.useEffect(function () {
+    if (done || answered) return;
+    if (timeLeft <= 0) {
+      setTimedOut(true);
+      return;
+    }
+    var id = setTimeout(function () {
+      return setTimeLeft(function (t) {
+        return t - 1;
+      });
+    }, 1000);
+    return function () {
+      return clearTimeout(id);
+    };
+  }, [timeLeft, answered, done]);
+  function pick(i) {
+    if (answered) return;
+    setSelected(i);
+    if (i === q.correct) setScore(function (s) {
+      return s + 1;
+    });
+  }
+  function next() {
+    if (idx + 1 >= qs.length) {
+      if (onResult) onResult(score, qs.length);
+      if (score >= 8 && setConfetti) {
+        setConfetti(true);
+        setTimeout(function () {
+          return setConfetti(false);
+        }, 3000);
+      }
+      setDone(true);
+    } else {
+      setIdx(function (i) {
+        return i + 1;
+      });
+      setSelected(null);
+      setTimedOut(false);
+      setTimeLeft(T);
+    }
+  }
+  if (done) {
+    var pct = Math.round(score / qs.length * 100);
+    var msg = score >= 10 ? "FLAWLESS! 10 for 10 👑" : score >= 8 ? "Lightning fast — you aced it! ⚡" : score >= 6 ? "Solid round. Run it back to sharpen up." : "Keep drilling — speed comes with reps! 💪🏽";
+    var color = score >= 8 ? C.green : score >= 6 ? C.orange : C.red;
+    return _H("div", {
+      style: {
+        background: C.cream,
+        minHeight: "100vh",
+        padding: 24,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center"
+      }
+    }, _H("div", {
+      style: {
+        fontSize: 64
+      }
+    }, score >= 8 ? "⚡" : score >= 6 ? "📚" : "💪🏽"), _H("div", {
+      style: {
+        fontSize: 44,
+        fontWeight: 900,
+        color: color,
+        marginTop: 8
+      }
+    }, score, "/", qs.length), _H("div", {
+      style: {
+        fontSize: 16,
+        fontWeight: 700,
+        color: C.charcoal,
+        marginTop: 4
+      }
+    }, "Speed Round · ", pct, "%"), _H("div", {
+      style: {
+        background: score >= 8 ? C.greenBg : C.redBg,
+        border: `2px solid ${color}`,
+        borderRadius: 12,
+        padding: 14,
+        marginTop: 16,
+        width: "100%",
+        maxWidth: 340,
+        textAlign: "center",
+        fontSize: 14,
+        fontWeight: 800,
+        color: color
+      }
+    }, msg), _H("div", {
+      style: {
+        display: "flex",
+        gap: 10,
+        marginTop: 20,
+        width: "100%",
+        maxWidth: 340
+      }
+    }, _H("button", {
+      onClick: function () {
+        if (restart) restart();
+      },
+      style: {
+        flex: 1,
+        padding: 14,
+        borderRadius: 12,
+        border: `2px solid ${C.red}`,
+        background: "transparent",
+        color: C.red,
+        fontWeight: 800,
+        cursor: "pointer"
+      }
+    }, "New Round ⚡"), _H("button", {
+      onClick: function () {
+        return setView("home");
+      },
+      style: {
+        flex: 1,
+        padding: 14,
+        borderRadius: 12,
+        border: "none",
+        background: C.gold,
+        color: C.dark,
+        fontWeight: 800,
+        cursor: "pointer"
+      }
+    }, "Home 🏠")));
+  }
+  var tColor = timeLeft > 10 ? C.green : timeLeft > 5 ? C.orange : C.red;
+  return _H("div", {
+    style: {
+      background: C.cream,
+      minHeight: "100vh"
+    }
+  },
+  // header
+  _H("div", {
+    style: {
+      background: `linear-gradient(135deg,${C.red},#7A1F1F)`,
+      padding: "14px 16px",
+      display: "flex",
+      alignItems: "center",
+      gap: 10
+    }
+  }, _H("button", {
+    onClick: function () {
+      return setView("home");
+    },
+    style: {
+      background: "rgba(255,255,255,0.15)",
+      border: "none",
+      borderRadius: 8,
+      padding: "6px 10px",
+      color: "#fff",
+      cursor: "pointer",
+      fontSize: 16
+    }
+  }, "←"), _H("div", null, _H("div", {
+    style: {
+      fontSize: 10,
+      color: "rgba(255,255,255,0.7)"
+    }
+  }, "SPEED ROUND"), _H("div", {
+    style: {
+      fontSize: 14,
+      fontWeight: 800,
+      color: "#fff"
+    }
+  }, "⚡ Beat the Clock")), _H("div", {
+    style: {
+      marginLeft: "auto",
+      fontSize: 12,
+      color: "rgba(255,255,255,0.85)",
+      fontWeight: 700
+    }
+  }, idx + 1, "/", qs.length, " · ✓", score)),
+  // body
+  _H("div", {
+    style: {
+      padding: 16
+    }
+  },
+  // timer
+  _H("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 10,
+      marginBottom: 12
+    }
+  }, _H("div", {
+    style: {
+      width: 46,
+      height: 46,
+      borderRadius: "50%",
+      flexShrink: 0,
+      border: `3px solid ${tColor}`,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontSize: 18,
+      fontWeight: 900,
+      color: tColor,
+      background: "#fff"
+    }
+  }, timedOut ? "0" : timeLeft), _H("div", {
+    style: {
+      flex: 1
+    }
+  }, _H(PBar, {
+    value: answered ? 0 : timeLeft,
+    max: T,
+    color: tColor
+  }), _H("div", {
+    style: {
+      fontSize: 11,
+      color: "#888",
+      marginTop: 4,
+      fontWeight: 700
+    }
+  }, timedOut ? "⏰ Time's up!" : answered ? "Answered" : "seconds left"))),
+  // module tag
+  _H("div", {
+    style: {
+      marginBottom: 12
+    }
+  }, _H("span", {
+    style: {
+      background: q.modColor + "22",
+      color: q.modColor,
+      padding: "3px 10px",
+      borderRadius: 99,
+      fontSize: 11,
+      fontWeight: 700
+    }
+  }, q.modEmoji, " ", q.modTitle)),
+  // question
+  _H("div", {
+    style: {
+      background: C.card,
+      borderRadius: 16,
+      padding: 20,
+      marginBottom: 14,
+      border: `2px solid ${C.red}`
+    }
+  }, _H("div", {
+    style: {
+      fontSize: 16,
+      fontWeight: 700,
+      color: C.charcoal,
+      lineHeight: 1.5
+    }
+  }, q.q)),
+  // options
+  _H("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 10
+    }
+  }, q.options.map(function (opt, i) {
+    var bg = C.card,
+      border = `2px solid ${C.border}`,
+      col = C.charcoal,
+      fw = 500;
+    if (answered) {
+      if (i === q.correct) {
+        bg = C.greenBg;
+        border = `2px solid ${C.green}`;
+        col = C.green;
+        fw = 700;
+      } else if (i === selected) {
+        bg = C.redBg;
+        border = `2px solid ${C.red}`;
+        col = C.red;
+        fw = 700;
+      }
+    }
+    return _H("button", {
+      key: i,
+      onClick: function () {
+        return pick(i);
+      },
+      style: {
+        background: bg,
+        border: border,
+        borderRadius: 12,
+        padding: "14px 16px",
+        textAlign: "left",
+        fontSize: 14,
+        color: col,
+        fontWeight: fw,
+        cursor: answered ? "default" : "pointer",
+        display: "flex",
+        gap: 10,
+        alignItems: "flex-start"
+      }
+    }, _H("span", {
+      style: {
+        fontWeight: 800,
+        minWidth: 20
+      }
+    }, ["A", "B", "C", "D"][i], "."), _H("span", null, opt));
+  })),
+  // feedback + next
+  answered && _H("div", null, _H("div", {
+    style: {
+      background: selected === q.correct ? C.greenBg : C.redBg,
+      borderRadius: 12,
+      padding: 14,
+      marginTop: 14,
+      border: `1px solid ${selected === q.correct ? C.green : C.red}`
+    }
+  }, _H("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 800,
+      color: selected === q.correct ? C.green : C.red,
+      marginBottom: 4
+    }
+  }, selected === q.correct ? "✅ Correct!" : timedOut ? "⏰ Out of time" : "❌ Not quite..."), _H("div", {
+    style: {
+      fontSize: 13,
+      color: C.charcoal,
+      lineHeight: 1.6
+    }
+  }, q.explain)), _H("button", {
+    onClick: next,
+    style: {
+      width: "100%",
+      marginTop: 14,
+      padding: 16,
+      borderRadius: 12,
+      border: "none",
+      background: C.red,
+      color: "#fff",
+      fontWeight: 800,
+      fontSize: 15,
+      cursor: "pointer"
+    }
+  }, idx + 1 >= qs.length ? "See Results ⚡" : "Next →"))));
+}
+
+
 // ── SUPABASE SYNC ────────────────────────────────────────────────────────────
 const SUPABASE_URL = "https://ejseathlglvvnmkpchib.supabase.co";
 const SUPABASE_KEY = "sb_publishable_vcdD-PwNinJgjarQsRhGBA_eNvFCAMu";
@@ -4422,6 +5298,9 @@ function App() {
   const [syncStatus, setSyncStatus] = React.useState("loading"); // loading | synced | offline
   const syncKeyRef = React.useRef(null);
   const hasLoadedRef = React.useRef(false);
+  const [meta, setMeta] = React.useState({});
+  const [speedKey, setSpeedKey] = React.useState(0);
+  const isWide = useIsWide();
 
   // Load saved progress on first mount
   React.useEffect(() => {
@@ -4457,6 +5336,123 @@ function App() {
       hasLoadedRef.current = true;
     });
   }
+  // Streak + local milestone meta (device-local; keeps the Supabase schema untouched)
+  React.useEffect(() => {
+    const m = touchStreak(loadMeta());
+    saveMeta(m);
+    setMeta(m);
+  }, []);
+  function handleSpeedResult(sc) {
+    setMeta(prev => {
+      const nm = Object.assign({}, prev, {
+        speedBest: Math.max(prev.speedBest || 0, sc)
+      });
+      saveMeta(nm);
+      return nm;
+    });
+  }
+  function handleExamResult(p) {
+    setMeta(prev => {
+      const nm = Object.assign({}, prev, {
+        finalBest: Math.max(prev.finalBest || 0, p)
+      });
+      saveMeta(nm);
+      return nm;
+    });
+  }
+
+  // The active view — shared by both mobile and iPad-landscape layouts
+  const content = [view === "home" && _jsx(Home, {
+    key: "home",
+    completed: completed,
+    scores: scores,
+    setView: setView,
+    setMod: setCurrentMod,
+    meta: meta
+  }), view === "module" && _jsx(ModView, {
+    key: "module",
+    moduleId: currentMod,
+    completed: completed,
+    setCompleted: setCompleted,
+    scores: scores,
+    setScores: setScores,
+    setView: setView,
+    setConfetti: setConfetti
+  }), view === "flashcards" && _jsx(FlashcardsView, {
+    key: "flashcards",
+    setView: setView
+  }), view === "fillin" && _jsx(FillInView, {
+    key: "fillin",
+    setView: setView
+  }), view === "scenarios" && _jsx(ScenariosView, {
+    key: "scenarios",
+    setView: setView
+  }), view === "checklists" && _jsx(ChecklistsView, {
+    key: "checklists",
+    setView: setView
+  }), view === "keyterms" && _jsx(KeyTermsView, {
+    key: "keyterms",
+    setView: setView
+  }), view === "speedround" && _jsx(SpeedRoundView, {
+    key: "speed" + speedKey,
+    setView: setView,
+    setConfetti: setConfetti,
+    onResult: handleSpeedResult,
+    restart: () => setSpeedKey(k => k + 1)
+  }), view === "finalquiz" && _jsx(FinalQuizView, {
+    key: "finalquiz",
+    setView: setView,
+    setConfetti: setConfetti,
+    onResult: handleExamResult
+  }), view === "reset" && _jsx(ResetView, {
+    key: "reset",
+    setView: setView,
+    setCompleted: setCompleted,
+    setScores: setScores
+  }), view === "sync" && _jsx(SyncView, {
+    key: "sync",
+    setView: setView,
+    onRelink: handleRelink
+  })];
+
+  // iPad landscape: sidebar on the left, view in the center
+  if (isWide) {
+    return _jsxs("div", {
+      style: {
+        fontFamily: "'Segoe UI',system-ui,-apple-system,sans-serif",
+        display: "flex",
+        minHeight: "100vh",
+        background: C.dark
+      },
+      children: [_jsx(Confetti, {
+        active: confetti
+      }), _jsx(Sidebar, {
+        completed: completed,
+        scores: scores,
+        meta: meta,
+        setView: setView,
+        setMod: setCurrentMod,
+        currentView: view
+      }), _jsx("div", {
+        style: {
+          flex: 1,
+          minWidth: 0,
+          height: "100vh",
+          overflowY: "auto",
+          WebkitOverflowScrolling: "touch"
+        },
+        children: _jsx("div", {
+          style: {
+            maxWidth: 620,
+            margin: "0 auto"
+          },
+          children: content
+        })
+      })]
+    });
+  }
+
+  // Phone / portrait: unchanged single-column layout
   return _jsxs("div", {
     style: {
       fontFamily: "'Segoe UI',system-ui,-apple-system,sans-serif",
@@ -4467,40 +5463,7 @@ function App() {
     },
     children: [_jsx(Confetti, {
       active: confetti
-    }), view === "home" && _jsx(Home, {
-      completed: completed,
-      scores: scores,
-      setView: setView,
-      setMod: setCurrentMod
-    }), view === "module" && _jsx(ModView, {
-      moduleId: currentMod,
-      completed: completed,
-      setCompleted: setCompleted,
-      scores: scores,
-      setScores: setScores,
-      setView: setView,
-      setConfetti: setConfetti
-    }), view === "flashcards" && _jsx(FlashcardsView, {
-      setView: setView
-    }), view === "fillin" && _jsx(FillInView, {
-      setView: setView
-    }), view === "scenarios" && _jsx(ScenariosView, {
-      setView: setView
-    }), view === "checklists" && _jsx(ChecklistsView, {
-      setView: setView
-    }), view === "keyterms" && _jsx(KeyTermsView, {
-      setView: setView
-    }), view === "finalquiz" && _jsx(FinalQuizView, {
-      setView: setView,
-      setConfetti: setConfetti
-    }), view === "reset" && _jsx(ResetView, {
-      setView: setView,
-      setCompleted: setCompleted,
-      setScores: setScores
-    }), view === "sync" && _jsx(SyncView, {
-      setView: setView,
-      onRelink: handleRelink
-    })]
+    }), content]
   });
 }
 
