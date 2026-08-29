@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>J Empire — Florida Process Server Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --gold:#C9A84C; --gold-lt:#F0D080; --gold-dk:#9A7530;
+    --cream:#FAF6EE; --dark:#1A1209; --charcoal:#2D2416;
+    --card:#FFFFFF; --border:#E8DFC8; --ink:#241B0E; --muted:#6B5C42;
+    --green:#2A7A4F; --green-bg:#E8F5EE;
+    --red:#B83232; --red-bg:#FAE8E8;
+    --blue:#1A4F8A; --blue-bg:#E8F0FA;
+    --purple:#6B3FA0; --purple-bg:#F0E8FA;
+    --orange:#B35F38; --orange-bg:#FAF0EB;
+    --teal:#1A7A6E; --teal-bg:#E8F5F3;
+    --pink:#A03F6B; --pink-bg:#FAE8F0;
+    --nav:250px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--cream); color:var(--ink);
+    font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    font-size:17px; line-height:1.55;
+    -webkit-text-size-adjust:100%;
+  }
+  #app{min-height:100vh;display:flex;flex-direction:column}
+  button{font-family:inherit;font-size:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  input{font-family:inherit;font-size:17px}
+  h1,h2,h3{font-family:Fraunces,Georgia,serif;margin:0;line-height:1.15;letter-spacing:-.01em}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    background:linear-gradient(160deg,var(--charcoal),var(--dark));
+    color:var(--cream); padding:18px 20px 16px;
+    border-bottom:3px solid var(--gold);
+    position:sticky; top:0; z-index:60;
+    padding-top:calc(18px + env(safe-area-inset-top));
+  }
+  .topbar .inner{max-width:1180px;margin:0 auto;display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  .topbar .crown{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-lt);font-weight:700}
+  .topbar h1{font-size:26px;font-weight:900;color:#fff;margin-top:3px}
+  .topbar p{margin:4px 0 0;font-size:14px;color:#CFC3AA}
+  .backbtn{
+    display:inline-flex;align-items:center;gap:7px;font-weight:700;font-size:15px;
+    color:var(--gold-lt);margin-bottom:8px;padding:4px 0;
+  }
+  .menubtn{
+    margin-left:auto;display:flex;align-items:center;gap:8px;
+    background:rgba(240,208,128,.14);border:2px solid var(--gold-dk);color:var(--gold-lt);
+    font-weight:800;font-size:14px;letter-spacing:.05em;text-transform:uppercase;
+    padding:10px 15px;border-radius:11px;
+  }
+
+  /* ---------- shell: nav + main ---------- */
+  .shell{flex:1;display:flex;max-width:1180px;width:100%;margin:0 auto;align-items:flex-start}
+  .sidenav{
+    display:none; flex:0 0 var(--nav); width:var(--nav);
+    padding:20px 12px 60px 16px; position:sticky; top:112px;
+    max-height:calc(100vh - 112px); overflow-y:auto;
+  }
+  .sidenav.open{display:block}
+  .navgroup{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:16px 0 7px 8px}
+  .navgroup:first-child{margin-top:0}
+  .navitem{
+    display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+    padding:11px 12px;border-radius:11px;font-weight:600;font-size:15.5px;
+    margin-bottom:3px;border:2px solid transparent;line-height:1.3;
+  }
+  .navitem:hover{background:#F2EADA}
+  .navitem.active{background:#fff;border-color:var(--gold);font-weight:800}
+  .navitem .ic{flex:0 0 auto;font-size:18px;width:22px;text-align:center}
+  .navitem .tick{margin-left:auto;font-size:13px;color:var(--green);font-weight:900}
+
+  .main{flex:1;min-width:0;padding:20px 16px 70px;padding-bottom:calc(70px + env(safe-area-inset-bottom))}
+
+  /* ---------- narrow: nav becomes a dropdown panel ---------- */
+  @media (max-width:819px){
+    .sidenav{
+      position:fixed;top:0;left:0;right:0;bottom:0;width:100%;flex-basis:auto;
+      background:var(--cream);z-index:80;padding:20px 16px 60px;max-height:none;
+      overflow-y:auto;padding-top:calc(20px + env(safe-area-inset-top));
+    }
+    .sidenav .closerow{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+    .sidenav .closerow b{font-family:Fraunces,serif;font-size:22px}
+    .sidenav .closerow button{font-size:17px;font-weight:800;padding:10px 16px;border-radius:11px;background:var(--charcoal);color:var(--gold-lt)}
+    .navitem{padding:14px 13px;font-size:17px}
+  }
+  @media (min-width:820px){
+    body{font-size:18px}
+    .sidenav{display:block;border-right:2px solid var(--border);background:#F6F0E2;min-height:calc(100vh - 112px)}
+    .sidenav .closerow{display:none}
+    .menubtn{display:none}
+    .main{padding:26px 30px 80px}
+    .topbar h1{font-size:30px}
+  }
+
+  /* ---------- cards ---------- */
+  .card{
+    background:var(--card);border:2px solid var(--border);border-radius:16px;
+    padding:18px;margin-bottom:14px;
+  }
+  .card h2{font-size:21px;font-weight:800}
+  .card h3{font-size:18px;font-weight:700}
+
+  .modgrid{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:14px}
+  @media (min-width:820px){ .modgrid{grid-template-columns:1fr 1fr} }
+
+  .modbtn{
+    display:flex;gap:14px;align-items:flex-start;width:100%;text-align:left;
+    background:var(--card);border:2px solid var(--border);border-radius:16px;
+    padding:16px;transition:transform .12s ease,border-color .12s ease;
+  }
+  .modgrid .modbtn{margin-bottom:0;height:100%}
+  .modbtn:active{transform:scale(.985)}
+  .modbtn .emoji{font-size:28px;line-height:1;flex:0 0 auto;margin-top:2px}
+  .modbtn .t{font-family:Fraunces,serif;font-weight:800;font-size:18.5px;display:block}
+  .modbtn .s{font-size:13.5px;color:var(--muted);display:block;margin-top:2px}
+  .modbtn .meta{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-top:7px;display:block}
+  .done{margin-left:auto;font-size:20px;flex:0 0 auto}
+
+  .bar{background:var(--border);border-radius:99px;height:10px;overflow:hidden}
+  .bar>i{display:block;height:100%;border-radius:99px;transition:width .35s ease}
+
+  .lesson{border:2px solid var(--border);border-radius:14px;margin-bottom:12px;overflow:hidden;background:var(--card)}
+  .lesson>button{width:100%;display:flex;gap:12px;align-items:center;padding:16px;text-align:left;font-weight:700}
+  .lesson .body{
+    padding:0 18px 18px;white-space:pre-wrap;font-size:17px;line-height:1.65;
+    border-top:1px dashed var(--border);padding-top:15px;max-width:70ch;
+  }
+  .lesson .chev{margin-left:auto;font-size:13px;color:var(--muted)}
+
+  /* ---------- quiz ---------- */
+  .qwrap{max-width:760px}
+  .opt{
+    display:block;width:100%;text-align:left;padding:15px;border-radius:12px;
+    border:2px solid var(--border);background:var(--card);margin-bottom:9px;font-weight:600;font-size:16.5px;
+  }
+  .opt.correct{border-color:var(--green);background:var(--green-bg)}
+  .opt.wrong{border-color:var(--red);background:var(--red-bg)}
+  .opt.dim{opacity:.55}
+  .explain{padding:14px;border-radius:12px;font-size:16px;margin-bottom:12px;border-left:5px solid;line-height:1.6}
+  .explain.ok{background:var(--green-bg);border-color:var(--green)}
+  .explain.no{background:var(--red-bg);border-color:var(--red)}
+
+  .btn{
+    display:block;width:100%;max-width:520px;padding:16px;border-radius:13px;font-weight:800;font-size:17px;
+    background:var(--charcoal);color:var(--gold-lt);border:2px solid var(--charcoal);
+  }
+  .btn.gold{background:var(--gold);border-color:var(--gold-dk);color:#2A1E08}
+  .btn.ghost{background:transparent;color:var(--charcoal);border-color:var(--border)}
+  .btn+.btn{margin-top:10px}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:520px}
+  .stat{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:14px;text-align:center}
+  .stat b{display:block;font-family:Fraunces,serif;font-size:26px;font-weight:900}
+  .stat span{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+
+  .flash{
+    background:var(--charcoal);color:var(--cream);border-radius:18px;padding:34px 26px;
+    min-height:250px;display:flex;flex-direction:column;justify-content:center;text-align:center;
+    border:3px solid var(--gold);margin-bottom:14px;max-width:760px;
+  }
+  .flash .cat{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-lt);font-weight:800;margin-bottom:14px}
+  .flash .q{font-family:Fraunces,serif;font-size:23px;font-weight:800;line-height:1.32}
+  .flash .a{font-size:17.5px;line-height:1.62;color:#EDE3CE}
+
+  .chk{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px dashed var(--border);text-align:left;width:100%}
+  .chk:last-child{border-bottom:none}
+  .chk .box{flex:0 0 auto;width:26px;height:26px;border-radius:7px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900}
+  .chk.on .box{background:var(--green);border-color:var(--green);color:#fff}
+  .chk.on span{text-decoration:line-through;opacity:.55}
+
+  .colgrid{display:grid;grid-template-columns:1fr;gap:14px}
+  @media (min-width:1000px){ .colgrid{grid-template-columns:1fr 1fr;align-items:start} }
+
+  .term{border-bottom:1px solid var(--border);padding:13px 0}
+  .term:last-child{border-bottom:none}
+  .term b{font-family:Fraunces,serif;font-size:16.5px;letter-spacing:.02em}
+  .term p{margin:3px 0 0;font-size:15.5px;color:var(--muted);line-height:1.55}
+
+  .inp{width:100%;max-width:520px;padding:15px;border-radius:12px;border:2px solid var(--border);background:#fff;margin-bottom:10px}
+  .inp:focus{outline:3px solid var(--gold-lt);outline-offset:1px;border-color:var(--gold)}
+  button:focus-visible,.modbtn:focus-visible,.navitem:focus-visible{outline:3px solid var(--gold-dk);outline-offset:2px}
+
+  .pagetitle{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+  .note{font-size:14px;color:var(--muted);margin-top:22px;line-height:1.55;max-width:70ch}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ============================================================
+   J EMPIRE — FLORIDA PROCESS SERVER STUDY
+   Content verified against the 2025 Florida Statutes (Chapter 48),
+   Fla. R. Civ. P. 1.070, Fla. Sm. Cl. R. 7.070, and the Ninth
+   Judicial Circuit's published CPS requirements. Reviewed Aug 2026.
+   ============================================================ */
+
+/* ---------- safe storage (works on GitHub Pages, degrades quietly) ---------- */
+var MEM = {};
+var Store = {
+  get: function(k, d){
+    try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : (MEM[k] !== undefined ? MEM[k] : d); }
+    catch(e){ return MEM[k] !== undefined ? MEM[k] : d; }
+  },
+  set: function(k, v){
+    MEM[k] = v;
+    try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){}
+  }
+};
+
+var S = {
+  view: 'home',
+  navOpen: false,
+  moduleId: null,
+  lessonOpen: {},
+  quiz: null,
+  practice: null,
+  completed: Store.get('jeps_completed', []),
+  scores: Store.get('jeps_scores', {}),
+  finalBest: Store.get('jeps_finalBest', 0),
+  checks: Store.get('jeps_checks', {})
+};
+
+/* ============================================================
+   MODULES
+   ============================================================ */
+var MODULES = [
+{
+  id:1, emoji:'⚖️', title:'What Is Process Serving?', subtitle:'The foundation',
+  color:'var(--blue)', bg:'var(--blue-bg)', read:'6 min',
+  lessons:[
+  { title:"What is 'process'?", icon:'📄', content:
+`Process is any official court document that commands a person to do something — or stop doing something. It is the court's way of saying "you are involved in a legal case."
+
+COMMON TYPES OF PROCESS
+• SUMMONS — tells someone they've been sued and must respond
+• COMPLAINT — describes what the lawsuit is about
+• SUBPOENA — orders someone to appear or produce documents
+• WRITS — court orders commanding specific actions
+• INJUNCTIONS — orders requiring someone to stop doing something
+
+🔑 KEY RULE: Due process guarantees no one can be taken to court without proper notice first. Service of process is how that notice happens. Without it, a case can be thrown out.
+
+⚖️ WHY IT MATTERS: Process must be delivered correctly for the court to have JURISDICTION over the person sued. Bad service means the court cannot legally act, and a judgment can be vacated later.
+
+📋 FOR PROCESS TO BE VALID
+1. It bears the SEAL of the court
+2. It is SIGNED by the person who served it
+3. It carries the required SERVICE INFORMATION (date, time, manner)
+4. It is served in the MANNER PRESCRIBED BY LAW
+
+💡 No valid service = no valid judgment, no matter how strong the case.` },
+
+  { title:'Who can serve process in Florida?', icon:'👤', content:
+`§48.021(1) — process is served by the sheriff of the county where the person is found, EXCEPT that nonenforceable civil process, criminal witness subpoenas, and criminal summonses may be served by a special process server appointed by the sheriff, or by a certified process server under §48.27. Civil witness subpoenas may be served by any person authorized by the rules of civil procedure.
+
+1. 🏛️ THE SHERIFF — the default server in every county.
+
+2. ⭐ SPECIAL PROCESS SERVER — appointed by the SHERIFF. Authorized in ONLY the county of the appointing sheriff (§48.021(3)).
+
+3. 🎓 CERTIFIED PROCESS SERVER (CPS) — that's you. Certified by the CHIEF JUDGE of the judicial circuit. Serves anywhere within that circuit.
+
+❌ WHO CANNOT SERVE: parties to the case, anyone under 18, anyone with a mental or legal disability.
+
+🚨 FALSE RETURN — KNOW YOUR OWN STATUTE
+• CERTIFIED process server → §48.31(2)
+• SPECIAL process server → §48.021(4)
+Either way: FELONY OF THE THIRD DEGREE and a permanent bar from serving process in Florida. Because you are certifying in the Ninth Circuit, §48.31(2) is YOUR provision.` },
+
+  { title:'The 9th Circuit — your circuit', icon:'🗺️', content:
+`The Ninth Judicial Circuit covers ORANGE COUNTY and OSCEOLA COUNTY. One certification covers both.
+
+WHAT THE STATUTE REQUIRES (§48.29(3))
+• At least 18 years old
+• No mental or legal disability
+• Permanent resident of Florida
+• Background investigation
+• Certificate of good conduct — no pending criminal case, no felony conviction, no conviction of a misdemeanor involving moral turpitude or dishonesty within the past 5 years
+• An examination IF prescribed by the chief judge — the chief judge sets the content and the passing grade
+• A $5,000 surety bond, renewable annually
+• An oath of office
+
+WHAT THE NINTH CIRCUIT REQUIRES (from ninthcircuit.org)
+• Applications are accepted QUARTERLY
+• Initial application: $300 — renewal: $250 (payable to "State of Florida")
+• FDLE background check
+• Certificate of good conduct
+• Passing examination grade of 80% or better
+• $5,000 surety bond
+
+🆔 ID CARD (§48.29(5)(b)): bears your identification number, printed name, signature, photograph, the SEAL OF THE CIRCUIT COURT, and an expiration date. Renewable annually on proof of good standing and current bond.
+
+🔁 RENEWAL in the Ninth Circuit is annual and requires the application, fee, background check, certificate of good conduct, an 80% exam result, and a current bond.
+
+🔑 There is NO statewide process server license. You must be certified in EACH circuit (§48.29(7)).` }],
+
+  quiz:[
+  {q:"What does 'process' mean in legal terms?",
+   options:['A court fine','Official court documents commanding action','A police report',"A judge's ruling"],correct:1,
+   explain:'Process = official court documents (summons, complaints, subpoenas, writs) that command someone to act or appear.'},
+  {q:'A CERTIFIED process server who executes a false return is punished under which statute?',
+   options:['§48.021(4)','§48.27(2)','§48.31(2)','§48.29(6)'],correct:2,
+   explain:'§48.31(2) governs certified process servers — third degree felony plus a permanent bar. §48.021(4) is the parallel provision for SPECIAL process servers.'},
+  {q:'The 9th Judicial Circuit covers which counties?',
+   options:['Orange & Seminole','Osceola & Polk','Orange & Osceola','Orange & Lake'],correct:2,
+   explain:'The 9th Judicial Circuit = Orange County + Osceola County. One certification, two counties.'},
+  {q:'Who sets the content and passing grade of the CPS examination?',
+   options:['FAPPS','The Florida Supreme Court','The chief judge of the circuit','The Department of State'],correct:2,
+   explain:'§48.29(3)(f) — the chief judge of the circuit prescribes the content, the passing grade, and how often it is offered. The Ninth Circuit requires 80% or better.'},
+  {q:'Is there a statewide process server license in Florida?',
+   options:['Yes — issued by the Supreme Court','Yes — through FDLE','No — you certify in each circuit','Yes — it covers all 20 circuits'],correct:2,
+   explain:'No statewide license exists. §48.29(7) lets you qualify in more than one circuit, but each one is separate.'},
+  {q:'A SPECIAL process server appointed by a sheriff may serve process where?',
+   options:['Anywhere in Florida','Only in the county of the appointing sheriff','Anywhere in the judicial circuit','Only in adjacent counties'],correct:1,
+   explain:'§48.021(3) — a special process server is authorized only in the county of the sheriff who appointed them. A CPS covers the whole circuit.'}]
+},
+
+{
+  id:2, emoji:'🚪', title:'Methods of Service', subtitle:'Chapter 48 core rules',
+  color:'var(--purple)', bg:'var(--purple-bg)', read:'10 min',
+  lessons:[
+  { title:'Personal service — the gold standard', icon:'🤝', content:
+`Personal service means handing the documents DIRECTLY to the person named. Courts favor it above every other method.
+
+HOW IT WORKS (§48.031(1)(a))
+Deliver a copy of the process together with a copy of the complaint, petition, or other initial pleading to the person to be served.
+
+✅ EMPLOYER RULE (§48.031(1)(b)): an employer contacted by an authorized server must allow service in a PRIVATE AREA designated by the employer. An employer who refuses commits a NONCRIMINAL VIOLATION punishable by a fine of up to $1,000.
+
+🔑 DOCUMENT EVERY TIME
+• Exact date and time
+• Exact address
+• Full name of the person served
+• Physical description
+• How you confirmed identity
+
+🚨 DISINTERESTED (§48.31(2)): you must have no personal or financial stake in any case you serve.
+
+📝 ON THE PAPER ITSELF (§48.031(5)): on the FIRST PAGE ONLY of at least one of the processes served, write the date and time of service, your initials or signature, and your identification number.` },
+
+  { title:"Substitute service at the abode", icon:'🏠', content:
+`When the person can't be handed the papers directly, Florida allows substitute service at their home.
+
+THE 3 REQUIREMENTS (§48.031(1)(a)) — ALL THREE
+1. 📍 USUAL PLACE OF ABODE — where the defendant actually LIVES right now. One person, one abode at a time.
+2. 👥 A PERSON RESIDING THERE who is AT LEAST 15 YEARS OLD. A visitor doesn't count. A 14-year-old doesn't count.
+3. 📢 INFORM THAT PERSON OF THE CONTENTS.
+
+Also in §48.031(1)(a): minors who are or have been MARRIED are served like any adult under this section.
+
+SPOUSE SUBSTITUTION (§48.031(2)(a)) — THREE CONDITIONS
+Substituted service on the spouse may be made anywhere in a county by a server authorized in that county IF:
+① the cause of action is NOT an adversarial proceeding between the spouse and the person to be served; AND
+② the SPOUSE REQUESTS such service, OR the spouse is also a party to the action; AND
+③ the spouse and the person to be served RESIDE TOGETHER in the same dwelling — regardless of whether that dwelling is in the county where the substituted service is made.
+
+SOLE PROPRIETOR (§48.031(2)(b))
+At the place of business, during regular business hours, serve the person in charge — but only after TWO attempts to serve the owner there.
+
+⚠️ Sliding papers under a door is not service. Dropping them in a residential mailbox is not service. (One narrow exception follows in the next lesson.)` },
+
+  { title:'Private mailboxes, virtual offices & registered offices', icon:'📬', content:
+`Two provisions that people miss — and that answer the "you can never use a mailbox" assumption.
+
+📮 PRIVATE MAILBOX / VIRTUAL OFFICE (§48.031(6))
+IF the ONLY address for the person that is discoverable through public records is a private mailbox, a virtual office, or an executive office or mini suite, substituted service MAY be made by leaving a copy of the process with the PERSON IN CHARGE of that location — but ONLY if you determine that the person to be served actually maintains a mailbox or office there.
+
+• "VIRTUAL OFFICE" = provides communications services (phone/fax) and address services with no dedicated office space, all communications routed through a common receptionist.
+• "EXECUTIVE OFFICE OR MINI SUITE" = communications services, a DEDICATED office space, and other supportive services, all routed through a common receptionist.
+
+🏢 REGISTERED OFFICES (§48.091)
+• (3) The registered agent must keep the registered office OPEN at least 10 a.m.–12 noon and 2 p.m.–4 p.m. every day except Saturdays, Sundays, and legal holidays, with someone there on whom process may be served.
+• (4)(a) A registered agent who is a natural person may be served under §48.031.
+• (4)(b) If you go to the DESIGNATED REGISTERED OFFICE to serve a natural-person registered agent and that person is not present, you may serve ANY EMPLOYEE of that agent who is present — INCLUDING DURING THE FIRST ATTEMPT.
+• (4)(c) If the registered agent is not a natural person, serve it under the law for that entity type, or any employee of the agent present at the office.
+• (5) The agent must forward the papers — but failing to forward does NOT invalidate your service.
+
+🔑 EXAM TRAP: "the registered agent is out of the office" does not automatically end your attempt at the registered office. Look for an employee who is present.` },
+
+  { title:'Businesses & entities — current law', icon:'🏢', content:
+`⚠️ The rules for serving businesses changed on January 2, 2023 (ch. 2022-190) and were adjusted again effective October 1, 2025 (ch. 2025-13). Older study material that starts with "president, then VP, then cashier" is outdated.
+
+🏢 CORPORATIONS (§48.081)
+1st → REGISTERED AGENT (§48.081(2))
+2nd → If the corporation ceases to have a registered agent, or the agent cannot be served after ONE GOOD FAITH ATTEMPT: (a) chair of the board, president, any vice president, secretary, or treasurer; OR (b) any person listed publicly on its LATEST ANNUAL REPORT, as most recently amended (§48.081(3))
+3rd → If, after due diligence, service still can't be completed and the narrow conditions in §48.081(4) are met: the Secretary of State under §48.161, or a court order under §48.102
+
+🤝 LLCs (§48.062)
+1st → REGISTERED AGENT (§48.062(2))
+2nd → If no agent or the agent can't be served after one good faith attempt, ANY of these (§48.062(3)):
+   (a) any MANAGER of a manager-managed LLC
+   (b) any MEMBER of a member-managed LLC
+   (c) any person LISTED PUBLICLY ON THE LATEST ANNUAL REPORT
+3rd → Secretary of State (§48.161) or court order (§48.102) under §48.062(4)
+There is NO "designated employee" step for an LLC — that step belongs to partnerships.
+
+👥 PARTNERSHIPS (§48.061)
+• PLAIN general partnership: any PARTNER first. If a partner isn't available during regular business hours they may designate an employee or agent. After ONE attempt on a partner or designated employee, serve the PERSON IN CHARGE during regular business hours.
+• LLP: REGISTERED AGENT first, then any partner, then designated employee, then person in charge after one attempt, then SOS/court order.
+• LP and LLLP: REGISTERED AGENT first, then any GENERAL PARTNER, then SOS/court order.
+
+🏦 FINANCIAL INSTITUTIONS (§48.092): served in accordance with §655.0201.
+
+🏛️ PUBLIC AGENCIES (§48.111(1)) — CURRENT ORDER
+(a) THE REGISTERED AGENT; or
+(b) if there is no registered agent, or the agent can't be served after one good faith attempt, in this order:
+   1. president, mayor, chair, or other head
+   2. vice president, vice mayor, or vice chair
+   3. any member of the governing board/council/commission, the manager of the entity, or an in-house attorney
+   4. any employee of the entity at its MAIN OFFICE
+§48.111(2): a public agency that is not a body corporate and has no governing board → serve the public officer being sued or the chief executive officer.
+
+🏛️ THE STATE (§48.121): serve the state attorney or an assistant state attorney for the circuit, AND send TWO COPIES by registered or certified mail to the Attorney General.
+
+🔑 GOLDEN RULE: corporations, LLCs, LLPs, LPs, and public agencies all start with the REGISTERED AGENT.` },
+
+  { title:'Minors, incompetents & prisoners', icon:'👶', content:
+`👶 MINORS (§48.041)
+Process against a minor WHO HAS NEVER BEEN MARRIED is served:
+(a) by serving a PARENT or guardian of the minor under §48.031 — or, when a legal guardian has been appointed, by serving the GUARDIAN under §48.031; and
+(b) by serving the GUARDIAN AD LITEM or other court-appointed representative, if one is appointed. Service on the guardian ad litem is unnecessary when they appear voluntarily or the court orders the appearance without service.
+
+A minor who is or has been MARRIED is served like an adult under §48.031(1)(a).
+
+Case law: Jones v. Lucks — handing papers to an unmarried minor and saying "someone is suing you" was ruled insufficient.
+
+🧠 INCOMPETENT PERSONS (§48.042)
+(a) serve TWO COPIES on the person who has care or custody — or serve the legal GUARDIAN under §48.031 if one is appointed; and
+(b) serve the guardian ad litem if appointed, unless they appear voluntarily.
+
+🔒 STATE PRISONERS (§48.051)
+One sentence, and it is exactly what it says: process against a state prisoner shall be served ON THE PRISONER. This lines up with Shurman v. Atlantic Mortgage, where an inmate's usual place of abode was held to be the prison.` },
+
+  { title:'Sunday service & the service clock', icon:'📅', content:
+`☀️ SUNDAY SERVICE (§48.20)
+Service or execution on a SUNDAY of any writ, process, warrant, order, or judgment is VOID, and the person who serves it is liable to the aggrieved party for damages as if there had been no process at all.
+
+THE ONLY EXCEPTION: if the person REQUESTING service makes an AFFIDAVIT that they have good reason to believe the person intends to ESCAPE FROM THIS STATE under protection of Sunday, then an officer furnished with an ORDER from the TRIAL COURT JUDGE may serve on Sunday, and it is as valid as any other day.
+
+It is not a general "urgency" exception. Client pressure never qualifies.
+
+⏰ SERVICE DEADLINES
+• FLORIDA STATE COURT → 120 DAYS from filing (Fla. R. Civ. P. 1.070(j))
+• FEDERAL COURT → 90 DAYS from filing (Fed. R. Civ. P. 4(m))
+• FLORIDA SMALL CLAIMS → 120 DAYS (Fla. Sm. Cl. R. 7.070(b), adopted 2026 to match Rule 1.070(j))
+
+⚠️ When a deadline is close, notify the attorney so they can seek an extension.` }],
+
+  quiz:[
+  {q:'For substitute service at the abode, the person receiving must be at least how old?',
+   options:['13','15','16','18'],correct:1,
+   explain:'§48.031(1)(a) — any person RESIDING there who is 15 years of age or older, informed of the contents.'},
+  {q:'Which of these is NOT required for substituted service on a spouse under §48.031(2)(a)?',
+   options:['They reside together in the same dwelling','The spouse requests service or is also a party','It is not an adversarial proceeding between them','The dwelling is in the county where service is made'],correct:3,
+   explain:'§48.031(2)(a) expressly allows service regardless of whether the dwelling is in the county where the substituted service is made. The other three ARE required — and the "spouse requests service or is a party" element is the one most people forget.'},
+  {q:'When serving an LLC and the registered agent cannot be served, who may you serve?',
+   options:['Only a designated employee','A manager, a member, or a person listed on the latest annual report','Only the Secretary of State','The person in charge after two attempts'],correct:1,
+   explain:'§48.062(3) lists exactly three: any manager of a manager-managed LLC, any member of a member-managed LLC, or any person listed publicly on the latest annual report. There is no "designated employee" tier for LLCs.'},
+  {q:'Under current law, who is served FIRST for a municipal corporation or county board?',
+   options:['The mayor or chair','The registered agent','Any board member','Any employee at the main office'],correct:1,
+   explain:'§48.111(1)(a) — the registered agent first. Only if there is none, or it cannot be served after one good faith attempt, do you move to president/mayor/chair, then vice, then board member/manager/in-house attorney, then any employee at the main office.'},
+  {q:"You arrive at a corporation's designated registered office. The natural-person registered agent is not there, but an employee of the agent is. You may:",
+   options:['Serve that employee, even on the first attempt','Leave and return for a second attempt','Serve only an officer','Go straight to the Secretary of State'],correct:0,
+   explain:'§48.091(4)(b) — you may serve any employee of the natural-person registered agent who is present at the designated registered office, including during the first attempt at service.'},
+  {q:'Sunday service is void unless a judge authorizes it based on what showing?',
+   options:['Any urgent client request','A sworn affidavit that the person intends to escape from the state','Written consent from the defendant','A filing fee'],correct:1,
+   explain:'§48.20 — the only exception is an order from the trial court judge based on an affidavit that the person intends to escape from this state under protection of Sunday.'},
+  {q:'An employer who refuses to let you serve an employee in a private area faces:',
+   options:['Nothing','A civil fine up to $500','A noncriminal violation, fine up to $1,000','A third degree felony'],correct:2,
+   explain:'§48.031(1)(b) — noncriminal violation, punishable by a fine of up to $1,000.'},
+  {q:'When serving an unmarried minor with a court-appointed legal guardian, you serve:',
+   options:['The minor only','The guardian','Both the minor and a parent, always','The school principal'],correct:1,
+   explain:'§48.041(1)(a) — serve a parent or guardian; when a legal guardian has been appointed, serve the guardian. Plus the guardian ad litem under (1)(b) if one is appointed.'},
+  {q:'Process against a state prisoner is served on:',
+   options:['The warden','The prisoner','The Department of Corrections','A spouse at the prior address'],correct:1,
+   explain:'§48.051 — process against a state prisoner shall be served on the prisoner.'},
+  {q:'Substituted service at a private mailbox under §48.031(6) is allowed when:',
+   options:['You have made three attempts at the home','It is the only address discoverable through public records and you determine the person maintains a box there','The attorney authorizes it','Never — mailboxes are always invalid'],correct:1,
+   explain:'§48.031(6)(a) — only if the private mailbox, virtual office, or executive office/mini suite is the ONLY publicly discoverable address AND you determine the person maintains one there. Then serve the person in charge of that location.'}]
+},
+
+{
+  id:3, emoji:'📋', title:'Return of Service & Non-Service', subtitle:'Proper vs. improper affidavits',
+  color:'var(--green)', bg:'var(--green-bg)', read:'8 min',
+  lessons:[
+  { title:'The return of service', icon:'📝', content:
+`After serving, you file a Return of Service with the court. It is your sworn proof.
+
+WHAT MUST BE IN IT (§48.21(1))
+• The DATE the process came to hand
+• The TIME it came to hand
+• The DATE it was served
+• The TIME it was served
+• The MANNER of service
+• The NAME of the person served
+• If served in a representative capacity, the POSITION that person occupies
+• A LIST of all pleadings and documents served
+• Your SIGNATURE — an electronic signature is allowed if you are authorized under Chapter 48 to serve process
+
+CPS-SPECIFIC (§48.29(6))
+A certified process server must place the §48.031(5) information on the FIRST PAGE of at least one of the processes served, and must make the return of service ON A FORM THAT HAS BEEN REVIEWED AND APPROVED BY THE COURT.
+
+⚠️ Circuits also issue administrative orders adding local requirements. Use the NINTH CIRCUIT's own current administrative order and approved form — do not rely on another circuit's order.
+
+WHAT HAPPENS IF SOMETHING IS MISSING (§48.21(2))
+• Failure to state the facts or include the signature INVALIDATES the service
+• BUT the return is AMENDABLE at any time on application to the court that issued the process
+• On amendment, service is as effective as if the return had been correct from the start
+• The omission subjects the server to a fine NOT EXCEEDING $10, in the court's discretion
+
+🔑 Courts presume a facially valid return is correct — evidence can rebut that presumption. Accuracy matters.
+
+For substitute service, courts check:
+1. Was it the defendant's usual place of abode?
+2. Was the person 15 or older?
+3. Did they reside there?
+4. Were they informed of the contents?` },
+
+  { title:'Real case law — usual place of abode', icon:'⚖️', content:
+`"Usual place of abode" is one of the most heavily litigated ideas in Chapter 48.
+
+📍 DEFINITION: the place where the person is ACTUALLY LIVING at the time service is made. One usual place of abode at a time, even with multiple properties.
+
+⚠️ "RESIDENCE" ≠ "USUAL PLACE OF ABODE": you can legally reside somewhere without currently living there.
+
+🏛️ CASES TO KNOW
+Shurman v. Atlantic Mortgage & Investment Corp. (Fla. 2001) — an inmate's usual place of abode was the prison, not the home he shared with his wife before incarceration.
+
+Robles-Martinez v. Diaz, Reus & Targ (Fla. 3d DCA 2011) — substitute service provisions must be STRICTLY COMPLIED WITH and are STRICTLY CONSTRUED.
+
+Stern v. Gad — serving the wife at a condo the husband owned was not valid abode service where he proved by affidavit he did not live in the U.S. at the time.
+
+Ward v. Gibson — a leased PARKING SPACE in a garage was not a usual place of abode.
+
+Rokeach v. Glickstein — holding papers to a car window while the driver fled was VALID, because the server identified himself and described the documents.
+
+Speer v. Wooddell — a houseguest of roughly a year WAS a proper person for substitute service.
+
+Couts v. Maryland Casualty Co. — a mother-in-law who was only VISITING was not.
+
+Baker v. Stearns Bank — a housekeeper who does not reside there is not.
+
+Schupak v. Sutton Hill Assocs. — a building DOORMAN in the lobby is not.
+
+Johnston v. Halliday — valid substitute service requires proof of (a) the usual place of abode, (b) the identity of the person served, (c) whether they were 15+, (d) whether they actually resided there, (e) whether they were informed of contents.
+
+🔑 EXAM TIP: if someone owns a home but doesn't currently live there, the answer points to where they ACTUALLY live.` },
+
+  { title:'Non-service & the diligence standard', icon:'🔍', content:
+`Sometimes you cannot complete service. That is acceptable — what is not acceptable is failing to document.
+
+⚖️ WHAT THE STATUTE ACTUALLY SAYS (§48.161(5))
+A party is considered to have used DUE DILIGENCE if that party:
+(a) made diligent inquiry and exerted an honest and conscientious effort appropriate to the circumstances to acquire the information needed for personal service;
+(b) reasonably employed the knowledge at their command; and
+(c) made AN APPROPRIATE NUMBER OF ATTEMPTS, TAKING INTO ACCOUNT THE PARTICULAR CIRCUMSTANCES, during such times when and where the party is reasonably likely to be found.
+
+⚠️ Note what is NOT there: a fixed number. If an answer choice says "an appropriate number under the circumstances," that is the statutory standard. Three or more attempts at varied times is common professional practice and what most courts expect in practice — but it is practice, not a statutory minimum.
+
+YOUR NON-SERVICE AFFIDAVIT SHOULD SHOW
+• Every attempt: exact date, time, address
+• What you observed (lights, vehicles, mail)
+• Why service could not be completed
+• Information gathered about the defendant's whereabouts
+
+⚠️ Attempting only at the SAME time every day is not a conscientious effort appropriate to the circumstances.
+
+AFTER NON-SERVICE — notify the attorney immediately. They may skip trace, seek constructive service, or ask the court for more time.
+
+🚨 NEVER mark service complete if it was not completed. False return is a felony (§48.31(2)).` },
+
+  { title:'When personal service fails — the alternatives', icon:'📰', content:
+`Your documentation is what unlocks every one of these.
+
+📄 SECRETARY OF STATE (§48.161) — for nonresidents, concealed parties, and entities where the statute authorizes it
+• Send process to the office of the Secretary of State by personal delivery, registered mail, certified mail return receipt requested, a commercial delivery firm, or ELECTRONIC TRANSMISSION
+• ALSO send notice of service and a copy of the process to the party at their last known physical address (and last known electronic address if the parties have recently and regularly used email between themselves)
+• File an AFFIDAVIT OF COMPLIANCE within 40 DAYS after the date of service on the Secretary of State, or within such additional time as the court allows
+• Service is EFFECTUATED on the date the affidavit of compliance is filed, or the date the notice requirements are completed — WHICHEVER IS LATER (§48.161(8))
+
+🖥️ SERVICE BY OTHER MEANS (§48.102)
+For corporations, general partnerships, LLPs, LPs, LLLPs, and LLCs only: if after due diligence personal service can't be made, the court on motion may authorize any other manner reasonably effective to give ACTUAL NOTICE — including service by EMAIL or other technology, by a person authorized to serve process or by an attorney.
+
+📰 SERVICE BY PUBLICATION — CHAPTER 49, NOT CHAPTER 48
+• Attorney files a diligent search affidavit
+• Court approves publication
+• Notice published in a designated newspaper, once a week for the required number of weeks
+• Proof of publication filed
+• Last resort only` }],
+
+  quiz:[
+  {q:'Which of these is NOT required on a return of service under §48.21(1)?',
+   options:['The date and time the process came to hand','The manner of service','A physical description of the person served','A list of all pleadings and documents served'],correct:2,
+   explain:'§48.21(1) requires date/time to hand, date/time served, manner, name, representative position, a list of documents, and a signature. A physical description is excellent practice and often required by local order — but it is not in §48.21(1).'},
+  {q:'A return of service is missing the time of service. What happens?',
+   options:['The service is permanently void','Service is invalidated, but the return may be amended on application to the court','Nothing — it is a minor detail','The server is charged with a felony'],correct:1,
+   explain:'§48.21(2) — the omission invalidates service, but the return is amendable at any time on application to the issuing court, and on amendment service is as effective as if it had been correct. A discretionary fine up to $10 may also be imposed.'},
+  {q:'The discretionary fine for an incomplete return of service is up to:',
+   options:['$10','$100','$500','$1,000'],correct:0,
+   explain:'§48.21(2) — a fine not exceeding $10, in the court\u2019s discretion. The $1,000 figure belongs to the employer-refusal provision in §48.031(1)(b).'},
+  {q:'How does §48.161(5) define an adequate number of service attempts?',
+   options:['Exactly three','At least five','An appropriate number taking into account the particular circumstances','Whatever the attorney requests'],correct:2,
+   explain:'§48.161(5)(c) sets no fixed number — it requires an appropriate number of attempts given the circumstances, at times and places the party is reasonably likely to be found.'},
+  {q:'Service by publication is governed by which chapter?',
+   options:['Chapter 47','Chapter 48','Chapter 49','Chapter 50'],correct:2,
+   explain:'Chapter 49. Chapter 48 covers service of process generally.'},
+  {q:'Under §48.161(8), service on the Secretary of State is effectuated when?',
+   options:['The moment the SOS receives the process','On the date the affidavit of compliance is filed, or the notice requirements are completed — whichever is later','40 days after mailing','When the return receipt is signed'],correct:1,
+   explain:'§48.161(8) — the later of the affidavit-of-compliance filing date or completion of the §48.161(3) notice requirements.'},
+  {q:'In Ward v. Gibson, why was service on a roommate at a leased parking space invalid?',
+   options:['The roommate was under 15',"It was not the defendant's usual place of abode",'No witness was present','The papers were not read aloud'],correct:1,
+   explain:'A leased garage parking space is not a place where someone lives, so it cannot be a usual place of abode.'}]
+},
+
+{
+  id:4, emoji:'📜', title:'Court Rules', subtitle:'Rule 1.070, Rule 7.070 & your authority',
+  color:'var(--orange)', bg:'var(--orange-bg)', read:'7 min',
+  lessons:[
+  { title:'Rule 1.070 — the 120-day rule', icon:'⏱️', content:
+`Florida Rule of Civil Procedure 1.070 governs process in Florida state court. Still current as of the April 1, 2026 rules.
+
+ISSUANCE (1.070(a)): on the commencement of the action, summons or other process must be promptly issued by the clerk or judge under their signature and the seal of the court, and delivered for service.
+
+SERVICE; BY WHOM MADE (1.070(b)): service may be made by an officer authorized by law to serve process, but the court may appoint any competent person not interested in the action to serve the process. §48.27(3) confirms this appointment route stays open alongside the CPS list.
+
+⏰ THE 120-DAY RULE (1.070(j))
+If service of the initial process and initial pleading is not made on a defendant within 120 DAYS after filing of the initial pleading directed to that defendant, the court — on its own initiative after notice, or on motion — must either direct that service be effected within a specified time, or dismiss the action without prejudice, or drop that defendant as a party. If the plaintiff shows GOOD CAUSE or EXCUSABLE NEGLECT, the court MUST extend the time.
+
+When a motion for leave to amend with an attached proposed amended complaint is filed, the 120-day period for serving new parties begins on the ENTRY OF THE ORDER granting leave to amend.
+
+A dismissal under this subdivision is not a voluntary dismissal and is not an adjudication on the merits.
+
+🔑 PROCESS RUNS STATEWIDE (§48.011): summons, subpoenas, and other process in civil actions run throughout the state. All process except subpoenas is directed to all and singular the sheriffs of the state.` },
+
+  { title:'Your authority as a CPS — §48.27 & §48.29', icon:'🎓', content:
+`Your authority comes from the Florida Certified Process Server Act, §§48.25–48.31 (§48.25 is the short title).
+
+📌 A NOTE ON RULE NUMBERS
+Some circuit websites list "Florida Rules of Civil Procedure 1.070 and 1.808" for process servers; others list "1.070 and 1.080." The substance of what a CPS may do is set by STATUTE, not by that rule. Learn §48.27 and §48.29 — and if a practice question references a rule number for CPS authority, confirm which numbering your course materials use.
+
+WHAT §48.27(2) AUTHORIZES
+(a) To serve INITIAL NONENFORCEABLE CIVIL PROCESS on a person found within the circuit where you are certified, when a civil action has been filed against that person in the circuit court or in a county court in the state.
+(b) To serve CRIMINAL WITNESS SUBPOENAS and CRIMINAL SUMMONSES on a person found within your circuit.
+
+• "Initial" = the first papers in a case
+• "Nonenforceable" = delivering notice, not enforcing a judgment
+
+❌ NOT YOURS TO SERVE
+• Arrest warrants
+• Writs of execution
+• Writs of possession (the sheriff executes these)
+
+🔁 §48.27(1): you are subject to ANNUAL recertification and reappointment by the chief judge.
+💵 §48.29(8): a certified process server MAY charge a fee for services.
+🌐 §48.29(7): you may be certified in more than one circuit, may serve in any circuit where you are listed, and may serve FOREIGN PROCESS in any circuit where you are listed.
+
+🆔 Carry your ID card. It shows your ID number, printed name, signature, photograph, the seal of the circuit court, and an expiration date. Expired card = no longer authorized.` },
+
+  { title:'Rule 7.070 — small claims', icon:'💰', content:
+`Florida Small Claims Rule 7.070 governs service in small claims court. Small claims covers actions at law in county court where the demand does not exceed $8,000, exclusive of costs, interest, and attorney fees (Rule 7.010(b)).
+
+RULE 7.070(a) — METHOD
+• Service is effected as provided by law, or as provided by Fla. R. Civ. P. 1.070(a)–(h)
+• Constructive or substituted service may be effected as provided by law
+• Service on FLORIDA RESIDENTS ONLY may ALSO be effected by CERTIFIED MAIL, with the return receipt signed by the defendant or by someone authorized to receive mail at the defendant's residence or principal place of business
+• EITHER THE CLERK OR AN ATTORNEY OF RECORD may mail the certified mail, at a cost in addition to the filing fee
+
+⚠️ Two things people get wrong: certified mail service is NOT available for out-of-state defendants, and the clerk is not the only one who can mail it.
+
+RULE 7.070(b) — SUMMONS; TIME LIMIT
+The Florida Supreme Court adopted a new subdivision (b) in 2026 giving small claims a 120-DAY service limit, in alignment with Fla. R. Civ. P. 1.070(j).
+
+SAME RULES STILL APPLY
+• Sunday prohibition
+• Return of service requirements
+• The 15-year-old substitute service requirement
+
+⚠️ You will see small claims constantly — landlord/tenant, small debts, minor damages.` }],
+
+  quiz:[
+  {q:'Under Rule 1.070(j), how long to complete service after filing in Florida state court?',
+   options:['60 days','90 days','120 days','150 days'],correct:2,
+   explain:'120 days after filing of the initial pleading directed to that defendant.'},
+  {q:'If the plaintiff shows good cause or excusable neglect for missing the 120 days, the court:',
+   options:['May extend the time','MUST extend the time for an appropriate period','Must dismiss with prejudice','Must transfer the case'],correct:1,
+   explain:'Rule 1.070(j) uses "must" — on a showing of good cause or excusable neglect the court must extend the time for an appropriate period.'},
+  {q:"Which statute sets out what a certified process server is authorized to serve?",
+   options:['Fla. R. Civ. P. 1.080','§48.27','§48.021','§48.011'],correct:1,
+   explain:'§48.27(2) — initial nonenforceable civil process, criminal witness subpoenas, and criminal summonses, within the circuit where you are certified.'},
+  {q:'Under Rule 7.070, certified mail service in small claims is available against:',
+   options:['Any defendant anywhere','Florida residents only','Corporations only','Out-of-state defendants only'],correct:1,
+   explain:'Rule 7.070(a) — service by certified mail is for Florida residents only. Either the clerk or an attorney of record may mail it.'},
+  {q:'Small claims court in Florida handles cases where the demand does not exceed:',
+   options:['$5,000','$8,000','$15,000','$30,000'],correct:1,
+   explain:'Rule 7.010(b) — $8,000, exclusive of costs, interest, and attorney fees.'},
+  {q:'Process issued in one Florida county may be served:',
+   options:['Only in that county','Only in adjacent counties','Anywhere in the state','Only in that judicial circuit'],correct:2,
+   explain:'§48.011 — summons, subpoenas, and other process in civil actions run throughout the state. Your own authority as a CPS, though, is limited to circuits where you are certified.'}]
+},
+
+{
+  id:5, emoji:'🇺🇸', title:'Federal Rules — FRCP 4', subtitle:'Federal service of process',
+  color:'var(--teal)', bg:'var(--teal-bg)', read:'6 min',
+  lessons:[
+  { title:'Federal Rule 4 — the basics', icon:'🏛️', content:
+`Federal Rule of Civil Procedure 4 governs service in federal court.
+
+WHAT A FEDERAL SUMMONS MUST INCLUDE (Rule 4(a))
+• Court name
+• Names of all parties
+• Plaintiff's attorney name and address
+• The time within which the defendant must appear and defend
+• A warning that failure to appear means DEFAULT JUDGMENT
+• The clerk's signature and the court's seal
+
+WHO MAY SERVE (Rule 4(c)): any person who is AT LEAST 18 and NOT A PARTY.
+
+🔑 THE CONTRAST
+• FLORIDA STATE: sheriff, special process server, or certified process server
+• FEDERAL: any non-party 18 or older
+
+⏱️ RESPONSE TIME
+• FORMALLY SERVED → 21 days to answer
+• WAIVED SERVICE → 60 days (90 if the request was sent outside the U.S.)` },
+
+  { title:'Deadlines, methods & waiver', icon:'⏰', content:
+`THE 90-DAY DEADLINE (Rule 4(m))
+Service must be completed within 90 DAYS of filing. If missed, the court dismisses without prejudice or orders service within a set time — unless the plaintiff shows GOOD CAUSE.
+
+INDIVIDUALS (Rule 4(e))
+1. Follow the law of the state where the district court sits or where service is made — in Florida, that means Chapter 48
+2. Personal delivery
+3. Leave at the dwelling with someone of suitable age and discretion who resides there
+4. Deliver to an authorized agent
+
+CORPORATIONS (Rule 4(h))
+1. Follow state law, OR
+2. Deliver to an officer, a managing or general agent, or an authorized agent
+
+WAIVER OF SERVICE (Rule 4(d)) — FEDERAL ONLY
+• Plaintiff MAILS a waiver request to the defendant
+• If the defendant signs and returns it, no personal service is needed
+• The defendant must be given at least 30 DAYS to return the form
+• Waiving buys the defendant more time to answer: 60 days domestic, 90 international
+• A defendant who refuses without good cause must PAY the costs of service
+
+🔑 Waiver of service does NOT exist in Florida state court.` },
+
+  { title:'Serving the government in federal court', icon:'🏛️', content:
+`A favorite exam topic, because it requires more than one recipient.
+
+⭐ SERVING THE UNITED STATES (Rule 4(i)) — do BOTH
+1. Deliver to the U.S. Attorney for the district (or a designated assistant or clerical employee), OR send by registered or certified mail to the civil-process clerk at the U.S. Attorney's office; AND
+2. Send a copy by registered or certified mail to the U.S. ATTORNEY GENERAL in Washington, D.C.
+
+⭐ A U.S. AGENCY OR OFFICER SUED IN OFFICIAL CAPACITY
+Serve the United States (both steps above) AND mail a copy to the agency, officer, or employee.
+
+⭐ A FEDERAL OFFICER SUED INDIVIDUALLY
+Serve the United States AND serve that person under the ordinary individual-service rules.
+
+⭐ STATE OR LOCAL GOVERNMENT (Rule 4(j)(2))
+Deliver to its CHIEF EXECUTIVE OFFICER, or serve in the manner prescribed by that state's law.
+
+🔑 For the U.S. government the theme is: you always also serve the United States.` },
+
+  { title:'Florida vs. federal — side by side', icon:'⚡', content:
+`SERVICE DEADLINE
+• Florida state → 120 DAYS (Rule 1.070(j))
+• Federal → 90 DAYS (Rule 4(m))
+
+WHO MAY SERVE
+• Florida → sheriff, special process server, certified process server
+• Federal → any non-party 18+
+
+WAIVER OF SERVICE
+• Florida → does not exist
+• Federal → Rule 4(d)
+
+TIME TO ANSWER
+• Florida state → 20 days after service (Fla. R. Civ. P. 1.140(a))
+• Federal, served → 21 days
+• Federal, waived → 60 days (90 abroad)
+
+SUBSTITUTE SERVICE AGE
+• Florida → person residing there, 15 or older
+• Federal → person of suitable age and discretion residing there (no fixed number)
+
+SUNDAY SERVICE
+• Florida → void under §48.20 absent a judge's order on a flight-risk affidavit
+• Federal → no equivalent Sunday bar in Rule 4` }],
+
+  quiz:[
+  {q:'How many days to serve in FEDERAL court after filing?',
+   options:['30','60','90','120'],correct:2,
+   explain:'Rule 4(m) — 90 days. Florida state court is 120 days.'},
+  {q:'Who may serve process in federal court?',
+   options:['Only U.S. Marshals','Only certified process servers','Any non-party who is at least 18','Only the clerk'],correct:2,
+   explain:'Rule 4(c)(2) — any person who is at least 18 years old and not a party.'},
+  {q:'A federal defendant who WAIVES service has how long to answer?',
+   options:['21 days','30 days','60 days (90 if outside the U.S.)','120 days'],correct:2,
+   explain:'Rule 4(d)(3) — 60 days from when the request was sent, or 90 days if sent outside the U.S. A formally served defendant gets 21 days.'},
+  {q:'Serving the United States under Rule 4(i) requires:',
+   options:['Mailing the President','Both delivering to the U.S. Attorney for the district AND mailing the U.S. Attorney General','Serving any federal employee','Publication in the Federal Register'],correct:1,
+   explain:'Rule 4(i)(1) — both steps are required.'},
+  {q:'How is a state or local government served under Rule 4(j)(2)?',
+   options:['Mail the Governor only','Deliver to its chief executive officer, or serve as that state\u2019s law prescribes','Serve any government employee','Serve the U.S. Attorney'],correct:1,
+   explain:'Rule 4(j)(2) gives both options.'},
+  {q:'Waiver of service exists in:',
+   options:['Both Florida state and federal court','Florida state court only','Federal court only','Small claims only'],correct:2,
+   explain:'Rule 4(d) is federal only. Florida state court has no waiver-of-service procedure.'}]
+},
+
+{
+  id:6, emoji:'📨', title:'Subpoenas, Writs & Evictions', subtitle:'The documents you will carry',
+  color:'var(--pink)', bg:'var(--pink-bg)', read:'8 min',
+  lessons:[
+  { title:'Subpoenas — two types, two service rules', icon:'📋', content:
+`📋 SUBPOENA AD TESTIFICANDUM — commands a person to APPEAR AND TESTIFY in court or at a deposition.
+📄 SUBPOENA DUCES TECUM — commands a person to PRODUCE documents, records, or evidence.
+
+GENERAL RULE (§48.031(3)(a)): witness subpoenas, criminal or civil, are served as provided in §48.031(1) — personal or abode substitute service.
+
+📬 THE MAIL EXCEPTION (§48.031(3)(a))
+A subpoena on a witness in a CIVIL TRAFFIC case, a CRIMINAL TRAFFIC case, a MISDEMEANOR case, or a SECOND OR THIRD DEGREE FELONY may be served by U.S. MAIL to the last known address, mailed AT LEAST 7 DAYS before the required appearance.
+Failure to appear in response to a subpoena served by U.S. mail that is NOT CERTIFIED may not be grounds for contempt.
+
+📌 THE POSTING RULE (§48.031(3)(b)) — know both halves
+• COURT APPEARANCE: may be posted at the witness's residence after THREE attempts, made at different times of the day or night on different dates, have failed.
+• DEPOSITION: may be posted after ONE attempt has failed.
+• AND IN BOTH CASES: the subpoena must be posted AT LEAST 5 DAYS before the date of the required appearance.
+
+👮 LAW ENFORCEMENT & GOVERNMENT WITNESSES (§48.031(4)(a))
+A criminal witness subpoena on an officer or a federal, state, or municipal employee testifying in an official capacity may be served under §48.031(1) OR by delivery to a designated supervisory or administrative employee at the witness's place of employment — if the agency head has designated someone to accept service. That designee need not accept if the witness no longer works there, is not scheduled to work before the appearance date, or the appearance date is LESS THAN 5 DAYS from the date of service.` },
+
+  { title:'Writs — sheriff vs. CPS', icon:'⚡', content:
+`❌ SHERIFF ONLY — NOT YOU
+• WRIT OF POSSESSION — the sheriff removes occupants after an eviction judgment (§48.184(6) names the sheriff expressly)
+• WRIT OF EXECUTION — seizing a debtor's property to satisfy a judgment
+• ARREST WARRANTS
+
+✅ WITHIN A CPS ROLE
+• WRIT OF GARNISHMENT — serving the initial notice on an employer or bank
+• INJUNCTIONS — delivering notice of a restraining order
+• NOTICE TO APPEAR in small claims
+
+🔑 RULE OF THUMB
+ENFORCING a judgment (seizing property, removing occupants, arrests) → SHERIFF
+DELIVERING NOTICE of legal action → CPS
+
+⏱️ INJUNCTIONS ARE TIME-SENSITIVE: an injunction does not bind the defendant until they are properly served. That is why injunction service is urgent.` },
+
+  { title:'Evictions — §48.183 posting', icon:'🏘️', content:
+`Possession cases are constant work in Orange and Osceola County. Learn this section precisely.
+
+📬 THE 3-DAY NOTICE: the landlord's pre-suit notice to pay or vacate. Not court process, but landlords often hire servers to deliver it.
+
+🏛️ §48.183(1) — WHEN YOU MAY POST
+In an action for possession of residential premises (including under chapters 83, 723, and 513) or nonresidential premises, if:
+• the TENANT CANNOT BE FOUND in the county, OR
+• there is NO PERSON 15 YEARS OF AGE OR OLDER residing at the tenant's usual place of abode in the county,
+AFTER AT LEAST TWO ATTEMPTS to obtain service,
+then the summons may be served by ATTACHING A COPY TO A CONSPICUOUS PLACE on the property described in the complaint or summons.
+
+⏱️ THE MINIMUM TIME DELAY BETWEEN THE TWO ATTEMPTS IS 6 HOURS. This number is tested.
+
+📮 §48.183(2) — WHO MAILS IT
+If the landlord causes or anticipates service solely by posting, THE LANDLORD provides the CLERK OF THE COURT with an additional copy of the complaint and a PRESTAMPED ENVELOPE addressed to the defendant at the premises. THE CLERK immediately mails it by first-class mail, notes the mailing in the docket, and files a certificate of the fact and date of mailing.
+
+You post. The clerk mails. Do not describe this as "you post and you mail."
+
+📅 EFFECTIVE DATE: service is effective on the date of POSTING or MAILING, WHICHEVER OCCURS LATER — and at least 5 DAYS must elapse from the date of service before a judgment for final removal may be entered.
+
+⚠️ This posting method is for POSSESSION cases only. Nothing in §48.183 prohibits serving a tenant the ordinary way.` },
+
+  { title:'Unknown parties in possession — §48.184', icon:'🚪', content:
+`A newer section (added 2022, amended 2023) that shows up in eviction work.
+
+WHEN IT APPLIES (§48.184(1)): only to actions under §82.03, §83.21, §83.59, or §723.061, and only for removing an UNKNOWN PARTY OR PARTIES IN POSSESSION.
+
+THE SUMMONS (§48.184(2)): issued in the name of "Unknown Party or Parties in Possession" when the occupant's name is not known to the plaintiff.
+
+📌 THE THREE-ATTEMPT PATTERN (§48.184(3)) — memorize the pattern, not just the number
+If service on the unknown occupant is not effectuated on the first attempt, at least TWO ADDITIONAL attempts must be made. The three attempts must be made:
+• ONCE DURING BUSINESS HOURS
+• ONCE DURING NONBUSINESS HOURS
+• ONCE DURING A WEEKEND
+
+You must INQUIRE as to the occupant's name at the time of service. The return must note the name of every occupant obtained, or state that the name could not be obtained after inquiry.
+
+ALSO REQUIRED (§48.184(4)) — BOTH:
+(a) attach a copy of the summons and complaint to a conspicuous location on the premises; AND
+(b) the plaintiff gives the clerk an extra copy and a prestamped envelope for each unknown occupant, and THE CLERK mails it first class.
+
+EFFECTIVE (§48.184(5)): the LATEST of personal service, posting, or the clerk's mailing.
+
+⚖️ §48.184(6): the WRIT OF POSSESSION is executed by the SHERIFF.` }],
+
+  quiz:[
+  {q:"What is a 'subpoena duces tecum'?",
+   options:['A warrant for arrest','A command to appear and testify','A command to produce documents or records','An order to pay money'],correct:2,
+   explain:'Duces tecum = produce documents. Ad testificandum = appear and testify.'},
+  {q:'A criminal witness subpoena for a DEPOSITION may be posted after how many failed attempts?',
+   options:['Zero','One','Three','Five'],correct:1,
+   explain:'§48.031(3)(b) — one failed attempt for a deposition; three attempts at different times of day or night on different dates for a court appearance.'},
+  {q:'The 5-day posting requirement in §48.031(3)(b) applies to:',
+   options:['Court appearances only','Depositions only','Both court appearances and depositions','Neither'],correct:2,
+   explain:'The final sentence of §48.031(3)(b) applies to the whole subsection: the subpoena must be posted at least 5 days before the date of the required appearance.'},
+  {q:'Under §48.183, what is the minimum time delay between the two attempts before you may post an eviction summons?',
+   options:['1 hour','6 hours','24 hours','3 days'],correct:1,
+   explain:'§48.183(1) — the minimum time delay between the two attempts is 6 hours.'},
+  {q:'In a §48.183 posting case, who mails the copy to the defendant?',
+   options:['The process server','The clerk of the court','The sheriff','The landlord personally'],correct:1,
+   explain:'§48.183(2) — the landlord supplies the clerk with a copy and a prestamped envelope, and the CLERK mails it first class and files a certificate of mailing.'},
+  {q:'Service under §48.183 is effective on:',
+   options:['The date of posting','The date of mailing','The later of posting or mailing','The date the tenant reads it'],correct:2,
+   explain:'§48.183(2) — effective on the date of posting or mailing, whichever occurs later, and at least 5 days must elapse before a judgment for final removal.'},
+  {q:'Under §48.184(3), the three attempts on an unknown occupant must be made:',
+   options:['All during business hours','Once during business hours, once during nonbusiness hours, once during a weekend','Three days in a row','At least 6 hours apart'],correct:1,
+   explain:'§48.184(3) sets that exact pattern. The 6-hour rule belongs to §48.183.'},
+  {q:'Can a certified process server serve a writ of execution?',
+   options:['Yes, always','Yes, if the court approves','No — that is enforcement, and belongs to the sheriff','Yes, in small claims'],correct:2,
+   explain:'A CPS serves initial NONENFORCEABLE process. Writs of execution and writs of possession enforce judgments.'},
+  {q:'An injunction binds the defendant:',
+   options:['When the judge signs it','When it is filed with the clerk','Only after the defendant is properly served','When published'],correct:2,
+   explain:'Until proper service, the order does not bind the defendant — which is why injunction service is urgent.'}]
+},
+
+{
+  id:7, emoji:'⏳', title:'Deadlines & Access', subtitle:'Numbers to memorize',
+  color:'var(--gold-dk)', bg:'#FFF8E8', read:'6 min',
+  lessons:[
+  { title:'Master deadline list', icon:'📅', content:
+`⏰ SERVICE DEADLINES
+• Florida state court → 120 DAYS from filing (Rule 1.070(j))
+• Florida small claims → 120 DAYS (Rule 7.070(b))
+• Federal court → 90 DAYS from filing (FRCP 4(m))
+
+⏰ RESPONSE DEADLINES
+• Florida state court → 20 days after service (Fla. R. Civ. P. 1.140(a))
+• Federal, formally served → 21 days
+• Federal, waived service → 60 days (90 if outside the U.S.)
+• The state's time to respond after being served under §48.121 → 40 days
+
+⏰ SPECIFIC NUMBERS
+• Criminal witness subpoena by mail → mailed at least 7 DAYS before appearance
+• Criminal witness subpoena posting → 3 attempts (court) / 1 attempt (deposition); posted at least 5 DAYS before appearance
+• Government-employee witness → a designee need not accept if the appearance date is LESS THAN 5 DAYS from service
+• Eviction posting under §48.183 → 2 attempts, MINIMUM 6 HOURS apart; 5 DAYS must elapse before final removal judgment
+• Affidavit of compliance after service on the Secretary of State → 40 DAYS (§48.161(3))
+• Federal waiver request → the defendant gets at least 30 DAYS to return the form
+• Sole proprietor substitute service → after 2 attempts at the place of business (§48.031(2)(b))
+• Corporations, LLCs, LLPs, LPs, public agencies → 1 GOOD FAITH ATTEMPT on the registered agent before moving down the list
+
+🔑 CHEAT SHEET
+120 = Florida state & small claims · 90 = federal · 40 = affidavit of compliance
+30 = federal waiver window · 20 = Florida answer · 21 = federal answer
+7 = mailed criminal subpoena · 6 hrs = between eviction attempts · 5 = posting & removal · 1 = good faith attempt on the RA` },
+
+  { title:'Building a diligent record', icon:'🔍', content:
+`§48.161(5) is the statutory yardstick. Everything below is how you satisfy it on paper.
+
+1. 📍 LOCATION WORK
+• The known address, more than once
+• Neighbors, when appropriate
+• Address verified through records
+
+2. ⏰ VARIED ATTEMPTS — the part that fails most often
+• Different TIMES of day: morning, afternoon, evening
+• Weekdays AND weekends
+• Same time every day is not a conscientious effort appropriate to the circumstances
+
+3. 📋 DOCUMENTATION
+• Every attempt: exact date AND time
+• What you observed — lights, vehicles, mail, trash bins
+• Any conversation with neighbors or building staff
+
+4. 🔎 INVESTIGATION
+• Employer, if known
+• Family, if available
+• Skip trace, if the attorney authorizes it
+
+Statutes that reward a strong record: §48.102 (court-ordered alternative service), §48.161 (Secretary of State), Chapter 49 (publication). None of them open without diligence.` },
+
+  { title:'Gated communities & access', icon:'🏰', content:
+`🚧 THE LAW IS ON YOUR SIDE — §48.031(7)
+A GATED RESIDENTIAL COMMUNITY, INCLUDING A CONDOMINIUM ASSOCIATION OR A COOPERATIVE, SHALL GRANT UNANNOUNCED ENTRY into the community — including its COMMON AREAS AND COMMON ELEMENTS — to a person who is attempting to serve process on a defendant or witness who resides within or is known to be within the community.
+
+"Unannounced" is the operative word. The guard is not entitled to call ahead and tip off the defendant.
+
+YOUR STEPS AT THE GATE
+1. Identify yourself as a process server with court process
+2. Cite §48.031(7) — bring a printed copy
+3. Document every interaction: date, time, guard's name, what was said
+4. If denied, ask for property management
+5. Keep attempting — one refusal is not non-service
+6. Notify the hiring attorney
+
+ESCALATION (the attorney's job, but know it exists)
+• A court order authorizing access
+• Sheriff assistance
+• §48.102 alternative service for entities
+• Chapter 49 publication as a last resort
+
+🔑 Your job is the record. Give the attorney the evidence they need.` }],
+
+  quiz:[
+  {q:'Affidavit of compliance after service on the Secretary of State must be filed within:',
+   options:['20 days','30 days','40 days','60 days'],correct:2,
+   explain:'§48.161(3) — within 40 days after the date of service on the Secretary of State, or within such additional time as the court allows.'},
+  {q:'Under §48.031(7), a gated community must grant what kind of entry?',
+   options:['Entry after calling the resident','Unannounced entry','Entry only with a court order','Entry only during business hours'],correct:1,
+   explain:'§48.031(7) — unannounced entry into the community, including common areas and common elements. The provision names condominium associations and cooperatives.'},
+  {q:'A defendant in Florida state court has how long to respond after service?',
+   options:['10 days','20 days','21 days','30 days'],correct:1,
+   explain:'20 days under Fla. R. Civ. P. 1.140(a). The 21-day figure is federal.'},
+  {q:'How many good faith attempts on a registered agent before you may move down the §48.081 list?',
+   options:['One','Two','Three','Five'],correct:0,
+   explain:'§48.081(3) — one good faith attempt, where the agent cannot otherwise be served because of a failure to comply with the applicable chapter.'},
+  {q:'What makes a diligent search record weak?',
+   options:['Attempting three times','Attempting only at the same time of day each visit','Not carrying ID','Serving on different days'],correct:1,
+   explain:'§48.161(5) requires attempts at times and places the party is reasonably likely to be found. Identical timing is the classic failure.'},
+  {q:'A security guard refuses you entry to a gated community. You should:',
+   options:['File non-service immediately','Force entry','Cite §48.031(7), document the refusal with names and times, notify the attorney, and keep attempting','Call 911'],correct:2,
+   explain:'Document and escalate. One refusal is not non-service, and the statute requires unannounced entry.'}]
+},
+
+{
+  id:8, emoji:'🧭', title:'Ethics, Safety & Business', subtitle:'Being a professional',
+  color:'var(--charcoal)', bg:'#F0EDE8', read:'6 min',
+  lessons:[
+  { title:'Ethics & conduct', icon:'⚖️', content:
+`Your return of service is sworn testimony. Ethics are the whole job.
+
+✅ HONESTY — every word on a return must be accurate.
+
+✅ DISINTEREST (§48.31(2)) — a certified process server MUST be disinterested in any process served. No personal or financial stake. Not your landlord, not your ex, not someone who owes you money.
+
+✅ CONFIDENTIALITY — you see sensitive legal information. Keep it private.
+
+✅ NO FALSE RETURNS — §48.31(2): a certified process server who WILLFULLY AND KNOWINGLY executes a false return of service is guilty of a FELONY OF THE THIRD DEGREE (punishable under §775.082, §775.083, or §775.084) and is PERMANENTLY BARRED from serving process in this state. The parallel provision for special process servers is §48.021(4).
+
+✅ REMOVAL (§48.31(1)) — you can be removed from the list for malfeasance, misfeasance, neglect of duty, or incompetence, as provided by court rule. That is a lower bar than a criminal charge.
+
+✅ PROFESSIONAL CONDUCT — you represent the court. Stay calm, don't argue, don't threaten. If it turns hostile, leave and document.
+
+THE DEFENDANT WHO REFUSES THE PAPERS
+They cannot escape service by refusing. Place the papers down near them, state clearly what they are, and document exactly what happened. Courts have upheld this.
+
+FAPPS CODE OF ETHICS covers truthfulness in returns and affidavits, avoiding conflicts of interest, professional conduct, and reporting misconduct by other servers.` },
+
+  { title:'Immunity from service', icon:'🛡️', content:
+`Some people are protected from service in certain circumstances. Both of these come from case law and general legal doctrine rather than Chapter 48 — they will not be found by searching the statute.
+
+🌍 DIPLOMATIC IMMUNITY
+Ambassadors, consuls, and foreign ministers are generally immune from service while serving in their official capacity, under international law and federal statute.
+
+⚖️ COURTHOUSE WITNESS IMMUNITY
+A nonresident who travels to another jurisdiction ONLY to attend court in an UNRELATED matter is immune from being served new papers for a reasonable period before, during, and after the appearance.
+
+WHY: so people are not deterred from showing up to court.
+
+⚠️ THE EXCEPTION: the immunity does not apply when the new case involves the SAME PARTIES AND ISSUES already before the court.
+
+🔑 EXAM TIP: if a question describes someone traveling to testify in an unrelated case and being handed brand-new papers, the answer is usually that the service is invalid — unless the new case connects to the same parties and issues.` },
+
+  { title:'Safety while serving', icon:'🦺', content:
+`You are often delivering unwelcome news to people who may be upset.
+
+BEFORE YOU GO
+• Research the area
+• Know your route and an exit
+• Tell someone where you're going
+• Charge your phone
+
+AT THE DOOR
+• Stand to the SIDE, not centered in front of the door
+• Have ID ready but confirm the person first
+• Keep body language neutral
+• Never put your foot in the door
+
+IF IT TURNS HOSTILE
+• Don't escalate
+• If threatened, LEAVE. Your safety comes first
+• Document everything
+• Report threats to law enforcement
+• Notify the hiring attorney
+
+🔑 FAPPS VIOLENCE REPORT: FAPPS maintains a report where servers log dangerous situations. Use it — it protects you and everyone else working the same addresses.
+
+⚠️ NEVER enter a private home without permission. You serve at the door.` },
+
+  { title:'Running the business', icon:'💼', content:
+`RECORD KEEPING
+• Log every attempt — date, time, address, observations
+• Photograph the address at service
+• Keep copies of all returns
+• Track mileage for taxes
+• Keep invoices and payment records
+
+YOUR ID CARD (§48.29(5)(b))
+• Carry it whenever you serve
+• Your ID number goes on the first page of at least one process served (§48.031(5))
+• Expired card = not authorized
+• Renewable annually on proof of good standing AND CURRENT BOND
+
+YOUR BOND (§48.29(3)(g))
+$5,000 with a surety company authorized to do business in Florida, for the benefit of anyone wrongfully injured by your malfeasance, misfeasance, neglect of duty, or incompetence. RENEWABLE ANNUALLY. Let it lapse and your ID card cannot be renewed.
+
+WORKING WITH ATTORNEYS
+• Confirm special instructions before you go out
+• Failed service? Notify immediately
+• Ask about deadlines up front
+• Return completed paperwork fast
+
+YOUR FEES (§48.29(8))
+A certified process server MAY charge a fee for services. Put your fee schedule in writing and invoice promptly.
+
+🔑 Attorneys re-hire servers they trust. Reliable, accurate, communicative — that is the whole business model. 👑` }],
+
+  quiz:[
+  {q:"What does 'disinterested' mean for a process server?",
+   options:['Bored with the job','Not caring about the outcome','Having no personal or financial stake in the case','Being politically neutral'],correct:2,
+   explain:'§48.31(2) — a certified process server must be disinterested in any process served.'},
+  {q:'A defendant refuses to take the papers. You should:',
+   options:['Leave and file non-service','Force them to take it','Place the papers near them, state what they are, and document exactly what happened','Call the police'],correct:2,
+   explain:'Refusal does not defeat service. Announce, place, and document.'},
+  {q:'Besides a false return, a CPS can be removed from the list for:',
+   options:['Only a felony conviction','Malfeasance, misfeasance, neglect of duty, or incompetence','Charging a fee','Serving in more than one circuit'],correct:1,
+   explain:'§48.31(1) — removal for malfeasance, misfeasance, neglect of duty, or incompetence, as provided by court rule.'},
+  {q:'Under §48.29(8), may a certified process server charge for services?',
+   options:['No — service must be free','Only in federal cases','Yes — a CPS may charge a fee','Only with court approval'],correct:2,
+   explain:'§48.29(8) — a certified process server may charge a fee for his or her services.'},
+  {q:'Your ID card is renewable annually upon proof of:',
+   options:['Good standing only','Good standing and a current bond','Continuing education only','Nothing — it renews automatically'],correct:1,
+   explain:'§48.29(5)(b) — renewable annually upon proof of good standing and current bond.'},
+  {q:'A nonresident travels here only to testify in an unrelated case and is handed new papers. Generally:',
+   options:['Fair game for any new service','Immune for a reasonable time before and after the appearance','Immune forever','Only protected if an attorney'],correct:1,
+   explain:'Courthouse witness immunity protects nonresidents attending court in unrelated matters — unless the new case involves the same parties and issues.'}]
+}];
+
+/* ============================================================
+   KEY TERMS
+   ============================================================ */
+var KEY_TERMS = [
+{term:'SUMMONS',definition:'A court document telling someone they have been sued and must respond to the complaint.'},
+{term:'SUBPOENA',definition:'A court order commanding a person to appear or to produce documents.'},
+{term:'PROCESS',definition:'Official court documents that command a person to act. Under §48.011, process in civil actions runs throughout the state.'},
+{term:'PLAINTIFF',definition:'The party who files a lawsuit and initiates the action.'},
+{term:'DEFENDANT',definition:'The party being sued or served with legal process.'},
+{term:'AFFIDAVIT',definition:'A written statement made under oath. Your return of service functions as sworn testimony.'},
+{term:'AFFIDAVIT OF COMPLIANCE',definition:'The filing required within 40 days after service on the Secretary of State, showing due diligence and the basis for substituted service (§48.161(3)).'},
+{term:'INJUNCTION',definition:'A court order requiring someone to stop a specific action. It does not bind the defendant until properly served.'},
+{term:'WRIT',definition:'A court order commanding a specific action, such as seizing property or removing occupants.'},
+{term:'WRIT OF POSSESSION',definition:'The order restoring possession of premises after an eviction judgment. Executed by the SHERIFF (§48.184(6)).'},
+{term:'GARNISHMENT',definition:"A court order directing a third party — an employer or bank — to hold a debtor's money or property."},
+{term:'DUE DILIGENCE',definition:'Defined in §48.161(5): diligent inquiry, an honest and conscientious effort appropriate to the circumstances, and an appropriate number of attempts at times and places the party is likely to be found.'},
+{term:'USUAL PLACE OF ABODE',definition:'Where the person is actually living at the time of service. One at a time, even with multiple properties.'},
+{term:'REGISTERED AGENT',definition:'The person or entity designated to receive legal documents for a business or public agency. Under current law, the first target for corporations, LLCs, LLPs, LPs, and public agencies.'},
+{term:'REGISTERED OFFICE',definition:'The address where the registered agent must be available at least 10 a.m.–12 noon and 2 p.m.–4 p.m. on business days (§48.091(3)).'},
+{term:'VIRTUAL OFFICE',definition:'Per §48.031(6)(b): an office providing communications and address services with no dedicated office space, all communications routed through a common receptionist.'},
+{term:'EXECUTIVE OFFICE OR MINI SUITE',definition:'Per §48.031(6)(b): communications services plus a DEDICATED office space and other supportive services, routed through a common receptionist.'},
+{term:'JURISDICTION',definition:'A court\u2019s legal authority to act over a person or subject. Proper service is what establishes personal jurisdiction.'},
+{term:'CIRCUIT',definition:'A judicial district. The 9th Circuit covers Orange County and Osceola County.'},
+{term:'SURETY BOND',definition:'The $5,000 bond required by §48.29(3)(g), renewable annually, for the benefit of anyone wrongfully injured by a server\u2019s malfeasance, misfeasance, neglect of duty, or incompetence.'},
+{term:'AD TESTIFICANDUM',definition:'A subpoena commanding a person to appear and TESTIFY.'},
+{term:'DUCES TECUM',definition:'A subpoena commanding a person to PRODUCE documents or records.'},
+{term:'NON-SERVICE',definition:'When service cannot be completed. Documented with every attempt and filed with the court.'},
+{term:'ALIAS SUMMONS',definition:'A second summons issued when the first could not be served.'},
+{term:'PLURIES SUMMONS',definition:'The third or later summons issued in the same case.'},
+{term:'LIS PENDENS',definition:'A recorded notice under §48.23 that a lawsuit is pending which may affect specific property. Not effective beyond 1 year absent a recorded instrument or a chapter 713 lien.'},
+{term:'SPECIAL PROCESS SERVER',definition:'Appointed by a county sheriff under §48.021; authorized only in that sheriff\u2019s county. Narrower than a certified process server.'},
+{term:'CERTIFIED PROCESS SERVER',definition:'Appointed by the chief judge of a circuit under §§48.27 and 48.29; serves initial nonenforceable civil process, criminal witness subpoenas, and criminal summonses within that circuit.'},
+{term:'INITIAL NONENFORCEABLE CIVIL PROCESS',definition:'The first papers in a civil case, delivering notice rather than enforcing a judgment. The core of CPS authority under §48.27(2)(a).'},
+{term:'WAIVER OF SERVICE',definition:'A federal-only procedure under FRCP 4(d) where a defendant gives up formal service in exchange for more time to answer. Does not exist in Florida state court.'}];
+
+/* ============================================================
+   SCENARIOS
+   ============================================================ */
+var SCENARIOS = [
+{title:'🏠 The 14-year-old at the door',
+ situation:"You arrive to serve John Smith. He isn't home, but his 14-year-old daughter answers. She says she lives there full time and offers to take the papers.",
+ question:'Can you leave the documents with her?',
+ options:["Yes — she lives there, that's enough",'No — she must be at least 15 years old','Yes — any family member counts','No — only adults 18+ can accept'],correct:1,
+ explain:'§48.031(1)(a) requires a person residing there who is at least 15. At 14 she does not qualify.'},
+
+{title:'💍 The spouse who offers to help',
+ situation:"You can't find the defendant. His wife is at her workplace across the county. She says they live together, the case is a car-accident suit against him only, and she'll take the papers for him.",
+ question:'Is substituted service on her valid here?',
+ options:['Yes — they live together and it is not adversarial between them','No — the spouse must be served at the shared dwelling','Yes, but only if you serve at their home county','It depends — she must REQUEST the service or be a party herself'],correct:3,
+ explain:'§48.031(2)(a) has three conditions: not adversarial between them, the spouse requests service OR is also a party, and they reside together in the same dwelling. Here she offered — get that request clear and documented. Location is not the issue: the statute allows service anywhere in a county regardless of whether the dwelling is in that county.'},
+
+{title:"🏢 The registered agent is 'out of town'",
+ situation:"You go to ABC Corp's designated registered office to serve its registered agent, a natural person. The receptionist — an employee of the agent — says he's away for two weeks and offers to sign.",
+ question:'What is the correct action?',
+ options:['Refuse — only the agent himself can accept','Leave and return for a second attempt','Serve the receptionist — §48.091(4)(b) permits serving any employee of the natural-person agent present at the registered office, including on the first attempt','File non-service'],correct:2,
+ explain:'§48.091(4)(b) was written for exactly this. At the DESIGNATED REGISTERED OFFICE, if the natural-person registered agent is not present, you may serve any employee of that agent who is present — including during the first attempt. Note this differs from a random office receptionist at some other address.'},
+
+{title:'📝 The false return temptation',
+ situation:"After four attempts you still can't find the defendant. Your client hints they'll pay double if you just mark it served.",
+ question:'What do you do?',
+ options:['Mark it served — four attempts is enough','Accept — no one will check','Refuse, document your attempts, and file non-service','Have a friend sign as a witness'],correct:2,
+ explain:'§48.31(2) — a certified process server who willfully and knowingly executes a false return is guilty of a third degree felony and is permanently barred from serving process in Florida.'},
+
+{title:'🏰 Gated community blocked',
+ situation:"Security refuses you entry, saying the resident 'does not accept visitors.'",
+ question:'What do you do?',
+ options:['Give up and file non-service','Force your way past security',"Cite §48.031(7) — gated communities, condo associations, and cooperatives must grant UNANNOUNCED entry — document the refusal with names and times, notify the attorney, keep attempting",'Call 911'],correct:2,
+ explain:'§48.031(7) requires unannounced entry into the community including common areas and common elements. Document everything and escalate through the attorney.'},
+
+{title:'👧 Serving a minor',
+ situation:"You have papers for 16-year-old Emma, who has never been married and has no court-appointed guardian. Her mother answers the door and says Emma is upstairs.",
+ question:'What is the correct way to complete service?',
+ options:['Serve the mother — a parent, under §48.041(1)(a)','Ask Emma to come down and serve only her','Serve both Emma and her mother, always','Mail the documents'],correct:0,
+ explain:'§48.041(1)(a) — for an unmarried minor with no appointed guardian, serve a PARENT or guardian under §48.031. Also check whether a guardian ad litem has been appointed under (1)(b). If Emma were married, she would be served as an adult.'},
+
+{title:'🚗 The fleeing driver',
+ situation:"You spot the defendant backing out of his driveway. You approach, identify yourself, and hold the summons to his closed car window while describing what it is. He speeds off without taking it.",
+ question:'Is this valid service?',
+ options:['No — he never touched the papers','Yes — courts have upheld this where the server identifies himself and clearly describes the documents (Rokeach v. Glickstein)','No — you must chase him on foot','Only if you call police first'],correct:1,
+ explain:'Physical acceptance is not required once you have properly approached, identified yourself, and described the documents.'},
+
+{title:'🏘️ The eviction posting',
+ situation:"You attempt an eviction summons at 9:00 a.m. — no answer, no one 15 or older there. You come back at 1:00 p.m. the same day. Still nothing. Your client wants you to post now.",
+ question:'Can you post?',
+ options:['Yes — two attempts is the requirement','No — the two attempts must be at least 6 hours apart, and 1:00 p.m. is only 4 hours later','No — you need three attempts','Yes, but only after the clerk mails a copy'],correct:1,
+ explain:'§48.183(1) — the minimum time delay between the two attempts is 6 HOURS. Come back at 3:00 p.m. or later. And remember the CLERK does the mailing, not you.'},
+
+{title:'📬 The mailbox shortcut',
+ situation:"After multiple failed attempts you know the defendant lives at this address. You're tempted to drop the papers in the residential mailbox and mark it served.",
+ question:'Is this valid service?',
+ options:["Yes — they'll get it",'Yes, if you photograph it','No — a residential mailbox is not valid; §48.031(6) is a narrow exception for a PRIVATE mailbox that is the only publicly discoverable address','Yes, for claims under $1,000'],correct:2,
+ explain:'Dropping papers in a home mailbox is not service. §48.031(6) is different: it allows leaving process with the PERSON IN CHARGE of a private mailbox, virtual office, or executive suite when that is the only address discoverable through public records and you determine the person maintains a box there.'},
+
+{title:'⏰ Approaching the deadline',
+ situation:"A complaint was filed January 1. It is now April 20 and you still haven't served the defendant. The attorney hasn't asked for an update.",
+ question:'What should you be thinking about?',
+ options:['No rush — courts are flexible','You have until December 31','Rule 1.070(j) gives 120 days — the deadline is about May 1. Alert the attorney now','Deadlines only apply in federal court'],correct:2,
+ explain:'120 days from January 1 lands around May 1. Flag it so the attorney can move for an extension on good cause or excusable neglect, which the court MUST grant on that showing.'},
+
+{title:'🏛️ Serving the city',
+ situation:"You have a summons for a municipal utility board. It has a registered agent listed, but the agent's office is closed when you arrive. Your client says to just serve the board chair.",
+ question:'What is the correct order?',
+ options:['Serve the chair — public agencies always start at the top','Registered agent first; only after one good faith attempt fails do you move to president/mayor/chair','Serve any employee at the main office','Serve the Secretary of State'],correct:1,
+ explain:'§48.111(1) — the registered agent comes first. Only if there is no registered agent, or it cannot be served after one good faith attempt, do you go to president/mayor/chair, then vice, then any board member/manager/in-house attorney, then any employee at the main office.'}];
+
+/* ============================================================
+   FILL IN THE BLANK
+   ============================================================ */
+var FILL_INS = [
+{sentence:'Florida process servers are governed by Chapter ___ of the Florida Statutes.',answer:'48',hint:'Chapter 4-?'},
+{sentence:'There is NO ___ license for process servers in Florida.',answer:'statewide',hint:'You certify circuit by circuit'},
+{sentence:'Substitute service at the abode requires a person residing there who is at least ___ years old.',answer:'15',hint:'Below driving age'},
+{sentence:'Service on a Sunday is void unless a judge orders it on an affidavit that the person intends to ___ ___ ___ ___.',answer:'escape from this state',hint:'The statute\u2019s exact words — four of them'},
+{sentence:'A CERTIFIED process server who executes a false return is punished under §48.___.',answer:'31',hint:'The last section of the Certified Process Server Act'},
+{sentence:'The Ninth Circuit requires a passing examination grade of ___ or better.',answer:'80%',hint:'B or better'},
+{sentence:'The 9th Judicial Circuit covers Orange County and ___ County.',answer:'Osceola',hint:'Where Kissimmee is'},
+{sentence:'When serving a corporation, LLC, LLP, LP, or public agency, you first attempt the ___ ___.',answer:'registered agent',hint:'Their official legal contact'},
+{sentence:'After completing service, you must file a ___ of service with the court.',answer:'return',hint:"Think 'return receipt'"},
+{sentence:'Service by publication is governed by Chapter ___ of the Florida Statutes.',answer:'49',hint:'One more than 48'},
+{sentence:'When serving an unmarried minor with no appointed guardian, you serve a ___ or guardian.',answer:'parent',hint:"Who's legally responsible?"},
+{sentence:'Florida Rule of Civil Procedure ___ sets the 120-day deadline for service.',answer:'1.070',hint:'One-point-zero-seven-zero'},
+{sentence:'In federal court, service must be completed within ___ days of filing.',answer:'90',hint:"Less than Florida's 120"},
+{sentence:'A CPS in the 9th Circuit must renew certification ___.',answer:'annually',hint:'Every year'},
+{sentence:'A false return of service is a felony of the ___ degree.',answer:'third',hint:'Not first, not second'},
+{sentence:'Under §48.183, the minimum time delay between the two eviction attempts is ___ hours.',answer:'6',hint:'A quarter of a day'},
+{sentence:'Under §48.183, the ___ of the court mails the copy to the defendant after posting.',answer:'clerk',hint:'Not you'},
+{sentence:'The surety bond required for CPS certification is $___.',answer:'5,000',hint:'Five thousand'},
+{sentence:'Subpoena ___ ___ commands someone to produce documents.',answer:'duces tecum',hint:'Latin, two words'},
+{sentence:'A defendant formally served in federal court has ___ days to answer.',answer:'21',hint:'Three weeks'},
+{sentence:'A defendant who waives service in federal court has ___ days to answer.',answer:'60',hint:'Domestic waiver'},
+{sentence:'A person can have only ___ usual place of abode at one time.',answer:'one',hint:'Even with several properties'},
+{sentence:'The discretionary fine for an incomplete return of service is up to $___.',answer:'10',hint:'Surprisingly small'},
+{sentence:'An employer who refuses to allow service in a private area may be fined up to $___.',answer:'1,000',hint:'Four figures'},
+{sentence:'A criminal witness subpoena served by U.S. mail must be mailed at least ___ days before the appearance.',answer:'7',hint:'One week'},
+{sentence:'A criminal witness subpoena may be posted only at least ___ days before the required appearance.',answer:'5',hint:'Applies to both court and deposition subpoenas'},
+{sentence:'The affidavit of compliance after service on the Secretary of State is due within ___ days.',answer:'40',hint:'Between 30 and 50'},
+{sentence:'Under §48.031(7), gated communities must grant ___ entry to process servers.',answer:'unannounced',hint:'No calling ahead'},
+{sentence:'Under §48.184, the three attempts must include one during business hours, one during nonbusiness hours, and one during a ___.',answer:'weekend',hint:'Saturday or Sunday'},
+{sentence:'Small claims cases involve a demand not exceeding $___.',answer:'8,000',hint:'Four figures'}];
+
+/* ============================================================
+   CHECKLISTS
+   ============================================================ */
+var CHECKLISTS = [
+{title:'Before you go out to serve',color:'var(--blue)',items:[
+ "Verify the defendant's name spelling on all documents",
+ 'Confirm the service address — cross-reference if possible',
+ 'Identify the ENTITY TYPE (individual, corporation, LLC, partnership, public agency, minor, incompetent, prisoner)',
+ 'For an entity: look up the registered agent and the latest annual report',
+ 'Know what type of service is required and what the fallback order is',
+ 'Check for special instructions from the attorney',
+ "Confirm you're within a circuit where you're certified",
+ 'Have your CPS ID card and current bond in good standing',
+ 'Charge your phone']},
+
+{title:'At the door — personal service',color:'var(--green)',items:[
+ 'Identify yourself as a process server',
+ "Ask if you are speaking to the defendant by full name",
+ 'Confirm identity before handing over documents',
+ 'Deliver the process AND a copy of the complaint or initial pleading',
+ 'Write the date, time, your initials or signature, and your ID number on the first page of at least one process (§48.031(5))',
+ 'Note exact time, date, location, and a physical description',
+ 'Stay calm and professional regardless of reaction']},
+
+{title:'At the door — substitute service',color:'var(--purple)',items:[
+ 'Confirm this is the usual place of abode and the defendant is not present',
+ 'Verify the person LIVES there — not visiting, not staff',
+ 'Verify the person is at least 15 years old',
+ 'INFORM them of the contents of the documents',
+ 'Leave copies of ALL documents',
+ 'Note their name, approximate age, and relationship to the defendant',
+ 'Note exact time, date, and address',
+ 'Document why personal service was not possible']},
+
+{title:'Serving a business entity',color:'var(--teal)',items:[
+ 'Attempt the REGISTERED AGENT first',
+ 'At the registered office, if a natural-person agent is absent, look for an employee present (§48.091(4)(b))',
+ 'Log the one good faith attempt with date, time, and what you observed',
+ 'Corporation: officers listed in §48.081(3)(a), or anyone on the latest annual report',
+ 'LLC: manager (manager-managed), member (member-managed), or anyone on the latest annual report',
+ 'Partnership: any partner → designated employee → person in charge after one attempt',
+ 'Check whether the address is a residence, private mailbox, virtual office, or mini suite (§48.081(5)/§48.062(5))',
+ 'If everything fails, tell the attorney about §48.161 and §48.102']},
+
+{title:'Completing your return of service',color:'var(--orange)',items:[
+ 'Date AND time the process came to hand',
+ 'Date AND time of service',
+ 'Exact address where service was made',
+ 'Manner of service',
+ 'Full name of the person served',
+ 'Their position, if served in a representative capacity',
+ 'List every pleading and document served',
+ 'Use the form reviewed and approved by the court (§48.29(6))',
+ 'Sign it',
+ 'File promptly and keep a copy']},
+
+{title:'When you cannot complete service',color:'var(--red)',items:[
+ 'Document EVERY attempt — date, time, observations',
+ 'Attempts at different times of day',
+ 'Attempts on different days of the week',
+ 'Note vehicles, lights, mail, or signs of activity',
+ 'Note any neighbor information gathered',
+ 'Do NOT mark as served if service was not completed',
+ 'File a proper non-service with all attempt documentation',
+ 'Notify the attorney immediately']},
+
+{title:'9th Circuit CPS application',color:'var(--gold-dk)',items:[
+ 'Confirm the current quarterly application window with Court Administration (407.836.0471)',
+ 'Complete a process server education course from an approved provider',
+ 'Pass the examination with 80% or better',
+ 'Obtain your certificate of good conduct',
+ 'Run the FDLE background check',
+ 'Complete the Initial Certified Process Server Application',
+ 'Pay the $300 application fee, payable to "State of Florida"',
+ 'Execute a $5,000 surety bond with an authorized surety company',
+ 'Take the oath of office',
+ 'Calendar the annual renewal: $250 fee, new background check, certificate of good conduct, 80% exam, current bond']}];
+
+/* ============================================================
+   FLASHCARDS
+   ============================================================ */
+var FLASHCARDS = [
+{q:"What is 'service of process'?",a:'Officially delivering court documents to notify a person of legal action. Required by due process, and what gives the court jurisdiction.',cat:'Basics'},
+{q:'What chapter governs Florida process servers?',a:'Chapter 48. §§48.25–48.31 are the Florida Certified Process Server Act.',cat:'Statutes'},
+{q:'Who may serve process in Florida?',a:'The sheriff; a special process server appointed by a sheriff (that county only); or a certified process server under §48.27 (that circuit).',cat:'Basics'},
+{q:'What is the 9th Judicial Circuit?',a:'Orange County and Osceola County. One certification covers both.',cat:'9th Circuit'},
+{q:'What are the Ninth Circuit CPS fees?',a:'$300 for a new application, $250 for renewal, payable to "State of Florida." Applications are accepted quarterly.',cat:'9th Circuit'},
+{q:'What is personal service?',a:'Delivering the process plus a copy of the complaint or initial pleading directly to the named person (§48.031(1)(a)).',cat:'Methods'},
+{q:'What are the three elements of abode substitute service?',a:'(1) the usual place of abode, (2) a person residing there who is 15 or older, (3) informing that person of the contents.',cat:'Methods'},
+{q:'What are the THREE conditions for spouse substitution?',a:'§48.031(2)(a): not adversarial between them; the spouse requests service OR is also a party; and they reside together in the same dwelling. Location within the county does not matter.',cat:'Methods'},
+{q:"What is 'usual place of abode'?",a:'Where the defendant is actually living at the time of service. Only one at a time.',cat:'Methods'},
+{q:'Can you use a 14-year-old for substitute service?',a:'No. At least 15 years old, and residing there (§48.031(1)(a)).',cat:'Methods'},
+{q:'When can you serve at a private mailbox?',a:'§48.031(6) — only when it is the ONLY address discoverable through public records and you determine the person maintains a box there. Then serve the person in charge of that location.',cat:'Methods'},
+{q:'Can you serve on a Sunday in Florida?',a:'No — §48.20 makes Sunday service VOID unless the trial court judge orders it on an affidavit that the person intends to escape from this state under protection of Sunday.',cat:'Rules'},
+{q:'Florida state court service deadline?',a:'120 days from filing — Fla. R. Civ. P. 1.070(j). Small claims is also 120 days under Rule 7.070(b).',cat:'Deadlines'},
+{q:'Federal court service deadline?',a:'90 days from filing — FRCP 4(m).',cat:'Deadlines'},
+{q:'What must be on a return of service?',a:'§48.21(1): date and time to hand, date and time served, manner, name of person served, their position if representative, a list of all documents served, and your signature.',cat:'Returns'},
+{q:'A return is missing the time of service — is service dead?',a:'No. §48.21(2) — the omission invalidates service but the return is AMENDABLE on application to the issuing court, and on amendment service is as effective as if it had been right all along. Fine up to $10.',cat:'Returns'},
+{q:'What form must a CPS use for the return?',a:'§48.29(6) — a form that has been reviewed and approved by the court. Check your circuit\u2019s current administrative order.',cat:'Returns'},
+{q:'What is a false return of service?',a:'For a CPS: §48.31(2) — a third degree felony plus a permanent bar from serving process in Florida. For a special process server it is §48.021(4).',cat:'Ethics'},
+{q:'When serving a MINOR with no guardian, who do you serve?',a:'A parent or guardian under §48.041(1)(a), plus the guardian ad litem if one is appointed. A married minor is served as an adult.',cat:'Special'},
+{q:'How do you serve an incompetent person?',a:'§48.042 — TWO COPIES to the person with care or custody, or the legal guardian if appointed, plus the guardian ad litem if appointed.',cat:'Special'},
+{q:'How do you serve a state prisoner?',a:'§48.051 — on the prisoner.',cat:'Special'},
+{q:'When serving a CORPORATION, who is first?',a:'The registered agent (§48.081(2)). After one good faith attempt: chair, president, any VP, secretary, treasurer — or anyone listed publicly on the latest annual report.',cat:'Special'},
+{q:'When serving an LLC, who comes after the registered agent?',a:'§48.062(3): any manager of a manager-managed LLC, any member of a member-managed LLC, OR anyone listed publicly on the latest annual report. There is no "designated employee" step for LLCs.',cat:'Special'},
+{q:'When serving an LLP or LP, who is first?',a:'The registered agent. Then any partner (LLP) or any general partner (LP/LLLP). A plain general partnership still starts with any partner.',cat:'Special'},
+{q:'How do you serve a public agency now?',a:'§48.111(1): registered agent FIRST. Then president/mayor/chair → vice → any board member, the manager, or an in-house attorney → any employee at the main office.',cat:'Special'},
+{q:'How do you serve the State of Florida?',a:'§48.121 — the state attorney or an assistant state attorney for the circuit, AND two copies by registered or certified mail to the Attorney General.',cat:'Special'},
+{q:'The registered agent is out and an employee is at the registered office. Now what?',a:'§48.091(4)(b) — you may serve any employee of the natural-person registered agent present at the designated registered office, including on the first attempt.',cat:'Special'},
+{q:'What hours must a registered office be open?',a:'§48.091(3) — at least 10 a.m.–12 noon and 2 p.m.–4 p.m. every day except Saturdays, Sundays, and legal holidays.',cat:'Special'},
+{q:'What is service by publication?',a:'Newspaper notice when the defendant cannot be found. Chapter 49 — not Chapter 48.',cat:'Methods'},
+{q:'What is §48.102?',a:'Service by other means. For business entities only: on motion, the court may authorize any manner reasonably effective to give actual notice, including email.',cat:'Methods'},
+{q:"How does the statute define 'due diligence'?",a:'§48.161(5): diligent inquiry, an honest and conscientious effort appropriate to the circumstances, and an APPROPRIATE NUMBER of attempts given the circumstances. No fixed number.',cat:'Diligence'},
+{q:'What is FRCP Rule 4?',a:'Federal service of process. 90-day deadline, any non-party 18+ may serve, waiver of service available.',cat:'Federal'},
+{q:"What is 'waiver of service'?",a:'FRCP 4(d), federal only. Plaintiff mails a waiver request; the defendant gets at least 30 days to return it and 60 days to answer if signed. Does not exist in Florida state court.',cat:'Federal'},
+{q:'Federal: served vs. waived — days to answer?',a:'Formally served = 21 days. Waived = 60 days (90 if the request was sent outside the U.S.).',cat:'Federal'},
+{q:'How do you serve the United States in federal court?',a:'FRCP 4(i) — BOTH: deliver to the U.S. Attorney for the district (or certified mail to its civil-process clerk), AND mail a copy to the U.S. Attorney General in Washington, D.C.',cat:'Federal'},
+{q:"What is 'disinterested'?",a:'§48.31(2) — no personal or financial stake in the case you are serving.',cat:'Ethics'},
+{q:'Besides a false return, why can a CPS be removed from the list?',a:'§48.31(1) — malfeasance, misfeasance, neglect of duty, or incompetence, as provided by court rule.',cat:'Ethics'},
+{q:'What does §48.27(2) authorize a CPS to serve?',a:'(a) initial nonenforceable civil process within the circuit, and (b) criminal witness subpoenas and criminal summonses.',cat:'Rules'},
+{q:'What is Rule 7.070?',a:'Florida Small Claims Rule on method of service. Certified mail is available for FLORIDA RESIDENTS ONLY, mailed by the clerk OR an attorney of record. Subdivision (b) adds a 120-day limit.',cat:'Rules'},
+{q:'Criminal witness subpoena by mail — advance notice?',a:'At least 7 days before the required appearance (§48.031(3)(a)). If mailed uncertified and the witness fails to appear, that alone is not grounds for contempt.',cat:'Deadlines'},
+{q:'Criminal subpoena posting — court vs. deposition?',a:'Court appearance: 3 failed attempts at different times of day or night on different dates. Deposition: 1 failed attempt. BOTH must be posted at least 5 days before the appearance.',cat:'Deadlines'},
+{q:'Affidavit of compliance after Secretary of State service?',a:'Within 40 days after the date of service on the SOS, or such additional time as the court allows (§48.161(3)).',cat:'Deadlines'},
+{q:'When is SOS service actually effectuated?',a:'§48.161(8) — on the date the affidavit of compliance is filed, or the date the notice requirements are completed, whichever is LATER.',cat:'Deadlines'},
+{q:"What is the 'nail and mail' rule really?",a:'§48.183 — in a possession case, after 2 attempts at least 6 HOURS apart with no tenant and no one 15+, you POST to a conspicuous place. The CLERK mails. Effective on the later of posting or mailing, and 5 days must elapse before a final removal judgment.',cat:'Special'},
+{q:'What is the §48.184 three-attempt pattern?',a:'For unknown parties in possession: once during business hours, once during nonbusiness hours, once during a weekend — plus posting and a clerk mailing.',cat:'Special'},
+{q:'Can a CPS serve a writ of execution?',a:'No. Writs of execution and writs of possession enforce judgments — sheriff only.',cat:'Documents'},
+{q:'Shurman v. Atlantic Mortgage — the holding?',a:"An inmate's usual place of abode was the state prison, not the home he shared with his wife before incarceration.",cat:'Case Law'},
+{q:'Robles-Martinez v. Diaz, Reus & Targ — why does it matter?',a:'Substitute service provisions must be STRICTLY COMPLIED WITH and are STRICTLY CONSTRUED. That is the interpretive rule behind most abode cases.',cat:'Case Law'},
+{q:'Ward v. Gibson — the holding?',a:'A leased parking space in a garage is not a usual place of abode, so substitute service on a roommate there was invalid.',cat:'Case Law'},
+{q:'Rokeach v. Glickstein — the holding?',a:'Holding papers to a car window while the driver fled was VALID service; the server identified himself and described the documents.',cat:'Case Law'},
+{q:'What makes process valid?',a:'Court seal, the server\u2019s signature, the required service information, and service in the manner prescribed by law.',cat:'Basics'},
+{q:'May a gated community deny entry?',a:'No — §48.031(7) requires gated residential communities, condominium associations, and cooperatives to grant UNANNOUNCED entry, including to common areas and common elements.',cat:'Rules'},
+{q:'What is diplomatic immunity from service?',a:'Ambassadors, consuls, and foreign ministers are generally immune while serving in an official capacity. Not found in Chapter 48 — it comes from international law and federal statute.',cat:'Special'},
+{q:'What is courthouse witness immunity?',a:'A nonresident attending court in an UNRELATED matter is immune from new service for a reasonable time before and after — unless the new case involves the same parties and issues.',cat:'Special'},
+{q:'May a CPS charge a fee?',a:'Yes — §48.29(8).',cat:'Ethics'},
+{q:'What does your ID card show, and what renews it?',a:'§48.29(5)(b) — ID number, printed name, signature, photograph, the seal of the circuit court, and an expiration date. Renewable annually on proof of good standing AND current bond.',cat:'9th Circuit'}];
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function el(tag, attrs, kids){
+  var n = document.createElement(tag);
+  if (attrs) for (var k in attrs){
+    if (k === 'class') n.className = attrs[k];
+    else if (k === 'style') n.setAttribute('style', attrs[k]);
+    else if (k.slice(0,2) === 'on') n[k] = attrs[k];
+    else if (k === 'text') n.textContent = attrs[k];
+    else if (k === 'html') n.innerHTML = attrs[k];
+    else n.setAttribute(k, attrs[k]);
+  }
+  (kids||[]).forEach(function(c){ if (c) n.appendChild(c); });
+  return n;
+}
+function shuffle(a){ a = a.slice(); for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function norm(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9%]/g,''); }
+function go(v){ S.view = v; render(); window.scrollTo(0,0); }
+
+function allQuestions(){
+  var out = [];
+  MODULES.forEach(function(m){ m.quiz.forEach(function(q){ out.push(q); }); });
+  SCENARIOS.forEach(function(s){ out.push({q:s.question + ' — ' + s.title.replace(/^\S+\s/,''), options:s.options, correct:s.correct, explain:s.explain}); });
+  return out;
+}
+
+function header(title, sub, backTo){
+  var left = [];
+  if (backTo) left.push(el('button',{class:'backbtn',text:'‹  Back',onclick:function(){ go(backTo); }}));
+  left.push(el('div',{class:'crown',text:'J Empire · Certified Process Server'}));
+  left.push(el('h1',{text:title}));
+  if (sub) left.push(el('p',{text:sub}));
+
+  var inner = el('div',{class:'inner'},[
+    el('div',{style:'min-width:0'}, left),
+    el('button',{class:'menubtn',text:'☰  Menu',onclick:function(){ S.navOpen = !S.navOpen; render(); }})
+  ]);
+  return el('div',{class:'topbar'},[inner]);
+}
+
+/* ---------- the always-visible section menu ---------- */
+var NAV = [
+  {group:'Study', items:[{id:'home', icon:'🏠', label:'Home & progress'}]},
+  {group:'Modules', items: MODULES.map(function(m){
+      return {id:'mod'+m.id, icon:m.emoji, label:m.title, modId:m.id};
+  })},
+  {group:'Practice', items:[
+    {id:'flashcards', icon:'🃏', label:'Flashcards'},
+    {id:'fillin',     icon:'✏️', label:'Fill in the blank'},
+    {id:'scenarios',  icon:'🎭', label:'Real scenarios'},
+    {id:'checklists', icon:'✅', label:'Field checklists'},
+    {id:'keyterms',   icon:'🔤', label:'Glossary'},
+    {id:'finalquiz',  icon:'🎯', label:'Final exam practice'}
+  ]}
+];
+
+function navGo(item){
+  S.navOpen = false;
+  if (item.modId){ S.moduleId = item.modId; S.lessonOpen = {}; go('module'); return; }
+  if (item.id === 'finalquiz'){
+    S.quiz = { pool: shuffle(allQuestions()).slice(0,40), i:0, picked:null, right:0, source:'final' };
+    go('quiz'); return;
+  }
+  if (item.id === 'home'){ go('home'); return; }
+  S.practice = { mode:item.id, i:0, flipped:false, val:'', shown:false, picked:null, right:0 };
+  go(item.id);
+}
+
+function buildNav(){
+  var nav = el('nav',{class:'sidenav'+(S.navOpen?' open':'')});
+  nav.appendChild(el('div',{class:'closerow'},[
+    el('b',{text:'Sections'}),
+    el('button',{text:'Close ✕',onclick:function(){ S.navOpen=false; render(); }})
+  ]));
+  NAV.forEach(function(g){
+    nav.appendChild(el('div',{class:'navgroup',text:g.group}));
+    g.items.forEach(function(it){
+      var active = (it.modId && S.view==='module' && S.moduleId===it.modId) ||
+                   (!it.modId && S.view===it.id) ||
+                   (it.id==='home' && S.view==='home');
+      var done = it.modId && S.completed.indexOf(it.modId) > -1;
+      nav.appendChild(el('button',{class:'navitem'+(active?' active':''),onclick:function(){ navGo(it); }},[
+        el('span',{class:'ic',text:it.icon}),
+        el('span',{text:it.label}),
+        done ? el('span',{class:'tick',text:'✓'}) : null
+      ]));
+    });
+  });
+  return nav;
+}
+
+function progressPct(){
+  return Math.round((S.completed.length / MODULES.length) * 100);
+}
+
+/* ============================================================
+   VIEWS
+   ============================================================ */
+function viewHome(){
+  var w = el('div',{});
+
+  var pct = progressPct();
+  var card = el('div',{class:'card'},[
+    el('h2',{text:'Your progress'}),
+    el('p',{style:'margin:4px 0 12px;font-size:14px;color:var(--muted)',
+      text: S.completed.length + ' of ' + MODULES.length + ' modules complete · ' + pct + '%'}),
+    el('div',{class:'bar'},[ el('i',{style:'width:'+pct+'%;background:var(--gold)'}) ])
+  ]);
+  var stats = el('div',{class:'grid2',style:'margin-top:12px'},[
+    el('div',{class:'stat'},[ el('b',{text:String(S.finalBest)+'%'}), el('span',{text:'Best final exam'}) ]),
+    el('div',{class:'stat'},[ el('b',{text:String(allQuestions().length)}), el('span',{text:'Practice questions'}) ])
+  ]);
+  card.appendChild(stats);
+  w.appendChild(card);
+
+  w.appendChild(el('button',{class:'btn gold',text:'⚡  Practice & drills',onclick:function(){ go('practice'); }}));
+  w.appendChild(el('div',{style:'height:22px'}));
+
+  w.appendChild(el('div',{class:'pagetitle',text:'The 8 modules'}));
+  var grid = el('div',{class:'modgrid'});
+
+  MODULES.forEach(function(m){
+    var done = S.completed.indexOf(m.id) > -1;
+    var sc = S.scores[m.id];
+    var b = el('button',{class:'modbtn',style:'border-color:'+(done?'var(--green)':'var(--border)'),onclick:function(){ S.moduleId=m.id; S.lessonOpen={}; go('module'); }},[
+      el('span',{class:'emoji',text:m.emoji}),
+      el('span',{},[
+        el('span',{class:'t',text:m.title}),
+        el('span',{class:'s',text:m.subtitle}),
+        el('span',{class:'meta',style:'color:'+m.color,
+          text: m.read + ' · ' + m.lessons.length + ' lessons · ' + m.quiz.length + ' questions' + (sc!==undefined ? ' · scored '+sc+'%' : '')})
+      ]),
+      el('span',{class:'done',text: done ? '✅' : ''})
+    ]);
+    grid.appendChild(b);
+  });
+  w.appendChild(grid);
+
+  w.appendChild(el('div',{class:'note',html:'Content verified against the 2025 Florida Statutes, Fla. R. Civ. P. 1.070, Fla. Sm. Cl. R. 7.070, and the Ninth Circuit\u2019s published CPS requirements.<br>Reviewed August 2026. Statutes change — confirm anything critical against flsenate.gov before you rely on it.'}));
+
+  return [header('Process Server Study','Florida Chapter 48 · Ninth Judicial Circuit'), w];
+}
+
+function viewModule(){
+  var m = MODULES.filter(function(x){ return x.id === S.moduleId; })[0];
+  var w = el('div',{});
+
+  m.lessons.forEach(function(L, i){
+    var open = !!S.lessonOpen[i];
+    var box = el('div',{class:'lesson',style:'border-color:'+(open?m.color:'var(--border)')});
+    box.appendChild(el('button',{onclick:function(){ S.lessonOpen[i] = !open; render(); }},[
+      el('span',{style:'font-size:21px',text:L.icon}),
+      el('span',{style:'font-family:Fraunces,serif;font-size:16.5px',text:L.title}),
+      el('span',{class:'chev',text: open ? '▲' : '▼'})
+    ]));
+    if (open) box.appendChild(el('div',{class:'body',text:L.content}));
+    w.appendChild(box);
+  });
+
+  w.appendChild(el('div',{style:'height:8px'}));
+  w.appendChild(el('button',{class:'btn gold',text:'Take the module quiz  ('+m.quiz.length+' questions)',onclick:function(){
+    S.quiz = { pool:m.quiz, i:0, picked:null, right:0, source:'module', modId:m.id };
+    go('quiz');
+  }}));
+
+  return [header(m.emoji+'  '+m.title, m.subtitle, 'home'), w];
+}
+
+function viewQuiz(){
+  var q = S.quiz;
+  var w = el('div',{class:'qwrap'});
+  var item = q.pool[q.i];
+
+  w.appendChild(el('div',{style:'display:flex;justify-content:space-between;font-size:13px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:8px'},[
+    el('span',{text:'Question '+(q.i+1)+' of '+q.pool.length}),
+    el('span',{text:q.right+' correct'})
+  ]));
+  w.appendChild(el('div',{class:'bar',style:'margin-bottom:16px'},[
+    el('i',{style:'width:'+Math.round((q.i/q.pool.length)*100)+'%;background:var(--gold)'})
+  ]));
+
+  w.appendChild(el('div',{class:'card'},[ el('h3',{text:item.q}) ]));
+
+  item.options.forEach(function(opt, oi){
+    var cls = 'opt';
+    if (q.picked !== null){
+      if (oi === item.correct) cls += ' correct';
+      else if (oi === q.picked) cls += ' wrong';
+      else cls += ' dim';
+    }
+    w.appendChild(el('button',{class:cls,text:opt,onclick:function(){
+      if (q.picked !== null) return;
+      q.picked = oi;
+      if (oi === item.correct) q.right++;
+      render();
+    }}));
+  });
+
+  if (q.picked !== null){
+    var ok = q.picked === item.correct;
+    w.appendChild(el('div',{class:'explain '+(ok?'ok':'no'),style:'margin-top:12px'},[
+      el('b',{text: ok ? '✅ Correct — ' : '❌ Not quite — '}),
+      document.createTextNode(item.explain)
+    ]));
+    var last = q.i === q.pool.length - 1;
+    w.appendChild(el('button',{class:'btn',text: last ? 'See your results' : 'Next question',onclick:function(){
+      if (last){ finishQuiz(); } else { q.i++; q.picked = null; render(); }
+    }}));
+  }
+
+  return [header('Quiz', q.source === 'final' ? 'Final exam practice' : 'Module '+q.modId, q.source==='final'?'practice':'module'), w];
+}
+
+function finishQuiz(){
+  var q = S.quiz;
+  var pct = Math.round((q.right / q.pool.length) * 100);
+  q.finalPct = pct;
+  if (q.source === 'module'){
+    S.scores[q.modId] = pct;
+    Store.set('jeps_scores', S.scores);
+    if (pct >= 80 && S.completed.indexOf(q.modId) === -1){
+      S.completed.push(q.modId);
+      Store.set('jeps_completed', S.completed);
+    }
+  } else {
+    if (pct > S.finalBest){ S.finalBest = pct; Store.set('jeps_finalBest', pct); }
+  }
+  go('result');
+}
+
+function viewResult(){
+  var q = S.quiz, pct = q.finalPct;
+  var pass = pct >= 80;
+  var w = el('div',{class:'qwrap'});
+  w.appendChild(el('div',{class:'card',style:'text-align:center;border-color:'+(pass?'var(--green)':'var(--red)')},[
+    el('div',{style:'font-size:52px;line-height:1',text: pass ? '👑' : '📚'}),
+    el('h2',{style:'font-family:Fraunces,serif;font-size:44px;font-weight:900;margin-top:6px',text:pct+'%'}),
+    el('p',{style:'margin:6px 0 0;font-weight:700;color:'+(pass?'var(--green)':'var(--red)'),
+      text: pass ? 'Passing — 80% is the Ninth Circuit standard' : 'Below 80% — review and run it again'}),
+    el('p',{style:'margin:8px 0 0;font-size:14px;color:var(--muted)',text: q.right+' of '+q.pool.length+' correct'})
+  ]));
+  w.appendChild(el('button',{class:'btn gold',text:'Try again',onclick:function(){
+    S.quiz = { pool: q.source==='final' ? shuffle(allQuestions()).slice(0,40) : q.pool, i:0, picked:null, right:0, source:q.source, modId:q.modId };
+    go('quiz');
+  }}));
+  w.appendChild(el('button',{class:'btn ghost',text:'Back to home',onclick:function(){ go('home'); }}));
+  return [header('Results', pass ? 'Nice work' : 'Keep going', 'home'), w];
+}
+
+function viewPractice(){
+  var w = el('div',{});
+  var modes = [
+    {id:'flashcards', icon:'🃏', label:'Flashcards', desc:FLASHCARDS.length+' cards — tap to flip', color:'var(--blue)'},
+    {id:'fillin', icon:'✏️', label:'Fill in the blank', desc:FILL_INS.length+' prompts — type the answer', color:'var(--orange)'},
+    {id:'scenarios', icon:'🎭', label:'Real scenarios', desc:SCENARIOS.length+' situations with explanations', color:'var(--green)'},
+    {id:'checklists', icon:'✅', label:'Field checklists', desc:CHECKLISTS.length+' tap-to-check lists', color:'var(--purple)'},
+    {id:'keyterms', icon:'🔤', label:'Glossary', desc:KEY_TERMS.length+' terms and definitions', color:'var(--pink)'},
+    {id:'finalquiz', icon:'🎯', label:'Final exam practice', desc:'40 mixed questions — need 80%', color:'var(--charcoal)'}
+  ];
+  var pgrid = el('div',{class:'modgrid'});
+  modes.forEach(function(b){
+    pgrid.appendChild(el('button',{class:'modbtn',onclick:function(){
+      if (b.id === 'finalquiz'){
+        S.quiz = { pool: shuffle(allQuestions()).slice(0,40), i:0, picked:null, right:0, source:'final' };
+        go('quiz');
+      } else { S.practice = { mode:b.id, i:0, flipped:false, val:'', shown:false, right:0 }; go(b.id); }
+    }},[
+      el('span',{class:'emoji',text:b.icon}),
+      el('span',{},[ el('span',{class:'t',text:b.label}), el('span',{class:'s',text:b.desc}) ])
+    ]));
+  });
+  w.appendChild(pgrid);
+  return [header('Practice & drills','Six ways to review','home'), w];
+}
+
+function viewFlashcards(){
+  var p = S.practice, c = FLASHCARDS[p.i];
+  var w = el('div',{});
+  w.appendChild(el('div',{style:'text-align:center;font-size:13px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:10px',
+    text:'Card '+(p.i+1)+' of '+FLASHCARDS.length}));
+  var f = el('div',{class:'flash',onclick:function(){ p.flipped = !p.flipped; render(); }},[
+    el('div',{class:'cat',text:c.cat}),
+    p.flipped ? el('div',{class:'a',text:c.a}) : el('div',{class:'q',text:c.q})
+  ]);
+  w.appendChild(f);
+  w.appendChild(el('button',{class:'btn gold',text: p.flipped ? 'Show the question' : 'Reveal the answer',onclick:function(){ p.flipped=!p.flipped; render(); }}));
+  w.appendChild(el('div',{class:'grid2',style:'margin-top:10px'},[
+    el('button',{class:'btn ghost',text:'‹ Previous',onclick:function(){ p.i=(p.i-1+FLASHCARDS.length)%FLASHCARDS.length; p.flipped=false; render(); }}),
+    el('button',{class:'btn ghost',text:'Next ›',onclick:function(){ p.i=(p.i+1)%FLASHCARDS.length; p.flipped=false; render(); }})
+  ]));
+  w.appendChild(el('button',{class:'btn ghost',style:'margin-top:10px',text:'Shuffle the deck',onclick:function(){ FLASHCARDS = shuffle(FLASHCARDS); p.i=0; p.flipped=false; render(); }}));
+  return [header('Flashcards','Tap the card to flip','practice'), w];
+}
+
+function viewFillIn(){
+  var p = S.practice, f = FILL_INS[p.i];
+  var w = el('div',{class:'qwrap'});
+  w.appendChild(el('div',{style:'display:flex;justify-content:space-between;font-size:13px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:10px'},[
+    el('span',{text:(p.i+1)+' of '+FILL_INS.length}), el('span',{text:p.right+' correct'})
+  ]));
+  w.appendChild(el('div',{class:'card'},[
+    el('h3',{style:'font-size:18px;line-height:1.45',text:f.sentence}),
+    el('p',{style:'margin:9px 0 0;font-size:13.5px;color:var(--muted)',text:'Hint: '+f.hint})
+  ]));
+
+  var input = el('input',{class:'inp',type:'text',placeholder:'Type your answer',value:p.val,
+    oninput:function(e){ p.val = e.target.value; }});
+  if (!p.shown) w.appendChild(input);
+
+  if (p.shown){
+    var ok = norm(p.val) === norm(f.answer);
+    w.appendChild(el('div',{class:'explain '+(ok?'ok':'no')},[
+      el('b',{text: ok ? '✅ Correct. ' : '❌ Answer: '}),
+      document.createTextNode(ok ? 'You wrote "'+p.val+'".' : f.answer)
+    ]));
+    var last = p.i === FILL_INS.length - 1;
+    w.appendChild(el('button',{class:'btn gold',text: last ? 'Start over' : 'Next',onclick:function(){
+      if (last){ S.practice = {mode:'fillin', i:0, val:'', shown:false, right:0}; }
+      else { p.i++; p.val=''; p.shown=false; }
+      render();
+    }}));
+  } else {
+    w.appendChild(el('button',{class:'btn gold',text:'Check answer',onclick:function(){
+      p.shown = true;
+      if (norm(p.val) === norm(f.answer)) p.right++;
+      render();
+    }}));
+    w.appendChild(el('button',{class:'btn ghost',text:'Skip',onclick:function(){ p.shown=true; render(); }}));
+  }
+  return [header('Fill in the blank','Type the missing words','practice'), w];
+}
+
+function viewScenarios(){
+  var p = S.practice, s = SCENARIOS[p.i];
+  var w = el('div',{class:'qwrap'});
+  w.appendChild(el('div',{style:'font-size:13px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:10px',
+    text:'Scenario '+(p.i+1)+' of '+SCENARIOS.length}));
+  w.appendChild(el('div',{class:'card'},[
+    el('h3',{text:s.title}),
+    el('p',{style:'margin:8px 0 0;font-size:16px;line-height:1.6',text:s.situation}),
+    el('p',{style:'margin:12px 0 0;font-weight:800',text:s.question})
+  ]));
+  s.options.forEach(function(opt, oi){
+    var cls = 'opt';
+    if (p.shown){
+      if (oi === s.correct) cls += ' correct';
+      else if (oi === p.picked) cls += ' wrong';
+      else cls += ' dim';
+    }
+    w.appendChild(el('button',{class:cls,text:opt,onclick:function(){
+      if (p.shown) return; p.picked = oi; p.shown = true; render();
+    }}));
+  });
+  if (p.shown){
+    w.appendChild(el('div',{class:'explain '+(p.picked===s.correct?'ok':'no'),style:'margin-top:12px'},[
+      document.createTextNode(s.explain)
+    ]));
+    var last = p.i === SCENARIOS.length - 1;
+    w.appendChild(el('button',{class:'btn gold',text: last ? 'Start over' : 'Next scenario',onclick:function(){
+      if (last){ S.practice = {mode:'scenarios', i:0, shown:false, picked:null}; }
+      else { p.i++; p.shown=false; p.picked=null; }
+      render();
+    }}));
+  }
+  return [header('Real scenarios','Field situations','practice'), w];
+}
+
+function viewChecklists(){
+  var w = el('div',{});
+  var cgrid = el('div',{class:'colgrid'});
+  CHECKLISTS.forEach(function(cl, ci){
+    var card = el('div',{class:'card',style:'border-color:'+cl.color});
+    card.appendChild(el('h3',{style:'color:'+cl.color,text:cl.title}));
+    card.appendChild(el('div',{style:'height:6px'}));
+    cl.items.forEach(function(it, ii){
+      var key = ci+'-'+ii, on = !!S.checks[key];
+      card.appendChild(el('button',{class:'chk'+(on?' on':''),onclick:function(){
+        S.checks[key] = !on; Store.set('jeps_checks', S.checks); render();
+      }},[
+        el('span',{class:'box',text: on ? '✓' : ''}),
+        el('span',{style:'font-size:15.5px;line-height:1.45',text:it})
+      ]));
+    });
+    cgrid.appendChild(card);
+  });
+  w.appendChild(cgrid);
+  w.appendChild(el('div',{style:'height:14px'}));
+  w.appendChild(el('button',{class:'btn ghost',text:'Clear all checkmarks',onclick:function(){
+    S.checks = {}; Store.set('jeps_checks', {}); render();
+  }}));
+  return [header('Field checklists','Tap to check off','practice'), w];
+}
+
+function viewKeyTerms(){
+  var w = el('div',{});
+  var grid = el('div',{class:'colgrid'});
+  var half = Math.ceil(KEY_TERMS.length/2);
+  [KEY_TERMS.slice(0,half), KEY_TERMS.slice(half)].forEach(function(chunk){
+    var card = el('div',{class:'card'});
+    chunk.forEach(function(t){
+      card.appendChild(el('div',{class:'term'},[
+        el('b',{text:t.term}),
+        el('p',{text:t.definition})
+      ]));
+    });
+    grid.appendChild(card);
+  });
+  w.appendChild(grid);
+  return [header('Glossary', KEY_TERMS.length+' terms','practice'), w];
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function render(){
+  var app = document.getElementById('app');
+  app.innerHTML = '';
+  var parts;
+  switch (S.view){
+    case 'module': parts = viewModule(); break;
+    case 'quiz': parts = viewQuiz(); break;
+    case 'result': parts = viewResult(); break;
+    case 'practice': parts = viewPractice(); break;
+    case 'flashcards': parts = viewFlashcards(); break;
+    case 'fillin': parts = viewFillIn(); break;
+    case 'scenarios': parts = viewScenarios(); break;
+    case 'checklists': parts = viewChecklists(); break;
+    case 'keyterms': parts = viewKeyTerms(); break;
+    default: parts = viewHome();
+  }
+  var main = el('main',{class:'main'});
+  main.appendChild(parts[1]);
+  app.appendChild(parts[0]);
+  app.appendChild(el('div',{class:'shell'},[ buildNav(), main ]));
+}
+render();
+</script>
+</body>
+</html>
