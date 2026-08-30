@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>J Empire Server — Printable Pack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#C9A84C;--gold-dk:#9A7530;--cream:#FAF6EE;--dark:#1A1209;
+  --charcoal:#2D2416;--border:#E8DFC8;--ink:#241B0E;--muted:#6B5C42;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);color:var(--ink);font-family:Inter,-apple-system,sans-serif;
+  font-size:17px;line-height:1.5;-webkit-text-size-adjust:100%;}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;line-height:1.15;}
+
+.bar{background:linear-gradient(160deg,var(--charcoal),var(--dark));color:var(--cream);
+  padding:22px 20px;border-bottom:3px solid var(--gold);}
+.bar .in{max-width:900px;margin:0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.bar svg{width:54px;height:54px;flex:none;}
+.bar .k{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-weight:800;}
+.bar h1{font-size:25px;font-weight:900;color:#fff;margin-top:3px;}
+.bar a.back{margin-left:auto;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--dark);background:var(--gold);padding:11px 16px;border-radius:10px;text-decoration:none;}
+
+.wrap{max-width:1250px;margin:0 auto;padding:18px 16px 60px;}
+.layout{display:grid;grid-template-columns:1fr;gap:16px;}
+.nav{background:#fff;border:2px solid var(--border);border-radius:14px;padding:12px;}
+.nav .ng{font-family:Fraunces,serif;font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--gold-dk);padding:10px 8px 5px;border-bottom:1.5px solid var(--gold);margin-bottom:4px;}
+.nav .ng:first-child{padding-top:2px;}
+.nav a{display:block;padding:9px 10px;font-size:14px;font-weight:600;color:var(--ink);
+  text-decoration:none;border-radius:8px;cursor:pointer;line-height:1.3;}
+.nav a:hover{background:#F3EDDC;}
+.nav a.on{background:var(--dark);color:var(--gold);font-weight:800;}
+.nav a.all{background:#F3EDDC;font-weight:800;margin-bottom:6px;}
+.nav a.all.on{background:var(--dark);color:var(--gold);}
+.sheet.hidden{display:none;}
+@media(min-width:1000px){
+  .layout{grid-template-columns:16rem 1fr;align-items:start;}
+  .nav{position:sticky;top:14px;max-height:calc(100vh - 30px);overflow-y:auto;}
+}
+.intro{background:#fff;border:2px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:20px;}
+.intro p{font-size:15px;color:var(--muted);}
+.intro b{color:var(--ink);}
+button.print{font-family:Inter,sans-serif;font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  background:var(--dark);color:var(--gold);border:none;border-radius:11px;padding:14px 22px;cursor:pointer;margin-top:12px;}
+
+.grouphd{font-family:Fraunces,serif;font-size:13px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--gold-dk);margin:26px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--gold);}
+
+.sheet{background:#fff;border:2px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:16px;}
+.sheet .hd .tx{flex:1;min-width:180px;}
+button.one{font-family:Inter,sans-serif;font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  background:var(--dark);color:var(--gold);border:none;border-radius:8px;padding:9px 14px;cursor:pointer;flex:none;}
+button.one:hover{background:var(--gold);color:var(--dark);}
+.sheet .hd{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+  border-bottom:2px solid var(--ink);padding-bottom:8px;margin-bottom:12px;}
+.sheet h2{font-size:22px;font-weight:900;}
+.sheet .when{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
+.sheet .sub{font-size:14px;color:var(--muted);margin:-6px 0 12px;}
+
+ul.ck{list-style:none;}
+ul.ck li{display:flex;gap:11px;align-items:flex-start;padding:7px 0;border-bottom:1px dotted #D8CEB4;font-size:15.5px;}
+ul.ck li:last-child{border-bottom:none;}
+ul.ck li:before{content:"";width:20px;height:20px;flex:none;border:2px solid var(--ink);border-radius:4px;margin-top:1px;}
+ul.ck li b{font-weight:700;}
+ul.ck li .why{display:block;font-size:13px;color:var(--muted);margin-top:1px;}
+
+.fields{display:grid;grid-template-columns:repeat(2,1fr);gap:9px 16px;margin-bottom:12px;}
+@media(max-width:560px){.fields{grid-template-columns:1fr;}}
+.f{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+.f span{display:block;border-bottom:1.5px solid var(--ink);height:26px;margin-top:2px;}
+.f.wide{grid-column:1/-1;}
+
+table.grid{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px;}
+table.grid th{background:var(--ink);color:#fff;font-family:Fraunces,serif;font-weight:700;
+  text-align:left;padding:7px 8px;font-size:12.5px;}
+table.grid td{border:1px solid var(--ink);height:34px;padding:4px 7px;}
+table.grid td.lbl{background:#F5F0E2;font-weight:700;width:22%;font-size:12.5px;}
+
+.note{font-size:13.5px;color:var(--muted);background:#F7F2E5;border-left:4px solid var(--gold);
+  border-radius:8px;padding:10px 12px;margin-top:12px;}
+.note b{color:var(--ink);}
+
+.ideas{background:var(--dark);color:#E9E0CC;border-radius:14px;padding:20px 22px;margin-top:26px;}
+.ideas h2{color:var(--gold);font-size:22px;font-weight:900;margin-bottom:10px;}
+.ideas h4{font-family:Fraunces,serif;color:#fff;font-size:16px;font-weight:700;margin:16px 0 4px;}
+.ideas p{font-size:14.5px;color:#B8AC93;}
+
+@media print{
+  @page{margin:.5in;}
+  body{background:#fff;font-size:11.5pt;}
+  .bar,.intro,.grouphd,.ideas,.nav,button,.noprint{display:none !important;}
+  .sheet.hidden{display:block !important;}
+  body.solo .sheet{display:none !important;}
+  body.solo .sheet.only{display:block !important;page-break-after:auto !important;}
+  .wrap{max-width:none;padding:0;}
+  .sheet{border:none;border-radius:0;padding:0;margin:0 0 0 0;page-break-after:always;break-after:page;}
+  .sheet:last-of-type{page-break-after:auto;}
+  .sheet h2{font-size:19pt;}
+  ul.ck li{font-size:11pt;padding:6px 0;}
+  ul.ck li:before{width:15pt;height:15pt;}
+  ul.ck li .why{font-size:9pt;}
+  .note{background:none;border-left:3px solid #000;font-size:9.5pt;}
+  table.grid td{height:28pt;}
+}
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="in">
+  <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="none" stroke="#C9A84C" stroke-width="3"/><path d="M28 40 L36 27 L44 37 L50 22 L56 37 L64 27 L72 40 Z" fill="#C9A84C"/><rect x="28" y="43" width="44" height="4" fill="#C9A84C"/><text x="50" y="82" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-size="38" font-weight="900" fill="#fff">J</text></svg>
+  <div><div class="k">J Empire Server</div><h1>The Printable Pack</h1></div>
+  <a class="back" href="index.html">&larr; Home</a>
+</div></div>
+
+<div class="wrap">
+
+  <div class="intro">
+    <p><b>Print these once and live off them for your first month.</b> Each sheet has its own Print button in the corner. Each sheet prints on its own page. Put the daily ones on a clipboard in the car, tape the Car Load-Out inside your glovebox, and keep a stack of blank Attempt Logs and Job Intake forms in the accordion file.</p>
+    <p style="margin-top:8px"><b>The rule that keeps you out of a paper trail:</b> every sheet has a home. Nothing floats.</p>
+    <button class="print" onclick="window.print()">Print all sheets</button>
+    <p style="margin-top:8px;font-size:13px">In the print dialog you can pick specific pages if you only need a few.</p>
+  </div>
+
+  <div class="layout">
+<div class="nav noprint"><a class="all on" data-t="all">&#9776; &nbsp;All sheets</a>
+<div class="ng">The daily rhythm</div>
+<a data-t="sh1">1 · The Night Before</a>
+<a data-t="sh2">2 · Car Load-Out</a>
+<a data-t="sh3">3 · At the Door</a>
+<a data-t="sh4">4 · After Each Serve — In the Car</a>
+<a data-t="sh5">5 · Daily Close-Out</a>
+<a data-t="sh6">6 · Return of Service — Self Audit</a>
+<a data-t="sh7">7 · The Weekly Reset</a>
+<div class="ng">Fill-in forms</div>
+<a data-t="sh8">8 · Job Intake Form</a>
+<a data-t="sh9">9 · Attempt Log</a>
+<a data-t="sh10">10 · Daily Route Sheet</a>
+<a data-t="sh11">11 · Weekly Numbers</a>
+<a data-t="sh12">12 · Renewals &amp; Dates</a>
+<a data-t="sh13">13 · Incident Log</a>
+<div class="ng">Habits &amp; trackers</div>
+<a data-t="sh14">14 · Ride-Along Debrief</a>
+<a data-t="sh15">15 · Serve Journal</a>
+<a data-t="sh16">16 · Conflict Check</a>
+<a data-t="sh17">17 · Flagged Addresses</a>
+<a data-t="sh18">18 · One Firm a Week</a></div>
+  <div class="sheets">
+  <div class="grouphd noprint">The daily rhythm</div>
+
+  <!-- 1 NIGHT BEFORE -->
+  <div class="sheet" id="sh1">
+    <div class="hd"><div class="tx"><h2>1 · The Night Before</h2><div class="when">15–20 min &middot; evening</div></div><button class="one" onclick="printOne(this)">Print</button></div>
+    <div class="sub">Tomorrow is won tonight. Never build a route in the morning.</div>
+    <ul class="ck">
+      <li><div><b>Pull tomorrow's jobs</b> from the accordion, sorted by serve-by date<span class="why">Anything due inside 5 days goes in the morning prime block</span></div></li>
+      <li><div><b>Print and assemble each packet</b> — summons plus complaint, two copies of everything<span class="why">A summons without the complaint is a defective serve</span></div></li>
+      <li><div><b>Pre-stamp every packet</b> with your name and CPS number<span class="why">Only date, time, and initials get handwritten at the door</span></div></li>
+      <li><div><b>Pre-fill each return of service</b> — everything except date, time, and manner</div></li>
+      <li><div><b>Sticky note on each packet:</b> physical description, vehicle, best time to catch them</div></li>
+      <li><div><b>Highlight the deadline</b> in yellow on the <i>outside</i> of the packet</div></li>
+      <li><div><b>Build the route</b> — batch by zone, 6–8 stops, hardest defendant first, one flex slot</div></li>
+      <li><div><b>Check for stacked addresses</b> — same complex or same community across different jobs</div></li>
+      <li><div><b>Load the accordion in route order</b>, next stop on top</div></li>
+      <li><div><b>Charge everything</b> — phone, battery pack, body cam</div></li>
+      <li><div><b>Fill the tank and refill the water</b></div></li>
+      <li><div><b>Text your route window</b> to your person, live location on</div></li>
+    </ul>
+    <div class="note"><b>Never on the list:</b> Sunday serves. Service on Sunday is void and you're personally liable. Sunday is for scouting and the weekly reset only.</div>
+  </div>
+
+  <!-- 2 CAR LOAD-OUT -->
+  <div class="sheet" id="sh2">
+    <div class="hd"><div class="tx"><h2>2 · Car Load-Out</h2><div class="when">Tape inside the glovebox</div></div><button class="one" onclick="printOne(this)">Print</button></div>
+    <div class="sub">Eight zones. If it doesn't have a zone, it doesn't come in the car.</div>
+    <ul class="ck">
+      <li><div><b>Dash</b> — two phone mounts, one navigating, one recording</div></li>
+      <li><div><b>Passenger seat</b> — clipboard box, TODAY only, in route order</div></li>
+      <li><div><b>Passenger footwell</b> — accordion file, every open job, tabbed by due date</div></li>
+      <li><div><b>Center console</b> — pens, self-inking stamp, highlighter, sticky notes, $20 cash</div></li>
+      <li><div><b>Glovebox</b> — certification copy, ID card backup, bond copy, printed §48.031(7), blank returns</div></li>
+      <li><div><b>Trunk</b> — cooler, water, cold towel, spare closed-toe shoes, umbrella, gallon bags, bug spray, first aid</div></li>
+      <li><div><b>Driver door</b> — battery pack and cable, hand sanitizer, sunglasses</div></li>
+      <li><div><b>Back seat</b> — <b>EMPTY.</b> This is a rule, not a suggestion<span class="why">The moment papers live in the back seat, the system is gone</span></div></li>
+    </ul>
+    <div class="note"><b>On your person, every door:</b> ID visible on a lanyard, papers folded low in your non-dominant hand, phone recording or timestamping, dominant hand free.</div>
+  </div>
+
+  <!-- 3 AT THE DOOR -->
+  <div class="sheet" id="sh3">
+    <div class="hd"><div class="tx"><h2>3 · At the Door</h2><div class="when">Per serve &middot; pocket card</div></div><button class="one" onclick="printOne(this)">Print</button></div>
+    <div class="sub">Ten seconds of scanning, then knock.</div>
+    <ul class="ck">
+      <li><div><b>Scan the house</b> — AC running, mail piled, trash cans, tags, blinds, toys, dog, camera</div></li>
+      <li><div><b>Photograph every vehicle tag</b> at the address</div></li>
+      <li><div><b>Park nose-out</b>, never blocking a driveway, two houses down if possible</div></li>
+      <li><div><b>Stand to the hinge side</b>, one step back. Three firm knocks plus the doorbell</div></li>
+      <li><div><b>Confirm identity before you hand anything over</b></div></li>
+      <li><div><b>If substitute:</b> confirm it's the abode &rarr; confirm they live there and are 15+ &rarr; <b>say the contents out loud</b><span class="why">All three prongs or the service can be quashed</span></div></li>
+      <li><div><b>Get the name and relationship</b> of whoever you served</div></li>
+      <li><div><b>Write date, time, initials, and your CPS number</b> on the first page of the process</div></li>
+      <li><div><b>Leave immediately.</b> No explaining, no legal questions, no lingering</div></li>
+      <li><div><b>Note the exact time before you reach the car</b></div></li>
+    </ul>
+    <div class="note"><b>Abort and log the attempt instead</b> if: loose dog, no confirmed identity through a closed door, the person says they don't live there, or anything feels wrong. An aborted attempt is still billable and documented.</div>
+  </div>
+
+  <!-- 4 AFTER EACH SERVE -->
+  <div class="sheet" id="sh4">
+    <div class="hd"><div class="tx"><h2>4 · After Each Serve — In the Car</h2><div class="when">2 min &middot; before you pull off</div></div><button class="one" onclick="printOne(this)">Print</button></div>
+    <div class="sub">Not tonight. Not at the next stop. Right now, engine running.</div>
+    <ul class="ck">
+      <li><div><b>Exact time</b> written down, to the minute</div></li>
+      <li><div><b>Photo taken</b> — house number and front door, timestamp and GPS embedded</div></li>
+      <li><div><b>Voice-memo your observations</b> while they're fresh<span class="why">Vehicles, lights, who answered, what they said, what you saw</span></div></li>
+      <li><div><b>Log the attempt in the app</b> — verify the GPS actually captured</div></li>
+      <li><div><b>Complete the return</b> — manner, name served, capacity, documents list</div></li>
+      <li><div><b>Text the client:</b> served, time, return tonight</div></li>
+      <li><div><b>Move the packet out of the active clipboard</b> into the done side</div></li>
+      <li><div><b>Flag the address</b> if anything went badly — never return there alone</div></li>
+    </ul>
+  </div>
+
+  <!-- 5 DAILY CLOSE-OUT -->
+  <div class="sheet" id="sh5">
+    <div class="hd"><div class="tx"><h2>5 · Daily Close-Out</h2><div class="when">15 min &middot; every working night</div></div><button class="one" onclick="printOne(this)">Print</button></div>
+    <div class="sub">This is the job. Servers don't lose clients because they can't serve — they lose them because nobody can get a status update.</div>
+    <ul class="ck">
+      <li><div><b>Every attempt logged</b>, including the no-answers, with exact times</div></li>
+      <li><div><b>Photos uploaded</b> to the right case folder <span class="why">CASE#_LASTNAME — same day, every day</span></div></li>
+      <li><div><b>Returns signed and sent</b> for everything served today</div></li>
+      <li><div><b>Run the affidavit audit</b> on every return before it goes out (sheet 6)</div></li>
+      <li><div><b>Invoice everything served today</b>, return attached</div></li>
+      <li><div><b>Flag at-risk jobs</b> — deadline inside 5 days with no successful attempt gets an email <b>tonight</b></div></li>
+      <li><div><b>Empty the inbox bin</b> — every new job routed into the accordion by due date</div></li>
+      <li><div><b>Update the master sheet</b> — status, attempts, invoiced, paid</div></li>
+      <li><div><b>Log your miles</b></div></li>
+      <li><div><b>Build tomorrow's route</b> (go to sheet 1)</div></li>
+    </ul>
+  </div>
+
+  <!-- 6 AFFIDAVIT AUDIT -->
+  <div class="sheet" id="sh6">
+    <div class="hd"><div class="tx"><h2>6 · Return of Service — Self Audit</h2><div class="when">Before you sign &middot; every time</div></div><button class="one" onclick="printOne(this)">Print</button></div>
+    <div class="sub">A false or defective return is the one mistake you cannot walk back. Run this on every single return.</div>
+    <ul class="ck">
+      <li><div><b>Date AND time the process came to hand</b><span class="why">When you received it — the most commonly forgotten field</span></div></li>
+      <li><div><b>Date AND time it was served</b>, to the minute</div></li>
+      <li><div><b>Manner of service</b> stated — personal, substitute, posting, corporate</div></li>
+      <li><div><b>Full name of the person served</b>, spelled correctly</div></li>
+      <li><div><b>Their capacity</b> if served in a representative role</div></li>
+      <li><div><b>Every pleading and document listed</b> — not "documents," each one named</div></li>
+      <li><div><b>Complete service address</b> including unit number</div></li>
+      <li><div><b>If substitute — all three prongs written out:</b> that it was the usual place of abode, that the person resides there, their age (15+), and that you informed them of the contents</div></li>
+      <li><div><b>If posting an eviction — both attempt times, at least 6 hours apart</b></div></li>
+      <li><div><b>If unknown occupants — three attempts</b>: business hours, non-business hours, and a weekend, plus that you asked their name</div></li>
+      <li><div><b>Your signature and CPS number</b></div></li>
+      <li><div><b>Every fact on this return is something you personally did and can swear to</b><span class="why">If any line makes you hesitate — don't sign. Re-attempt or call the attorney.</span></div></li>
+    </ul>
+    <div class="note"><b>Client app cross-check:</b> before marking a job complete in ProVest, ABC, Proof, or a client portal — confirm the attempt count, photos, and GPS all uploaded and the status matches what your return says. A return that disagrees with the app is the fastest way to lose a network account.</div>
+  </div>
+
+  <!-- 7 WEEKLY -->
+  <div class="sheet" id="sh7">
+    <div class="hd"><div class="tx"><h2>7 · The Weekly Reset</h2><div class="when">Sunday &middot; 30–45 min</div></div><button class="one" onclick="printOne(this)">Print</button></div>
+    <div class="sub">You can't serve on Sunday anyway. Use it.</div>
+    <ul class="ck">
+      <li><div><b>Purge the accordion</b> — everything served and returned moves to the closed box</div></li>
+      <li><div><b>Re-tab what's left</b> by due date, front slot is due this week</div></li>
+      <li><div><b>Chase the money</b> — anything invoiced over 30 days gets one polite email</div></li>
+      <li><div><b>Scan for danger</b> — any serve-by date inside 7 days with zero attempts goes into Monday's prime block right now</div></li>
+      <li><div><b>Review the numbers</b> (sheet 10)</div></li>
+      <li><div><b>Send outreach</b> — new firms, or follow-ups to anyone who hasn't replied</div></li>
+      <li><div><b>Restock the car</b> — paper, water, bug spray, gallon bags, pens</div></li>
+      <li><div><b>Back up the photos</b> — verify the cloud folders actually synced</div></li>
+      <li><div><b>Scout Sunday</b> — drive by tough addresses, photograph tags, confirm occupancy for Monday morning</div></li>
+      <li><div><b>Check renewal dates</b> — certification, bond, notary commission, insurance</div></li>
+    </ul>
+  </div>
+
+  <div class="grouphd noprint">Fill-in forms — keep blanks in the accordion</div>
+
+  <!-- 8 INTAKE -->
+  <div class="sheet" id="sh8">
+    <div class="hd"><div class="tx"><h2>8 · Job Intake Form</h2><div class="when">Fill while you're on the phone</div></div><button class="one" onclick="printOne(this)">Print</button></div>
+    <div class="fields">
+      <div class="f">Date/time received<span></span></div>
+      <div class="f">Client / firm<span></span></div>
+      <div class="f">Contact + phone<span></span></div>
+      <div class="f">Case number<span></span></div>
+      <div class="f">Court / county<span></span></div>
+      <div class="f">Plaintiff<span></span></div>
+      <div class="f wide">Defendant(s) — list every one<span></span></div>
+      <div class="f wide">Service address (incl. unit)<span></span></div>
+      <div class="f">Serve-by date<span></span></div>
+      <div class="f">Hearing date (if any)<span></span></div>
+      <div class="f wide">Documents to be served<span></span></div>
+      <div class="f wide">Description / vehicle / best times<span></span></div>
+      <div class="f">Fee agreed<span></span></div>
+      <div class="f">Non-serve fee<span></span></div>
+      <div class="f">Who files the return?<span></span></div>
+      <div class="f">Rush?  Y / N<span></span></div>
+    </div>
+    <div class="note"><b>Before you hang up:</b> confirm you have a complaint and not just a summons, confirm the fee in writing by email, and log the date and time it came to hand — that goes on the return.</div>
+  </div>
+
+  <!-- 9 ATTEMPT LOG -->
+  <div class="sheet" id="sh9">
+    <div class="hd"><div class="tx"><h2>9 · Attempt Log</h2><div class="when">One per case &middot; rides with the packet</div></div><button class="one" onclick="printOne(this)">Print</button></div>
+    <div class="fields">
+      <div class="f">Case number<span></span></div>
+      <div class="f">Defendant<span></span></div>
+      <div class="f wide">Address<span></span></div>
+    </div>
+    <table class="grid">
+      <tr><th>#</th><th>Date</th><th>Time</th><th>Day</th><th>Observations — vehicles/tags, lights, AC, mail, who spoke, what they said</th><th>Photo?</th></tr>
+      <tr><td class="lbl" style="width:5%">1</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">2</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">3</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">4</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">5</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">6</td><td></td><td></td><td></td><td></td><td></td></tr>
+    </table>
+    <div class="note"><b>Vary the hour, not just the day.</b> Three attempts at 2 PM is one attempt repeated. Diligence means varied times and places where the person is reasonably likely to be found — early morning, evening, weekend.</div>
+  </div>
+
+  <!-- 10 ROUTE SHEET -->
+  <div class="sheet" id="sh10">
+    <div class="hd"><div class="tx"><h2>10 · Daily Route Sheet</h2><div class="when">Clipboard &middot; one per block</div></div><button class="one" onclick="printOne(this)">Print</button></div>
+    <div class="fields">
+      <div class="f">Date<span></span></div>
+      <div class="f">Block (AM / PM)<span></span></div>
+      <div class="f">Zone<span></span></div>
+      <div class="f">Miles start / end<span></span></div>
+    </div>
+    <table class="grid">
+      <tr><th>#</th><th>Defendant / case</th><th>Address</th><th>Due</th><th>Time in</th><th>Result</th></tr>
+      <tr><td class="lbl" style="width:5%">1</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">2</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">3</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">4</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">5</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">6</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">7</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">8</td><td></td><td></td><td></td><td></td><td></td></tr>
+    </table>
+    <div class="note">Hardest defendant first, while you're fresh. Leave one flex slot — something always takes 40 minutes instead of 8.</div>
+  </div>
+
+  <!-- 11 NUMBERS -->
+  <div class="sheet" id="sh11">
+    <div class="hd"><div class="tx"><h2>11 · Weekly Numbers</h2><div class="when">Sunday &middot; 5 min</div></div><button class="one" onclick="printOne(this)">Print</button></div>
+    <div class="sub">The one number attorneys hire on: percentage served inside the client's deadline.</div>
+    <table class="grid">
+      <tr><th style="width:44%">Measure</th><th>This week</th><th>Last week</th><th>Notes</th></tr>
+      <tr><td class="lbl" style="width:44%">Jobs received</td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">Attempts made</td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">Serves completed</td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl"><b>% served inside deadline</b></td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">Non-serves + affidavits</td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">Revenue billed</td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">Revenue collected</td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">Outstanding over 30 days</td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">Miles driven</td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">Tax set aside (25–30%)</td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">New firms contacted</td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">Follow-ups sent</td><td></td><td></td><td></td></tr>
+    </table>
+  </div>
+
+  <!-- 12 RENEWALS -->
+  <div class="sheet" id="sh12">
+    <div class="hd"><div class="tx"><h2>12 · Renewals &amp; Dates</h2><div class="when">Tape inside the accordion</div></div><button class="one" onclick="printOne(this)">Print</button></div>
+    <div class="sub">Nobody chases you on these. An expired card is something opposing counsel can attack.</div>
+    <table class="grid">
+      <tr><th style="width:38%">Item</th><th>Expires</th><th>60-day alarm set</th><th>Cost</th></tr>
+      <tr><td class="lbl" style="width:38%">CPS certification (9th Circuit)</td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">$5,000 process server bond</td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">Circuit ID card</td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">Notary commission</td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">Notary bond</td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">Auto insurance</td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">E&amp;O / liability insurance</td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">Fictitious name (DBA)</td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">LLC annual report</td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">Driver's license</td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">NAPPS / FAPPS membership</td><td></td><td></td><td></td></tr>
+    </table>
+  </div>
+
+  <!-- 13 INCIDENT -->
+  <div class="sheet" id="sh13">
+    <div class="hd"><div class="tx"><h2>13 · Incident Log</h2><div class="when">Fill the same day &middot; keep forever</div></div><button class="one" onclick="printOne(this)">Print</button></div>
+    <div class="sub">Threats, refusals that escalated, dogs, police contact, property damage, anything that could come back.</div>
+    <div class="fields">
+      <div class="f">Date / time<span></span></div>
+      <div class="f">Case number<span></span></div>
+      <div class="f wide">Address<span></span></div>
+      <div class="f">Person involved<span></span></div>
+      <div class="f">Vehicle / tag<span></span></div>
+      <div class="f wide">What happened — facts only, no opinions<span></span></div>
+      <div class="f wide"><span></span></div>
+      <div class="f wide"><span></span></div>
+      <div class="f">911 called?  Y / N<span></span></div>
+      <div class="f">Police report #<span></span></div>
+      <div class="f">Client notified?  Y / N<span></span></div>
+      <div class="f">Address flagged?  Y / N<span></span></div>
+    </div>
+    <div class="note"><b>File a police report if you're threatened.</b> It protects you and it protects the case. Then flag the address in your system so you never return alone — and tell the client before they send you back.</div>
+  </div>
+
+  <div class="grouphd noprint">Habits &amp; trackers</div>
+
+  <div class="sheet" id="sh14">
+    <div class="hd"><div class="tx"><h2>14 · Ride-Along Debrief</h2><div class="when">Mentor week &middot; fill in the car after</div></div><button class="one" onclick="printOne(this)">Print</button></div>
+    <div class="sub">Print one per ride-along. What you watch him do is worth more than what he tells you.</div>
+    <div class="fields">
+      <div class="f">Date<span></span></div>
+      <div class="f">Serves observed<span></span></div>
+    </div>
+    <ul class="ck">
+      <li><div><b>How did he open?</b> First words out of his mouth at the door<span class="why">Write it down verbatim</span></div></li>
+      <li><div><b>How fast did he leave</b> after handing them over?</div></li>
+      <li><div><b>What did he do that isn't in any book?</b></div></li>
+      <li><div><b>How did he handle the one that didn't go smoothly?</b></div></li>
+      <li><div><b>What did he write down, and when?</b></div></li>
+      <li><div><b>What surprised you?</b></div></li>
+    </ul>
+    <div class="f wide" style="margin-top:10px">Notes<span></span></div>
+    <div class="f wide"><span></span></div>
+    <div class="f wide"><span></span></div>
+    <div class="note"><b>Ask before you leave:</b> which firms are his (so you stay off them) &middot; what he charges for a non-serve &middot; who actually pays on time &middot; walk me through the last serve you had quashed &middot; will you take my overflow calls this month.</div>
+  </div>
+
+  <div class="sheet" id="sh15">
+    <div class="hd"><div class="tx"><h2>15 · Serve Journal</h2><div class="when">One per serve &middot; your first ten only</div></div><button class="one" onclick="printOne(this)">Print</button></div>
+    <div class="sub">After ten of these you'll have your own playbook, better than anything I can write you.</div>
+    <div class="fields">
+      <div class="f">Serve #<span></span></div>
+      <div class="f">Date / time<span></span></div>
+      <div class="f">Type (personal / sub / posting)<span></span></div>
+      <div class="f">Attempts it took<span></span></div>
+    </div>
+    <div class="f wide">What I actually said at the door<span></span></div>
+    <div class="f wide"><span></span></div>
+    <div class="f wide">How they reacted<span></span></div>
+    <div class="f wide"><span></span></div>
+    <div class="f wide">What worked<span></span></div>
+    <div class="f wide">What I'd do differently<span></span></div>
+    <div class="f wide">Something I didn't expect<span></span></div>
+    <div class="fields" style="margin-top:8px">
+      <div class="f">Nervous?  1 &ndash; 10<span></span></div>
+      <div class="f">Would I sign this return again?  Y / N<span></span></div>
+    </div>
+  </div>
+
+  <div class="sheet" id="sh16">
+    <div class="hd"><div class="tx"><h2>16 · Conflict Check</h2><div class="when">Before accepting any job</div></div><button class="one" onclick="printOne(this)">Print</button></div>
+    <div class="sub">You must be a disinterested party. In a county this size, this will come up — catch it on the phone, not after you've served.</div>
+    <ul class="ck">
+      <li><div><b>Do I know either party personally?</b> Plaintiff or defendant</div></li>
+      <li><div><b>Any family connection?</b> Including in-laws and extended family</div></li>
+      <li><div><b>Any financial interest</b> in the outcome, however small?</div></li>
+      <li><div><b>Do my kids know their kids?</b> School, sports, church, neighborhood</div></li>
+      <li><div><b>Have I ever lived at or near this address?</b></div></li>
+      <li><div><b>Is this connected to any matter I'm personally involved in?</b></div></li>
+      <li><div><b>Would I be comfortable if opposing counsel asked me all of the above under oath?</b></div></li>
+    </ul>
+    <div class="note"><b>Any yes = decline the job.</b> Refer it out — to your mentor or another server. Referring a conflict makes you look professional. Serving one you shouldn't have makes the service challengeable and puts your certification at risk.</div>
+  </div>
+
+  <div class="sheet" id="sh17">
+    <div class="hd"><div class="tx"><h2>17 · Flagged Addresses</h2><div class="when">Glovebox &middot; check before every route</div></div><button class="one" onclick="printOne(this)">Print</button></div>
+    <div class="sub">Every address that went badly. Check this list before you build a route, and trade it with your mentor — he'll do the same for you.</div>
+    <table class="grid">
+      <tr><th style="width:30%">Address</th><th style="width:14%">Date</th><th>Why flagged</th><th style="width:16%">Never alone?</th></tr>
+      <tr><td></td><td></td><td></td><td></td></tr>
+      <tr><td></td><td></td><td></td><td></td></tr>
+      <tr><td></td><td></td><td></td><td></td></tr>
+      <tr><td></td><td></td><td></td><td></td></tr>
+      <tr><td></td><td></td><td></td><td></td></tr>
+      <tr><td></td><td></td><td></td><td></td></tr>
+      <tr><td></td><td></td><td></td><td></td></tr>
+      <tr><td></td><td></td><td></td><td></td></tr>
+    </table>
+    <div class="note"><b>Flag it for:</b> a threat, a weapon seen or mentioned, an aggressive dog, a gate that refused you, a hostile guard, bad address info, or anything that made you leave early. Tell the client before they send you back.</div>
+  </div>
+
+  <div class="sheet" id="sh18">
+    <div class="hd"><div class="tx"><h2>18 · One Firm a Week</h2><div class="when">Ongoing &middot; forever</div></div><button class="one" onclick="printOne(this)">Print</button></div>
+    <div class="sub">Not a campaign. One firm, every week. Fifty a year and you never have a dry month.</div>
+    <table class="grid">
+      <tr><th style="width:8%">Wk</th><th style="width:26%">Firm / company</th><th style="width:20%">Contact name</th><th style="width:14%">Sent</th><th style="width:14%">Follow-up 1</th><th>Response</th></tr>
+      <tr><td class="lbl">1</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">2</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">3</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">4</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">5</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">6</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">7</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">8</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">9</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">10</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">11</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="lbl">12</td><td></td><td></td><td></td><td></td><td></td></tr>
+    </table>
+    <div class="note"><b>Most work comes from the second or third touch</b>, not the first. The follow-up column is the one that actually earns you clients.</div>
+  </div>
+
+  </div></div>
+
+  <!-- IDEAS -->
+  <div class="ideas noprint">
+    <h2>Other things I'd think about</h2>
+    <p>Beyond the checklists — these are the things that tend to bite new servers in the first 90 days.</p>
+
+    <h4>Keep a "hot address" list</h4>
+    <p>One page in the glovebox of every address that went badly — hostile person, dog, gate problem, wrong info. Before any route, check it. Also share it with your mentor; he'll do the same for you, and that trade is how servers keep each other safe.</p>
+
+    <h4>Your phone is evidence — back it up daily</h4>
+    <p>If your phone dies or gets stolen with three days of un-uploaded attempt photos on it, those serves are challengeable and you have no proof. Auto-upload to the cloud, verify it actually synced during your weekly reset.</p>
+
+    <h4>Never let a client's app be your only record</h4>
+    <p>If you work for ProVest or ABC and the account ends, you can lose access to your own attempt history. Keep your own copy of every photo, log, and return in your own folders. Your record of your work should never live only on someone else's platform.</p>
+
+    <h4>Watch for the deadline you didn't notice</h4>
+    <p>A hearing date is not the same as a serve-by date, and some services have to happen a set number of days before an appearance. Ask at intake, write both down, and work backward from the earlier one.</p>
+
+    <h4>Get comfortable saying no</h4>
+    <p>To a serve outside your circuit. To an enforceable writ. To a case you have any connection to. To a client who won't pay for non-serves. To a serve you're not confident you did correctly. Every one of those is a "no" that protects your certification.</p>
+
+    <h4>Build the diligent search affidavit as you go</h4>
+    <p>Don't wait until attempt four to start writing it. The observations you record at attempt one are what make it credible — vehicles, occupancy signs, who you spoke to. Written after the fact, it reads thin and an opposing attorney will say so.</p>
+
+    <h4>Keep one folder called "Proof of Me"</h4>
+    <p>Certification, ID card, bond, insurance, W-9, driver's license, a short bio. Every agency and network asks for the same stack. Build it once and applications take ten minutes instead of an hour.</p>
+
+    <h4>Ask your mentor for his rejected work</h4>
+    <p>Not just his overflow — the serves he turned down for being too far, too hard, or too small. Those are the ones that build your skills fastest, and they cost him nothing to hand over.</p>
+
+    <h4>Track revenue per route hour, not per serve</h4>
+    <p>A $65 serve twelve miles away beats a $110 rush forty miles away. Once you have a month of data, you'll see which clients and which zones are actually worth your time — and that's when you start pricing like a business instead of guessing.</p>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var links=document.querySelectorAll('.nav a'), sheets=document.querySelectorAll('.sheet');
+  function pick(t){
+    links.forEach(function(a){a.classList.toggle('on',a.dataset.t===t);});
+    sheets.forEach(function(sh){sh.classList.toggle('hidden', t!=='all' && sh.id!==t);});
+    document.querySelectorAll('.grouphd').forEach(function(g){g.style.display=(t==='all')?'':'none';});
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  links.forEach(function(a){a.addEventListener('click',function(){pick(a.dataset.t);});});
+})();
+function printOne(btn){
+  var sh=btn.closest('.sheet');
+  document.querySelectorAll('.sheet').forEach(function(x){x.classList.remove('only');});
+  sh.classList.add('only');
+  document.body.classList.add('solo');
+  window.print();
+}
+window.addEventListener('afterprint',function(){
+  document.body.classList.remove('solo');
+  document.querySelectorAll('.sheet').forEach(function(x){x.classList.remove('only');});
+});
+</script>
+</body>
+</html>

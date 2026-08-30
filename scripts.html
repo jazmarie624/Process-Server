@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>J Empire Server — The Door Script</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+html{font-size:18px;}
+:root{--gold:#C9A84C;--gold-lt:#F0D080;--gold-dk:#9A7530;--cream:#FAF6EE;--dark:#1A1209;
+  --charcoal:#2D2416;--border:#E8DFC8;--ink:#241B0E;--muted:#6B5C42;
+  --blue:#1A4F8A;--blue-bg:#E8F0FA;--green:#2A7A4F;--green-bg:#E8F5EE;--red:#9E2B1E;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:var(--cream);color:var(--ink);font-family:Inter,-apple-system,sans-serif;
+  font-size:1rem;line-height:1.55;padding:.8rem;-webkit-text-size-adjust:100%;}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;line-height:1.15;}
+.wrap{max-width:1200px;margin:0 auto;}
+
+.mast{background:linear-gradient(160deg,var(--charcoal),var(--dark));border-radius:14px;
+  padding:1rem 1.2rem;margin-bottom:.7rem;color:var(--cream);border-bottom:3px solid var(--gold);}
+.mast .top{display:flex;align-items:center;gap:.9rem;flex-wrap:wrap;}
+.mast svg{width:3.1rem;height:3.1rem;flex:none;}
+.mast .k{font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-weight:800;}
+.mast h1{font-size:1.5rem;font-weight:900;color:#fff;margin-top:.1rem;}
+.mast a.back{margin-left:auto;font-size:.7rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--dark);background:var(--gold);padding:.6rem .9rem;border-radius:10px;text-decoration:none;}
+.sizebar{display:flex;align-items:center;gap:.7rem;margin-top:.8rem;padding-top:.7rem;border-top:1px solid #3A3020;flex-wrap:wrap;}
+.sizebar label{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:#A79A80;font-weight:800;}
+.sizebar input{flex:1;min-width:9rem;height:2rem;accent-color:var(--gold);}
+.sizebar .val{font-family:ui-monospace,monospace;font-size:.85rem;font-weight:700;color:var(--gold);min-width:3.2rem;text-align:right;}
+
+.tabs{display:flex;flex-wrap:wrap;gap:.28rem;margin-bottom:-1px;}
+.tab{font-size:.76rem;font-weight:800;letter-spacing:.03em;padding:.6rem .8rem .55rem;background:#E5DCC5;
+  color:#6B5C42;border:1px solid var(--border);border-bottom:none;border-radius:10px 10px 0 0;
+  cursor:pointer;user-select:none;white-space:nowrap;}
+.tab:hover{background:#EFE8D6;color:var(--ink);}
+.tab:focus-visible{outline:3px solid var(--gold-dk);outline-offset:2px;}
+.tab.en.on{background:var(--blue);color:#fff;border-color:var(--blue);}
+.tab.es.on{background:var(--green);color:#fff;border-color:var(--green);}
+.pane{display:none;background:#fff;border:1px solid var(--border);border-radius:0 14px 14px 14px;padding:1.1rem;}
+.pane.on{display:block;}
+
+h2{font-size:1.5rem;font-weight:900;margin-bottom:.2rem;}
+.lede{font-size:.94rem;color:var(--muted);margin-bottom:.7rem;}
+h3{font-size:1.1rem;font-weight:700;margin:1.5rem 0 .6rem;padding-bottom:.3rem;border-bottom:2px solid var(--gold);}
+h3:first-of-type{margin-top:.6rem;}
+
+.scene{border:1px solid var(--border);border-radius:12px;margin-bottom:.75rem;overflow:hidden;}
+.scene>.sh{padding:.55rem .85rem;font-family:Fraunces,serif;font-weight:700;font-size:1rem;color:#fff;}
+.en .scene>.sh{background:var(--blue);} .es .scene>.sh{background:var(--green);}
+.scene .sb{padding:.85rem;}
+.beat{margin-bottom:.85rem;}
+.beat:last-child{margin-bottom:0;}
+.who{display:block;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:.15rem;}
+.say{font-size:1.1rem;font-weight:600;padding:.4rem 0 .4rem .75rem;border-left:5px solid var(--gold);}
+.ph{font-size:.9rem;color:var(--green);font-weight:600;font-family:ui-monospace,monospace;
+  padding:.25rem 0 .1rem .75rem;letter-spacing:.01em;}
+.gl{font-size:.9rem;color:var(--muted);padding:.15rem 0 .1rem .75rem;font-style:italic;}
+.gl b{font-style:normal;color:var(--ink);}
+.dir{font-size:.88rem;color:var(--muted);font-style:italic;padding:.25rem 0 0 .75rem;}
+.note{font-size:.88rem;color:var(--muted);background:#F7F2E5;border-left:4px solid var(--gold);
+  border-radius:8px;padding:.6rem .75rem;margin-top:.5rem;}
+.note b{color:var(--ink);}
+.warn{background:#FCF2F0;border-left-color:var(--red);}
+
+/* drill */
+.mask{background:repeating-linear-gradient(45deg,#EFE8D6,#EFE8D6 9px,#E2D9C0 9px,#E2D9C0 18px);
+  border-radius:8px;color:transparent;cursor:pointer;position:relative;border-left-color:#C9BFA4;}
+.mask:after{content:attr(data-hint);position:absolute;left:.75rem;top:50%;transform:translateY(-50%);
+  color:var(--muted);font-size:.82rem;font-weight:700;}
+.mask .ph2{display:none;}
+.revealed{background:none;color:inherit;cursor:default;border-left-color:var(--gold);}
+.revealed:after{content:"";}
+.drillbar{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.8rem;}
+.db{font-size:.76rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:.55rem 1rem;
+  border-radius:20px;border:2px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer;}
+.db:hover{background:var(--cream);}
+
+.bank{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;}
+@media(max-width:700px){.bank{grid-template-columns:1fr;}}
+.word{background:#FBF8F0;border:1px solid var(--border);border-left:5px solid var(--gold);border-radius:9px;padding:.6rem .75rem;}
+.word b{display:block;font-family:Fraunces,serif;font-size:1.05rem;font-weight:700;}
+.word .e{font-size:.9rem;color:var(--muted);}
+.word .p{font-size:.85rem;color:var(--green);font-family:ui-monospace,monospace;font-weight:600;margin-top:.1rem;}
+
+@media(min-width:1000px){
+  body{padding:.7rem 1rem;}
+  .wrap{display:grid;grid-template-columns:14rem 1fr;gap:.8rem;align-items:start;}
+  .mast{grid-column:1/-1;margin-bottom:0;}
+  .tabs{flex-direction:column;gap:.25rem;margin:0;position:sticky;top:.7rem;}
+  .tab{border-radius:10px 0 0 10px;border-right:none;text-align:left;white-space:normal;}
+  .pane{border-radius:12px;min-height:calc(100vh - 8rem);padding:1.15rem 1.4rem;}
+}
+@media print{.tabs,.mast,.drillbar{display:none;}.pane{display:block !important;page-break-after:always;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="mast">
+  <div class="top">
+    <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="none" stroke="#C9A84C" stroke-width="3"/><path d="M28 40 L36 27 L44 37 L50 22 L56 37 L64 27 L72 40 Z" fill="#C9A84C"/><rect x="28" y="43" width="44" height="4" fill="#C9A84C"/><text x="50" y="82" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-size="38" font-weight="900" fill="#fff">J</text></svg>
+    <div><div class="k">J Empire Server</div><h1>The Door Script</h1></div>
+    <a class="back" href="index.html">&larr; Home</a>
+  </div>
+  <div class="sizebar">
+    <label for="fs">Text size</label>
+    <input type="range" id="fs" min="15" max="26" step="1" value="18">
+    <div class="val" id="fsv">18px</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab en on" data-p="e1" tabindex="0">EN · The Lines</div>
+  <div class="tab en" data-p="e2" tabindex="0">EN · With Delivery Notes</div>
+  <div class="tab en" data-p="e3" tabindex="0">EN · Drill</div>
+  <div class="tab es" data-p="s1" tabindex="0">ES · Las Líneas (The Lines)</div>
+  <div class="tab es" data-p="s2" tabindex="0">ES · Con Pronunciación (With Pronunciation)</div>
+  <div class="tab es" data-p="s3" tabindex="0">ES · Drill (Practice)</div>
+  <div class="tab es" data-p="s4" tabindex="0">ES · Word Bank (Vocabulary)</div>
+</div>
+
+<!-- ============ EN 1 · LINES ============ -->
+<div class="pane on en" id="e1">
+  <h2>English — the lines</h2>
+  <p class="lede">Clean, no commentary. Read these out loud in the car until they come without thinking.</p>
+
+  <div class="scene"><div class="sh">1 · Correct person answers</div><div class="sb">
+    <div class="beat"><span class="who">Confirm</span><div class="say">Good morning. Are you Maria Ramirez?</div></div>
+    <div class="beat"><span class="who">Identify</span><div class="say">My name is Jazmin Aguayo. I'm a certified process server with the Ninth Judicial Circuit.</div></div>
+    <div class="beat"><span class="who">Deliver</span><div class="say">I have legal documents for you from the Osceola County court. These are for you.</div></div>
+    <div class="beat"><span class="who">Close</span><div class="say">You've been served. The papers explain what this is about and the deadline to respond. Have a good day.</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">2 · Someone else answers — substitute service</div><div class="sb">
+    <div class="beat"><span class="who">Abode</span><div class="say">Hi, my name is Jazmin Aguayo. Does Maria Ramirez live here?</div></div>
+    <div class="beat"><span class="who">Resident + age</span><div class="say">And do you live here too? Are you fifteen or older?</div></div>
+    <div class="beat"><span class="who">Inform of contents</span><div class="say">I'm leaving these with you. They are legal documents for Maria — a summons and complaint from the court. Please give them to her.</div></div>
+    <div class="beat"><span class="who">Get the name</span><div class="say">Can I get your first name and your relationship to her? It goes on the court's form.</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">3 · "What is this about?"</div><div class="sb">
+    <div class="beat"><span class="who">Answer</span><div class="say">I'm not able to give legal advice and I don't know the details of the case. The first page has the case number and the court. The attorney's name and phone number are on the front, or you can call the clerk of court.</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">4 · They refuse to take the papers</div><div class="sb">
+    <div class="beat"><span class="who">After identity is confirmed</span><div class="say">That's completely fine. I'm placing them right here. You have been served.</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">5 · They won't open but you can hear them</div><div class="sb">
+    <div class="beat"><span class="who">Through the door</span><div class="say">Miss Ramirez, my name is Jazmin Aguayo. I'm a certified process server. I have court documents for you. I'm going to leave them at your door.</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">6 · Gate guard or front desk</div><div class="sb">
+    <div class="beat"><span class="who">To the guard</span><div class="say">Good morning. My name is Jazmin Aguayo, I'm a certified process server for the Ninth Judicial Circuit — here's my ID and my server number. Florida Statute 48.031(7) requires a gated community to grant unannounced entry for service of process. I'm not asking you to call ahead. I just need the gate.</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">7 · Serving at a workplace</div><div class="sb">
+    <div class="beat"><span class="who">To the manager</span><div class="say">Hi, my name is Jazmin Aguayo and I'm a certified process server. I need to serve one of your employees with legal documents. Florida law requires you to let me do that in a private area — and I'd rather do it discreetly than in front of customers. Where would you like to put us?</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">8 · Hostile or yelling</div><div class="sb">
+    <div class="beat"><span class="who">Flat and calm, already stepping back</span><div class="say">I'm not with the police and I'm not here to argue. My name is Jazmin Aguayo and I'm a certified process server. I don't know anything about your case — I just deliver the documents. Everything you need is inside. Have a good day.</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">9 · They're evasive about who they are</div><div class="sb">
+    <div class="beat"><span class="who">Wrong-detail method</span><div class="say">I have a delivery for a Maria Ramirez with a middle initial J — is that you, or do I have the wrong unit?</div></div>
+    <div class="beat"><span class="who">Spelling method</span><div class="say">Can you spell the last name for me so I mark this correctly?</div></div>
+  </div></div>
+</div>
+
+<!-- ============ EN 2 · WITH NOTES ============ -->
+<div class="pane en" id="e2">
+  <h2>English — with delivery notes</h2>
+  <p class="lede">Same lines, plus how to say them and what happens if you get it wrong.</p>
+
+  <div class="note"><b>The 10-second reset before every knock.</b> Papers folded low in your non-dominant hand. ID visible. Phone recording or timestamping. Stand to the hinge side, never centered. Read the name once more so you say it right the first time. Three firm knocks plus the doorbell, then one step back.</div>
+
+  <div class="scene"><div class="sh">1 · Correct person answers</div><div class="sb">
+    <div class="beat"><span class="who">Confirm — warm, quick, no hesitation</span><div class="say">Good morning. Are you Maria Ramirez?</div>
+      <div class="dir">Use their name in the first three seconds. Hesitation reads as a threat; confidence reads as routine. Do not hand over anything until they answer.</div></div>
+    <div class="beat"><span class="who">Identify — steady, unhurried</span><div class="say">My name is Jazmin Aguayo. I'm a certified process server with the Ninth Judicial Circuit.</div>
+      <div class="dir">Say <b>certified process server</b>, never anything that could sound like law enforcement. Implying you're a cop is a crime in Florida and it voids the service.</div></div>
+    <div class="beat"><span class="who">Deliver — matter of fact</span><div class="say">I have legal documents for you from the Osceola County court. These are for you.</div>
+      <div class="dir">Extend the papers as you say it. Most people take them automatically.</div></div>
+    <div class="beat"><span class="who">Close — then leave</span><div class="say">You've been served. The papers explain what this is about and the deadline to respond. Have a good day.</div>
+      <div class="dir">Turn and go. Don't linger, don't explain, don't answer legal questions. Note the exact time before you reach your car — memory degrades within minutes.</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">2 · Someone else answers — substitute service</div><div class="sb">
+    <div class="beat"><span class="who">Prong one — is this the abode?</span><div class="say">Hi, my name is Jazmin Aguayo. Does Maria Ramirez live here?</div>
+      <div class="dir">"Usual place of abode" means where she actually lives right now. Not a mailing address, not last month's apartment.</div></div>
+    <div class="beat"><span class="who">Prong two — the one people skip</span><div class="say">And do you live here too? Are you fifteen or older?</div>
+      <div class="dir">They must <b>reside there.</b> A visiting relative, a babysitter, a contractor, a girlfriend who stays over — none of those count. Florida courts have quashed service over exactly this. Ask, and write down what they said.</div></div>
+    <div class="beat"><span class="who">Prong three — say it out loud</span><div class="say">I'm leaving these with you. They are legal documents for Maria — a summons and complaint from the court. Please give them to her.</div>
+      <div class="dir">Informing them of the contents is a spoken act you have to actually perform and then swear to on the return. Never skip it because it feels obvious.</div></div>
+    <div class="beat"><span class="who">For your return</span><div class="say">Can I get your first name and your relationship to her? It goes on the court's form.</div>
+      <div class="dir">You need the name, the relationship, and their approximate age for the return.</div></div>
+    <div class="note warn"><b>If they say they don't live there — stop.</b> Do not leave the papers. That's a defective serve. Log it as an attempt, note who you spoke to and exactly what they said, and come back at a different hour.</div>
+  </div></div>
+
+  <div class="scene"><div class="sh">3 · "What is this about?"</div><div class="sb">
+    <div class="beat"><span class="who">Answer once, then leave</span><div class="say">I'm not able to give legal advice and I don't know the details of the case. The first page has the case number and the court. The attorney's name and phone number are on the front, or you can call the clerk of court.</div>
+      <div class="dir">Never speculate. "It looks like a credit card thing" is legal advice from a stranger and it can end up in a deposition. Handing them a next step is also what calms people down.</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">4 · They refuse to take the papers</div><div class="sb">
+    <div class="beat"><span class="who">Only after identity is confirmed</span><div class="say">That's completely fine. I'm placing them right here. You have been served.</div>
+      <div class="dir">Once you've identified the right person and told them what the papers are, refusal doesn't defeat service. Set them down in near proximity — at their feet, on the threshold, tucked in the door. On the return, write that you identified them, informed them, they refused, and you left the documents in their presence.</div></div>
+    <div class="note warn"><b>Never do this without confirmed identity.</b> Papers left with a stranger who refused to say who they are is not service.</div>
+  </div></div>
+
+  <div class="scene"><div class="sh">5 · They won't open but you can hear them</div><div class="sb">
+    <div class="beat"><span class="who">Through the door</span><div class="say">Miss Ramirez, my name is Jazmin Aguayo. I'm a certified process server. I have court documents for you. I'm going to leave them at your door.</div>
+      <div class="dir">Say it once, clearly, loud enough to be heard.</div></div>
+    <div class="note warn"><b>This is usually an attempt, not a serve.</b> A voice through a door is not confirmed identity. Unless you saw them, or they answered to their name and you can swear to who they are, log it as an attempt and come back at a different hour. This is exactly where new servers get burned.</div>
+  </div></div>
+
+  <div class="scene"><div class="sh">6 · Gate guard or front desk</div><div class="sb">
+    <div class="beat"><span class="who">Calm, credentialed, not asking permission</span><div class="say">Good morning. My name is Jazmin Aguayo, I'm a certified process server for the Ninth Judicial Circuit — here's my ID and my server number. Florida Statute 48.031(7) requires a gated community to grant unannounced entry for service of process. I'm not asking you to call ahead. I just need the gate.</div>
+      <div class="dir">Keep the statute printed in your door bag and hand it over instead of arguing. If they still refuse: get the guard's name, the company name, and the time, then tell the attorney. That's their motion to make, not your fight. Never force a gate.</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">7 · Serving at a workplace</div><div class="sb">
+    <div class="beat"><span class="who">Frame it as protecting them</span><div class="say">Hi, my name is Jazmin Aguayo and I'm a certified process server. I need to serve one of your employees with legal documents. Florida law requires you to let me do that in a private area — and I'd rather do it discreetly than in front of customers. Where would you like to put us?</div>
+      <div class="dir">Offering to avoid a scene gets you a back office almost every time. The statute — employers must provide a private area, with a fine up to $1,000 for refusing — is your backup, not your opener.</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">8 · Hostile or yelling</div><div class="sb">
+    <div class="beat"><span class="who">Lower your voice, step back as you speak</span><div class="say">I'm not with the police and I'm not here to argue. My name is Jazmin Aguayo and I'm a certified process server. I don't know anything about your case — I just deliver the documents. Everything you need is inside. Have a good day.</div>
+      <div class="dir">People match volume. Going quieter pulls them down with you. Say it once, then leave — two steps backward, turn, go. You don't get a second serve if you're injured.</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">9 · They're evasive about who they are</div><div class="sb">
+    <div class="beat"><span class="who">Wrong-detail method</span><div class="say">I have a delivery for a Maria Ramirez with a middle initial J — is that you, or do I have the wrong unit?</div>
+      <div class="dir">People correct wrong information almost reflexively.</div></div>
+    <div class="beat"><span class="who">Spelling method</span><div class="say">Can you spell the last name for me so I mark this correctly?</div></div>
+    <div class="note warn"><b>The line you don't cross.</b> Confirming identity is fine. Pretending to be UPS, a florist, a utility worker, or law enforcement is not — it can void your service, cost your certification, and impersonating police is a crime. Be creative about <i>timing</i>, never about <i>who you are.</i></div>
+  </div></div>
+</div>
+
+<!-- ============ EN 3 · DRILL ============ -->
+<div class="pane en" id="e3">
+  <h2>English — drill</h2>
+  <p class="lede">Read the situation, say your line out loud, then tap to check yourself.</p>
+  <div class="drillbar"><button class="db" data-act="hide" data-scope="e3">Hide all</button><button class="db" data-act="show" data-scope="e3">Reveal all</button></div>
+
+  <div class="scene"><div class="sh">The right person opens the door</div><div class="sb">
+    <div class="beat"><span class="who">Your opening</span><div class="say mask" data-hint="say it, then tap">Good morning. Are you Maria Ramirez?</div></div>
+    <div class="beat"><span class="who">How you identify yourself</span><div class="say mask" data-hint="say it, then tap">My name is Jazmin Aguayo. I'm a certified process server with the Ninth Judicial Circuit.</div></div>
+    <div class="beat"><span class="who">Your close</span><div class="say mask" data-hint="say it, then tap">You've been served. The papers explain what this is about and the deadline to respond. Have a good day.</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">A woman answers and says Maria lives there</div><div class="sb">
+    <div class="beat"><span class="who">The question most servers forget</span><div class="say mask" data-hint="say it, then tap">And do you live here too? Are you fifteen or older?</div></div>
+    <div class="beat"><span class="who">Informing her of the contents</span><div class="say mask" data-hint="say it, then tap">I'm leaving these with you. They are legal documents for Maria — a summons and complaint from the court. Please give them to her.</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">"What is this about?"</div><div class="sb">
+    <div class="beat"><span class="who">Your answer</span><div class="say mask" data-hint="say it, then tap">I'm not able to give legal advice and I don't know the details of the case. The first page has the case number and the court. The attorney's name and phone number are on the front, or you can call the clerk of court.</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">He backs away and refuses to take them</div><div class="sb">
+    <div class="beat"><span class="who">Your line</span><div class="say mask" data-hint="say it, then tap">That's completely fine. I'm placing them right here. You have been served.</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">The gate guard says he has to call ahead</div><div class="sb">
+    <div class="beat"><span class="who">Your line</span><div class="say mask" data-hint="say it, then tap">Good morning. My name is Jazmin Aguayo, I'm a certified process server for the Ninth Judicial Circuit — here's my ID and my server number. Florida Statute 48.031(7) requires a gated community to grant unannounced entry for service of process. I'm not asking you to call ahead. I just need the gate.</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">A manager asks why you're at his restaurant</div><div class="sb">
+    <div class="beat"><span class="who">Your line</span><div class="say mask" data-hint="say it, then tap">Hi, my name is Jazmin Aguayo and I'm a certified process server. I need to serve one of your employees with legal documents. Florida law requires you to let me do that in a private area — and I'd rather do it discreetly than in front of customers. Where would you like to put us?</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">He's yelling at you on the porch</div><div class="sb">
+    <div class="beat"><span class="who">Your line, then you leave</span><div class="say mask" data-hint="say it, then tap">I'm not with the police and I'm not here to argue. My name is Jazmin Aguayo and I'm a certified process server. I don't know anything about your case — I just deliver the documents. Everything you need is inside. Have a good day.</div></div>
+  </div></div>
+</div>
+
+<!-- ============ ES 1 · LAS LÍNEAS ============ -->
+<div class="pane es" id="s1">
+  <h2>Español — las líneas <span style="font-size:1rem;color:var(--muted);font-weight:400">(Spanish — the lines)</span></h2>
+  <p class="lede">Spanish first, English meaning underneath in parentheses. Always <b>usted</b>, never <b>tú</b> — formality is protection.</p>
+
+  <div class="scene"><div class="sh">1 · La persona correcta abre la puerta <span style="opacity:.8;font-weight:400">(The right person answers the door)</span></div><div class="sb">
+    <div class="beat"><span class="who">Confirmar (Confirm who they are)</span><div class="say">Buenos días. ¿Es usted María Ramírez?</div>
+      <div class="gl">(Good morning. Are you Maria Ramirez?)</div></div>
+    <div class="beat"><span class="who">Identificarse (Identify yourself)</span><div class="say">Mi nombre es Jazmin Aguayo. Soy servidora de procesos certificada del Noveno Circuito Judicial.</div>
+      <div class="gl">(My name is Jazmin Aguayo. I am a certified process server with the Ninth Judicial Circuit.)</div></div>
+    <div class="beat"><span class="who">Entregar (Hand over the papers)</span><div class="say">Tengo documentos legales para usted del tribunal del condado de Osceola. Estos son para usted.</div>
+      <div class="gl">(I have legal documents for you from the Osceola County court. These are for you.)</div></div>
+    <div class="beat"><span class="who">Cerrar (Close and leave)</span><div class="say">Ha sido notificada oficialmente. Los papeles explican de qué se trata y la fecha límite para responder. Que tenga buen día.</div>
+      <div class="gl">(You have been served. The papers explain what this is about and the deadline to respond. Have a good day.)</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">2 · Otra persona abre — entrega sustituta <span style="opacity:.8;font-weight:400">(Someone else answers — substitute service)</span></div><div class="sb">
+    <div class="beat"><span class="who">El domicilio (Is this the abode?)</span><div class="say">Hola, mi nombre es Jazmin Aguayo. ¿Vive aquí María Ramírez?</div>
+      <div class="gl">(Hi, my name is Jazmin Aguayo. Does Maria Ramirez live here?)</div></div>
+    <div class="beat"><span class="who">Residencia y edad (Do they reside there, and are they 15+?)</span><div class="say">¿Y usted también vive aquí? ¿Tiene quince años o más?</div>
+      <div class="gl">(And do you live here too? Are you fifteen or older?)</div></div>
+    <div class="beat"><span class="who">Informar del contenido (Inform them of the contents)</span><div class="say">Le voy a dejar estos documentos. Son documentos legales para María — una citación y una demanda del tribunal. Por favor entrégueselos a ella.</div>
+      <div class="gl">(I am leaving these documents with you. They are legal documents for Maria — a summons and a complaint from the court. Please give them to her.)</div></div>
+    <div class="beat"><span class="who">Para el formulario (For your return of service)</span><div class="say">¿Me puede dar su nombre y su relación con ella? Es para el formulario del tribunal.</div>
+      <div class="gl">(Can I get your name and your relationship to her? It is for the court&rsquo;s form.)</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">3 · "¿De qué se trata esto?" <span style="opacity:.8;font-weight:400">("What is this about?")</span></div><div class="sb">
+    <div class="beat"><span class="who">Respuesta (Your answer)</span><div class="say">No puedo dar consejos legales y no conozco los detalles del caso. La primera página tiene el número del caso y el tribunal. El nombre y el teléfono del abogado están en la primera página, o puede llamar a la secretaría del tribunal.</div>
+      <div class="gl">(I cannot give legal advice and I do not know the details of the case. The first page has the case number and the court. The attorney&rsquo;s name and phone number are on the first page, or you can call the clerk of court.)</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">4 · Se niega a recibir los documentos <span style="opacity:.8;font-weight:400">(They refuse to take the papers)</span></div><div class="sb">
+    <div class="beat"><span class="who">Después de confirmar la identidad (Only after identity is confirmed)</span><div class="say">Está bien, no hay problema. Los dejo aquí mismo. Usted ha sido notificado oficialmente.</div>
+      <div class="gl">(That is fine, no problem. I am leaving them right here. You have been served.)</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">5 · No abre la puerta pero usted la escucha <span style="opacity:.8;font-weight:400">(They will not open the door but you can hear them)</span></div><div class="sb">
+    <div class="beat"><span class="who">A través de la puerta (Through the door)</span><div class="say">Señora Ramírez, mi nombre es Jazmin Aguayo. Soy servidora de procesos certificada. Tengo documentos del tribunal para usted. Los voy a dejar en su puerta.</div>
+      <div class="gl">(Ms. Ramirez, my name is Jazmin Aguayo. I am a certified process server. I have court documents for you. I am going to leave them at your door.)</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">6 · Guardia del portón o recepción <span style="opacity:.8;font-weight:400">(Gate guard or front desk)</span></div><div class="sb">
+    <div class="beat"><span class="who">Al guardia (To the guard)</span><div class="say">Buenos días. Mi nombre es Jazmin Aguayo, soy servidora de procesos certificada del Noveno Circuito Judicial — aquí está mi identificación y mi número. El Estatuto de Florida 48.031(7) requiere que una comunidad con portón permita la entrada sin anunciar para la entrega de documentos legales. No le pido que llame. Solo necesito que abra el portón.</div>
+      <div class="gl">(Good morning. My name is Jazmin Aguayo, I am a certified process server for the Ninth Judicial Circuit — here is my ID and my server number. Florida Statute 48.031(7) requires a gated community to grant unannounced entry for service of process. I am not asking you to call ahead. I just need you to open the gate.)</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">7 · Entrega en el lugar de trabajo <span style="opacity:.8;font-weight:400">(Serving at a workplace)</span></div><div class="sb">
+    <div class="beat"><span class="who">Al gerente (To the manager)</span><div class="say">Hola, mi nombre es Jazmin Aguayo y soy servidora de procesos certificada. Necesito entregarle documentos legales a uno de sus empleados. La ley de Florida requiere que me permita hacerlo en un área privada — y prefiero hacerlo con discreción, no frente a los clientes. ¿Dónde prefiere que lo hagamos?</div>
+      <div class="gl">(Hi, my name is Jazmin Aguayo and I am a certified process server. I need to serve legal documents to one of your employees. Florida law requires you to let me do that in a private area — and I would rather do it discreetly, not in front of customers. Where would you prefer we do this?)</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">8 · Persona hostil o gritando <span style="opacity:.8;font-weight:400">(Hostile or yelling)</span></div><div class="sb">
+    <div class="beat"><span class="who">Calmada, ya retrocediendo (Calm, already stepping back)</span><div class="say">No soy policía y no vine a discutir. Mi nombre es Jazmin Aguayo y soy servidora de procesos certificada. No sé nada de su caso — solo entrego los documentos. Toda la información está adentro. Que tenga buen día.</div>
+      <div class="gl">(I am not with the police and I did not come to argue. My name is Jazmin Aguayo and I am a certified process server. I do not know anything about your case — I only deliver the documents. All the information is inside. Have a good day.)</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">9 · Evade decir quién es <span style="opacity:.8;font-weight:400">(They are evasive about who they are)</span></div><div class="sb">
+    <div class="beat"><span class="who">Método del dato incorrecto (The wrong-detail method)</span><div class="say">Tengo una entrega para María Ramírez con la inicial J — ¿es usted, o tengo la unidad equivocada?</div>
+      <div class="gl">(I have a delivery for Maria Ramirez with a middle initial J — is that you, or do I have the wrong unit?)</div></div>
+    <div class="beat"><span class="who">Método de deletrear (The spelling method)</span><div class="say">¿Me puede deletrear el apellido para marcarlo correctamente?</div>
+      <div class="gl">(Can you spell the last name for me so I mark this correctly?)</div></div>
+  </div></div>
+
+  <div class="note"><b>Si se le acaba el español (If your Spanish runs out):</b> "Disculpe, mi español es limitado — toda la información está en los papeles."<br><i>(Excuse me, my Spanish is limited — all the information is in the papers.)</i> Honest beats fluent, every time.</div>
+</div>
+
+<!-- ============ ES 2 · PRONUNCIACIÓN ============ -->
+<div class="pane es" id="s2">
+  <h2>Español — con pronunciación <span style="font-size:1rem;color:var(--muted);font-weight:400">(Spanish — with pronunciation)</span></h2>
+  <p class="lede">Three lines each: <b>gold</b> is the Spanish, <b>italic parentheses</b> is what it means, <b>green</b> is how it sounds. Capitals are the stressed syllable.</p>
+
+  <div class="note"><b>Two sounds to get right.</b> Spanish <b>d</b> between vowels is soft, almost like <i>th</i> in "the" — <i>notificada</i> is nearly "no-tee-fee-KAH-tha." And the <b>r</b> in <i>Ramírez</i> is a quick tap of the tongue, like the <i>tt</i> in "butter."</div>
+
+  <div class="scene"><div class="sh">1 · La persona correcta abre la puerta <span style="opacity:.8;font-weight:400">(The right person answers)</span></div><div class="sb">
+    <div class="beat"><span class="who">Confirmar (Confirm)</span><div class="say">Buenos días. ¿Es usted María Ramírez?</div>
+      <div class="gl">(Good morning. Are you Maria Ramirez?)</div>
+      <div class="ph">BWEH-nohs DEE-ahs. ess oo-STED mah-REE-ah rah-MEE-ress?</div></div>
+    <div class="beat"><span class="who">Identificarse (Identify yourself)</span><div class="say">Mi nombre es Jazmin Aguayo. Soy servidora de procesos certificada del Noveno Circuito Judicial.</div>
+      <div class="gl">(My name is Jazmin Aguayo. I am a certified process server with the Ninth Judicial Circuit.)</div>
+      <div class="ph">mee NOM-breh ess haz-MEEN ah-GWAH-yoh. soy ser-vee-DOH-rah deh proh-SEH-sohs ser-tee-fee-KAH-dah del noh-VEH-noh seer-KWEE-toh hoo-dee-see-AHL</div></div>
+    <div class="beat"><span class="who">Entregar (Hand over)</span><div class="say">Tengo documentos legales para usted del tribunal del condado de Osceola.</div>
+      <div class="gl">(I have legal documents for you from the Osceola County court.)</div>
+      <div class="ph">TEN-goh doh-koo-MEN-tohs leh-GAH-less PAH-rah oo-STED del tree-boo-NAHL del kon-DAH-doh deh oh-seh-OH-lah</div></div>
+    <div class="beat"><span class="who">Cerrar (Close)</span><div class="say">Ha sido notificada oficialmente. Que tenga buen día.</div>
+      <div class="gl">(You have been served. Have a good day.)</div>
+      <div class="ph">ah SEE-doh noh-tee-fee-KAH-dah oh-fee-see-al-MEN-teh. keh TEN-gah bwen DEE-ah</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">2 · Otra persona abre <span style="opacity:.8;font-weight:400">(Someone else answers — substitute service)</span></div><div class="sb">
+    <div class="beat"><span class="who">El domicilio (The abode)</span><div class="say">¿Vive aquí María Ramírez?</div>
+      <div class="gl">(Does Maria Ramirez live here?)</div>
+      <div class="ph">VEE-veh ah-KEE mah-REE-ah rah-MEE-ress?</div></div>
+    <div class="beat"><span class="who">Residencia y edad (Residency and age)</span><div class="say">¿Y usted también vive aquí? ¿Tiene quince años o más?</div>
+      <div class="gl">(And do you live here too? Are you fifteen or older?)</div>
+      <div class="ph">ee oo-STED tam-bee-EN VEE-veh ah-KEE? tee-EH-neh KEEN-seh AH-nyohs oh MAHS?</div></div>
+    <div class="beat"><span class="who">Informar del contenido (Inform of contents)</span><div class="say">Son documentos legales para María — una citación y una demanda del tribunal. Por favor entrégueselos a ella.</div>
+      <div class="gl">(They are legal documents for Maria — a summons and a complaint from the court. Please give them to her.)</div>
+      <div class="ph">sohn doh-koo-MEN-tohs leh-GAH-less PAH-rah mah-REE-ah — OO-nah see-tah-see-OHN ee OO-nah deh-MAHN-dah del tree-boo-NAHL. por fah-VOR en-TREH-geh-seh-lohs ah EH-yah</div></div>
+    <div class="beat"><span class="who">Para el formulario (For the return)</span><div class="say">¿Me puede dar su nombre y su relación con ella?</div>
+      <div class="gl">(Can I get your name and your relationship to her?)</div>
+      <div class="ph">meh PWEH-deh dar soo NOM-breh ee soo reh-lah-see-OHN kohn EH-yah?</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">3 · "¿De qué se trata esto?" <span style="opacity:.8;font-weight:400">("What is this about?")</span></div><div class="sb">
+    <div class="beat"><span class="who">Respuesta (Answer)</span><div class="say">No puedo dar consejos legales y no conozco los detalles del caso.</div>
+      <div class="gl">(I cannot give legal advice and I do not know the details of the case.)</div>
+      <div class="ph">no PWEH-doh dar kon-SEH-hohs leh-GAH-less ee no koh-NOHS-koh lohs deh-TAH-yess del KAH-soh</div></div>
+    <div class="beat"><span class="who">Dónde buscar (Where to look)</span><div class="say">El nombre y el teléfono del abogado están en la primera página, o puede llamar a la secretaría del tribunal.</div>
+      <div class="gl">(The attorney&rsquo;s name and phone number are on the first page, or you can call the clerk of court.)</div>
+      <div class="ph">el NOM-breh ee el teh-LEH-foh-noh del ah-boh-GAH-doh es-TAHN en lah pree-MEH-rah PAH-hee-nah, oh PWEH-deh yah-MAR ah lah seh-kreh-tah-REE-ah del tree-boo-NAHL</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">4 · Se niega a recibir <span style="opacity:.8;font-weight:400">(They refuse to take them)</span></div><div class="sb">
+    <div class="beat"><span class="who">Su línea (Your line)</span><div class="say">Está bien, no hay problema. Los dejo aquí mismo. Usted ha sido notificado oficialmente.</div>
+      <div class="gl">(That is fine, no problem. I am leaving them right here. You have been served.)</div>
+      <div class="ph">es-TAH bee-EN, no eye proh-BLEH-mah. lohs DEH-hoh ah-KEE MEES-moh. oo-STED ah SEE-doh noh-tee-fee-KAH-doh oh-fee-see-al-MEN-teh</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">5 · No abre la puerta <span style="opacity:.8;font-weight:400">(They will not open the door)</span></div><div class="sb">
+    <div class="beat"><span class="who">A través de la puerta (Through the door)</span><div class="say">Señora Ramírez, soy servidora de procesos certificada. Los voy a dejar en su puerta.</div>
+      <div class="gl">(Ms. Ramirez, I am a certified process server. I am going to leave them at your door.)</div>
+      <div class="ph">seh-NYOH-rah rah-MEE-ress, soy ser-vee-DOH-rah deh proh-SEH-sohs ser-tee-fee-KAH-dah. lohs voy ah DEH-har en soo PWEHR-tah</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">6 · Guardia del portón <span style="opacity:.8;font-weight:400">(Gate guard)</span></div><div class="sb">
+    <div class="beat"><span class="who">Su credencial (Your credentials)</span><div class="say">Aquí está mi identificación y mi número.</div>
+      <div class="gl">(Here is my ID and my number.)</div>
+      <div class="ph">ah-KEE es-TAH mee ee-den-tee-fee-kah-see-OHN ee mee NOO-meh-roh</div></div>
+    <div class="beat"><span class="who">La ley (The law)</span><div class="say">El Estatuto de Florida requiere que una comunidad con portón permita la entrada sin anunciar.</div>
+      <div class="gl">(Florida Statute requires a gated community to grant entry without announcing.)</div>
+      <div class="ph">el es-tah-TOO-toh deh FLOH-ree-dah reh-kee-EH-reh keh OO-nah koh-moo-nee-DAHD kohn por-TOHN per-MEE-tah lah en-TRAH-dah seen ah-noon-see-AR</div></div>
+    <div class="beat"><span class="who">La petición (The ask)</span><div class="say">No le pido que llame. Solo necesito que abra el portón.</div>
+      <div class="gl">(I am not asking you to call. I just need you to open the gate.)</div>
+      <div class="ph">no leh PEE-doh keh YAH-meh. SOH-loh neh-seh-SEE-toh keh AH-brah el por-TOHN</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">7 · En el lugar de trabajo <span style="opacity:.8;font-weight:400">(At the workplace)</span></div><div class="sb">
+    <div class="beat"><span class="who">Al gerente (To the manager)</span><div class="say">Necesito entregarle documentos legales a uno de sus empleados.</div>
+      <div class="gl">(I need to serve legal documents to one of your employees.)</div>
+      <div class="ph">neh-seh-SEE-toh en-treh-GAR-leh doh-koo-MEN-tohs leh-GAH-less ah OO-noh deh soos em-pleh-AH-dohs</div></div>
+    <div class="beat"><span class="who">La discreción (Discretion)</span><div class="say">Prefiero hacerlo con discreción, no frente a los clientes. ¿Dónde prefiere que lo hagamos?</div>
+      <div class="gl">(I would rather do it discreetly, not in front of customers. Where would you prefer we do this?)</div>
+      <div class="ph">preh-fee-EH-roh ah-SER-loh kohn dees-kreh-see-OHN, no FREN-teh ah lohs klee-EN-tess. DOHN-deh preh-fee-EH-reh keh loh ah-GAH-mohs?</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">8 · Persona hostil <span style="opacity:.8;font-weight:400">(Hostile person)</span></div><div class="sb">
+    <div class="beat"><span class="who">Su línea (Your line)</span><div class="say">No soy policía y no vine a discutir. Solo entrego los documentos.</div>
+      <div class="gl">(I am not with the police and I did not come to argue. I only deliver the documents.)</div>
+      <div class="ph">no soy poh-lee-SEE-ah ee no VEE-neh ah dees-koo-TEER. SOH-loh en-TREH-goh lohs doh-koo-MEN-tohs</div></div>
+    <div class="beat"><span class="who">Cerrar y salir (Close and leave)</span><div class="say">Toda la información está adentro. Que tenga buen día.</div>
+      <div class="gl">(All the information is inside. Have a good day.)</div>
+      <div class="ph">TOH-dah lah een-for-mah-see-OHN es-TAH ah-DEN-troh. keh TEN-gah bwen DEE-ah</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">9 · Evade decir quién es <span style="opacity:.8;font-weight:400">(Evasive about identity)</span></div><div class="sb">
+    <div class="beat"><span class="who">Dato incorrecto (Wrong detail)</span><div class="say">¿Es usted, o tengo la unidad equivocada?</div>
+      <div class="gl">(Is that you, or do I have the wrong unit?)</div>
+      <div class="ph">ess oo-STED, oh TEN-goh lah oo-nee-DAHD eh-kee-voh-KAH-dah?</div></div>
+    <div class="beat"><span class="who">Deletrear (Spelling)</span><div class="say">¿Me puede deletrear el apellido?</div>
+      <div class="gl">(Can you spell the last name for me?)</div>
+      <div class="ph">meh PWEH-deh deh-leh-treh-AR el ah-peh-YEE-doh?</div></div>
+  </div></div>
+
+  <div class="note"><b>Si se le acaba el español (If your Spanish runs out):</b> "Disculpe, mi español es limitado — toda la información está en los papeles."<br>
+  <i>(Excuse me, my Spanish is limited — all the information is in the papers.)</i><br>
+  <span style="color:#2A7A4F;font-family:ui-monospace,monospace;font-weight:600">dees-KOOL-peh, mee es-pah-NYOL ess lee-mee-TAH-doh — TOH-dah lah een-for-mah-see-OHN es-TAH en lohs pah-PEH-less</span></div>
+</div>
+
+<!-- ============ ES 3 · DRILL ============ -->
+<div class="pane es" id="s3">
+  <h2>Español — drill <span style="font-size:1rem;color:var(--muted);font-weight:400">(Spanish — practice)</span></h2>
+  <p class="lede">The English is the header. Say the Spanish out loud, then tap the shaded bar to check yourself.</p>
+  <div class="drillbar"><button class="db" data-act="hide" data-scope="s3">Hide all</button><button class="db" data-act="show" data-scope="s3">Reveal all</button></div>
+
+  <div class="scene"><div class="sh">"Good morning. Are you Maria Ramirez?"</div><div class="sb">
+    <div class="beat"><div class="say mask" data-hint="dígalo, luego toque">Buenos días. ¿Es usted María Ramírez?</div><div class="ph">BWEH-nohs DEE-ahs. ess oo-STED mah-REE-ah rah-MEE-ress?</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">"My name is Jazmin Aguayo. I'm a certified process server."</div><div class="sb">
+    <div class="beat"><div class="say mask" data-hint="dígalo, luego toque">Mi nombre es Jazmin Aguayo. Soy servidora de procesos certificada.</div><div class="ph">mee NOM-breh ess haz-MEEN ah-GWAH-yoh. soy ser-vee-DOH-rah deh proh-SEH-sohs ser-tee-fee-KAH-dah</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">"I have legal documents for you from the Osceola County court."</div><div class="sb">
+    <div class="beat"><div class="say mask" data-hint="dígalo, luego toque">Tengo documentos legales para usted del tribunal del condado de Osceola.</div><div class="ph">TEN-goh doh-koo-MEN-tohs leh-GAH-less PAH-rah oo-STED del tree-boo-NAHL del kon-DAH-doh deh oh-seh-OH-lah</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">"You have been served. Have a good day."</div><div class="sb">
+    <div class="beat"><div class="say mask" data-hint="dígalo, luego toque">Ha sido notificada oficialmente. Que tenga buen día.</div><div class="ph">ah SEE-doh noh-tee-fee-KAH-dah oh-fee-see-al-MEN-teh. keh TEN-gah bwen DEE-ah</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">"Does Maria Ramirez live here?"</div><div class="sb">
+    <div class="beat"><div class="say mask" data-hint="dígalo, luego toque">¿Vive aquí María Ramírez?</div><div class="ph">VEE-veh ah-KEE mah-REE-ah rah-MEE-ress?</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">"Do you live here too? Are you fifteen or older?"</div><div class="sb">
+    <div class="beat"><div class="say mask" data-hint="dígalo, luego toque">¿Y usted también vive aquí? ¿Tiene quince años o más?</div><div class="ph">ee oo-STED tam-bee-EN VEE-veh ah-KEE? tee-EH-neh KEEN-seh AH-nyohs oh MAHS?</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">"These are legal documents for Maria — a summons and complaint. Please give them to her."</div><div class="sb">
+    <div class="beat"><div class="say mask" data-hint="dígalo, luego toque">Son documentos legales para María — una citación y una demanda del tribunal. Por favor entrégueselos a ella.</div><div class="ph">sohn doh-koo-MEN-tohs leh-GAH-less PAH-rah mah-REE-ah — OO-nah see-tah-see-OHN ee OO-nah deh-MAHN-dah del tree-boo-NAHL. por fah-VOR en-TREH-geh-seh-lohs ah EH-yah</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">"Can I get your name and your relationship to her?"</div><div class="sb">
+    <div class="beat"><div class="say mask" data-hint="dígalo, luego toque">¿Me puede dar su nombre y su relación con ella?</div><div class="ph">meh PWEH-deh dar soo NOM-breh ee soo reh-lah-see-OHN kohn EH-yah?</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">"I can't give legal advice and I don't know the details of the case."</div><div class="sb">
+    <div class="beat"><div class="say mask" data-hint="dígalo, luego toque">No puedo dar consejos legales y no conozco los detalles del caso.</div><div class="ph">no PWEH-doh dar kon-SEH-hohs leh-GAH-less ee no koh-NOHS-koh lohs deh-TAH-yess del KAH-soh</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">"That's fine. I'm leaving them right here. You have been served."</div><div class="sb">
+    <div class="beat"><div class="say mask" data-hint="dígalo, luego toque">Está bien, no hay problema. Los dejo aquí mismo. Usted ha sido notificado oficialmente.</div><div class="ph">es-TAH bee-EN, no eye proh-BLEH-mah. lohs DEH-hoh ah-KEE MEES-moh. oo-STED ah SEE-doh noh-tee-fee-KAH-doh oh-fee-see-al-MEN-teh</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">"I'm not asking you to call ahead. I just need the gate."</div><div class="sb">
+    <div class="beat"><div class="say mask" data-hint="dígalo, luego toque">No le pido que llame. Solo necesito que abra el portón.</div><div class="ph">no leh PEE-doh keh YAH-meh. SOH-loh neh-seh-SEE-toh keh AH-brah el por-TOHN</div></div>
+  </div></div>
+
+  <div class="scene"><div class="sh">"I'm not with the police and I'm not here to argue."</div><div class="sb">
+    <div class="beat"><div class="say mask" data-hint="dígalo, luego toque">No soy policía y no vine a discutir.</div><div class="ph">no soy poh-lee-SEE-ah ee no VEE-neh ah dees-koo-TEER</div></div>
+  </div></div>
+</div>
+
+<!-- ============ ES 4 · WORD BANK ============ -->
+<div class="pane es" id="s4">
+  <h2>Español — word bank <span style="font-size:1rem;color:var(--muted);font-weight:400">(Spanish — vocabulary)</span></h2>
+  <p class="lede">The twenty words that carry every conversation you'll have at a door.</p>
+
+  <h3>The words that matter most (las palabras más importantes)</h3>
+  <div class="bank">
+    <div class="word"><b>notificado / notificada</b><div class="e">served, officially notified</div><div class="p">noh-tee-fee-KAH-doh / -dah</div><div class="e" style="margin-top:.2rem"><b>-a</b> for a woman, <b>-o</b> for a man. This is the word that makes you sound like you belong.</div></div>
+    <div class="word"><b>citación</b><div class="e">summons</div><div class="p">see-tah-see-OHN</div></div>
+    <div class="word"><b>demanda</b><div class="e">complaint, lawsuit</div><div class="p">deh-MAHN-dah</div></div>
+    <div class="word"><b>tribunal / corte</b><div class="e">court</div><div class="p">tree-boo-NAHL / KOR-teh</div></div>
+    <div class="word"><b>documentos legales</b><div class="e">legal documents</div><div class="p">doh-koo-MEN-tohs leh-GAH-less</div></div>
+    <div class="word"><b>fecha límite</b><div class="e">deadline</div><div class="p">FEH-chah LEE-mee-teh</div></div>
+    <div class="word"><b>abogado / abogada</b><div class="e">attorney</div><div class="p">ah-boh-GAH-doh / -dah</div></div>
+    <div class="word"><b>secretaría del tribunal</b><div class="e">clerk of court</div><div class="p">seh-kreh-tah-REE-ah del tree-boo-NAHL</div></div>
+    <div class="word"><b>servidora de procesos</b><div class="e">process server (female)</div><div class="p">ser-vee-DOH-rah deh proh-SEH-sohs</div></div>
+    <div class="word"><b>certificada</b><div class="e">certified</div><div class="p">ser-tee-fee-KAH-dah</div></div>
+    <div class="word"><b>identificación</b><div class="e">ID</div><div class="p">ee-den-tee-fee-kah-see-OHN</div></div>
+    <div class="word"><b>desalojo</b><div class="e">eviction</div><div class="p">deh-sah-LOH-hoh</div></div>
+    <div class="word"><b>inquilino / inquilina</b><div class="e">tenant</div><div class="p">een-kee-LEE-noh / -nah</div></div>
+    <div class="word"><b>propietario</b><div class="e">landlord, owner</div><div class="p">proh-pee-eh-TAH-ree-oh</div></div>
+    <div class="word"><b>domicilio</b><div class="e">residence, address</div><div class="p">doh-mee-SEE-lee-oh</div></div>
+    <div class="word"><b>vive aquí</b><div class="e">lives here</div><div class="p">VEE-veh ah-KEE</div></div>
+    <div class="word"><b>portón</b><div class="e">gate</div><div class="p">por-TOHN</div></div>
+    <div class="word"><b>empleado / empleada</b><div class="e">employee</div><div class="p">em-pleh-AH-doh / -dah</div></div>
+    <div class="word"><b>gerente</b><div class="e">manager</div><div class="p">heh-REN-teh</div></div>
+    <div class="word"><b>entregar</b><div class="e">to deliver, to hand over</div><div class="p">en-treh-GAR</div></div>
+  </div>
+
+  <h3>Short phrases worth owning (frases cortas útiles)</h3>
+  <div class="bank">
+    <div class="word"><b>Que tenga buen día.</b><div class="e">Have a good day.</div><div class="p">keh TEN-gah bwen DEE-ah</div><div class="e" style="margin-top:.2rem">Warmer than anything a translation app gives you. Osceola is heavily Puerto Rican — this lands.</div></div>
+    <div class="word"><b>Está bien, no hay problema.</b><div class="e">That's fine, no problem.</div><div class="p">es-TAH bee-EN, no eye proh-BLEH-mah</div></div>
+    <div class="word"><b>Por favor.</b><div class="e">Please.</div><div class="p">por fah-VOR</div></div>
+    <div class="word"><b>Disculpe.</b><div class="e">Excuse me / I'm sorry.</div><div class="p">dees-KOOL-peh</div></div>
+    <div class="word"><b>¿Me puede repetir, por favor?</b><div class="e">Can you repeat that, please?</div><div class="p">meh PWEH-deh reh-peh-TEER, por fah-VOR</div></div>
+    <div class="word"><b>Más despacio, por favor.</b><div class="e">Slower, please.</div><div class="p">mahs des-PAH-see-oh, por fah-VOR</div></div>
+    <div class="word"><b>Mi español es limitado.</b><div class="e">My Spanish is limited.</div><div class="p">mee es-pah-NYOL ess lee-mee-TAH-doh</div></div>
+    <div class="word"><b>Toda la información está en los papeles.</b><div class="e">All the information is in the papers.</div><div class="p">TOH-dah lah een-for-mah-see-OHN es-TAH en lohs pah-PEH-less</div></div>
+  </div>
+
+  <div class="note"><b>Two habits that matter more than vocabulary.</b> Stay in <b>usted</b> — formality keeps the interaction professional and protects you. And when your Spanish runs out, say so and point at the papers. Nobody expects a process server to be a translator, and honest reads better than fumbling.</div>
+</div>
+
+</div>
+
+<script>
+(function(){
+  var fs=document.getElementById('fs'),fsv=document.getElementById('fsv');
+  function size(){document.documentElement.style.fontSize=fs.value+'px';fsv.textContent=fs.value+'px';}
+  fs.addEventListener('input',size);size();
+
+  var tabs=document.querySelectorAll('.tab');
+  function go(id){
+    document.querySelectorAll('.pane').forEach(function(p){p.classList.toggle('on',p.id===id);});
+    tabs.forEach(function(t){t.classList.toggle('on',t.dataset.p===id);});
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  tabs.forEach(function(t){
+    t.addEventListener('click',function(){go(t.dataset.p);});
+    t.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();go(t.dataset.p);}});
+  });
+
+  document.querySelectorAll('.mask').forEach(function(m){
+    m.addEventListener('click',function(){m.classList.toggle('revealed');});
+  });
+  document.querySelectorAll('.db').forEach(function(b){
+    b.addEventListener('click',function(){
+      var scope=document.getElementById(b.dataset.scope);
+      scope.querySelectorAll('.mask').forEach(function(m){
+        if(b.dataset.act==='show'){m.classList.add('revealed');}else{m.classList.remove('revealed');}
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>

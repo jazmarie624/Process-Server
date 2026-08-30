@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Serve Book — Certified Process Server Field Manual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+html{font-size:18px;}
+:root{
+  --paper:#DDE9E5; --card:#FFFFFF; --ink:#12211E; --ink2:#4E6862;
+  --deep:#0E3A33; --teal:#0E6B5C; --coral:#D2694A; --amber:#C98A1E;
+  --sand:#F3F9F7; --line:#C6D9D3; --good:#0E6B5C; --bad:#B23A2E;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--paper);color:var(--ink);font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  font-size:1rem;line-height:1.55;padding:.8rem;-webkit-text-size-adjust:100%;}
+.wrap{max-width:1500px;margin:0 auto;}
+.serif{font-family:'Source Serif 4',Georgia,serif;font-weight:700;}
+
+/* ---------- header ---------- */
+.mast{background:var(--deep);color:#F0F7F5;border-radius:12px;padding:1rem 1.15rem;margin-bottom:.7rem;}
+.mast .top{display:flex;justify-content:space-between;align-items:center;gap:.8rem;flex-wrap:wrap;}
+.mast h1{font-family:'Source Serif 4',Georgia,serif;font-weight:700;font-size:1.75rem;line-height:1.1;letter-spacing:-.3px;}
+.mast .sub{font-size:.8rem;color:#9CBDB5;margin-top:.2rem;}
+.seal{background:var(--coral);color:#fff;border-radius:24px;padding:.45rem .9rem;font-size:.72rem;
+  font-weight:700;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;}
+.sizebar{display:flex;align-items:center;gap:.7rem;margin-top:.8rem;padding-top:.75rem;border-top:1px solid #2A544C;flex-wrap:wrap;}
+.sizebar label{font-size:.72rem;letter-spacing:1px;text-transform:uppercase;color:#9CBDB5;font-weight:600;white-space:nowrap;}
+.sizebar input[type=range]{flex:1;min-width:150px;height:2rem;accent-color:var(--coral);}
+.sizebar .val{font-family:'IBM Plex Mono',monospace;font-size:.95rem;font-weight:600;color:var(--coral);min-width:3.4rem;text-align:right;}
+
+/* ---------- tabs ---------- */
+.tabs{display:flex;flex-wrap:wrap;gap:.28rem;margin-bottom:-1px;}
+.tab{font-size:.78rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:.62rem .85rem .55rem;
+  background:#C6D9D3;color:#4E6862;border-radius:9px 9px 0 0;cursor:pointer;user-select:none;white-space:nowrap;
+  border:1px solid var(--line);border-bottom:none;}
+.tab:hover{background:#D3E2DD;color:var(--deep);}
+.tab:focus-visible{outline:3px solid var(--coral);outline-offset:2px;}
+.tab.on{background:var(--card);color:var(--deep);box-shadow:inset 0 5px 0 var(--coral);padding-top:.75rem;border-bottom:1px solid var(--card);}
+.pane{display:none;background:var(--card);border:1px solid var(--line);border-radius:0 12px 12px 12px;padding:1.1rem;}
+.pane.on{display:block;}
+
+/* ---------- type ---------- */
+h2{font-family:'Source Serif 4',Georgia,serif;font-weight:700;font-size:1.5rem;line-height:1.15;margin-bottom:.25rem;letter-spacing:-.3px;}
+h3{font-family:'Source Serif 4',Georgia,serif;font-weight:700;font-size:1.15rem;color:var(--deep);
+  margin:1.6rem 0 .7rem;padding-bottom:.35rem;border-bottom:2px solid var(--line);}
+h3:first-of-type{margin-top:.7rem;}
+.lede{font-size:.95rem;color:var(--ink2);margin-bottom:.5rem;}
+p,li{font-size:.95rem;}
+
+/* ---------- tiles ---------- */
+.grid{display:grid;gap:.65rem;}
+.g2{grid-template-columns:repeat(2,1fr);}
+.g3{grid-template-columns:repeat(3,1fr);}
+.g4{grid-template-columns:repeat(4,1fr);}
+@media(max-width:860px){.g3,.g4{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:600px){.g2,.g3,.g4{grid-template-columns:1fr;}body{padding:.45rem;}}
+.tile{background:var(--sand);border:1px solid var(--line);border-left:6px solid var(--teal);
+  border-radius:10px;padding:.75rem .85rem;color:var(--ink2);}
+.tile b{display:block;font-family:'Source Serif 4',Georgia,serif;font-weight:700;font-size:1rem;color:var(--deep);margin-bottom:.3rem;}
+.tile ul{padding-left:1.05rem;margin-top:.2rem;}
+.tile li{margin-bottom:.25rem;}
+.tile.hot{border-left-color:var(--bad);background:#FCF3F1;}
+.tile.warn{border-left-color:var(--amber);background:#FDF8EE;}
+.tile.ok{border-left-color:var(--good);background:#F0F8F5;}
+.cite{font-family:'IBM Plex Mono',monospace;font-size:.7rem;font-weight:600;background:var(--teal);color:#fff;
+  padding:.12rem .45rem;border-radius:12px;display:inline-block;white-space:nowrap;}
+.kbd{font-family:'IBM Plex Mono',monospace;font-size:.82rem;background:#E7F1EE;border:1px solid var(--line);border-radius:5px;padding:.05rem .35rem;}
+.note{font-size:.88rem;color:var(--ink2);background:#EDF5F3;border-radius:8px;padding:.6rem .75rem;margin-top:.55rem;}
+
+table{width:100%;border-collapse:collapse;font-size:.9rem;margin-top:.3rem;}
+th{background:var(--deep);color:#fff;font-family:'Source Serif 4',Georgia,serif;font-weight:700;
+  text-align:left;padding:.5rem .6rem;font-size:.9rem;}
+th:first-child{border-radius:8px 0 0 0;} th:last-child{border-radius:0 8px 0 0;}
+td{border-bottom:1px solid var(--line);padding:.5rem .6rem;vertical-align:top;color:var(--ink2);}
+td b{color:var(--ink);}
+tr:nth-child(even) td{background:var(--sand);}
+ol.steps{padding-left:1.25rem;color:var(--ink2);}
+ol.steps li{margin-bottom:.45rem;}
+ol.steps b{color:var(--ink);}
+ul.pl{padding-left:1.15rem;color:var(--ink2);}
+ul.pl li{margin-bottom:.3rem;}
+
+/* ---------- PRONG CHECKER ---------- */
+.prongs{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:.7rem;}
+@media(max-width:640px){.prongs{grid-template-columns:1fr;}}
+.prong{border:3px dashed var(--line);border-radius:12px;padding:.85rem;cursor:pointer;background:#fff;
+  text-align:left;transition:all .15s;user-select:none;}
+.prong .num{font-family:'IBM Plex Mono',monospace;font-size:.75rem;font-weight:600;color:var(--ink2);}
+.prong .t{font-family:'Source Serif 4',Georgia,serif;font-weight:700;font-size:1.05rem;color:var(--deep);margin:.15rem 0 .25rem;}
+.prong .d{font-size:.85rem;color:var(--ink2);}
+.prong.on{border:3px solid var(--good);background:#EAF6F1;box-shadow:0 3px 0 rgba(14,107,92,.25);}
+.prong.on .num:after{content:" ✓";color:var(--good);font-weight:700;}
+.verdict{border-radius:12px;padding:.9rem 1rem;text-align:center;font-family:'Source Serif 4',Georgia,serif;
+  font-weight:700;font-size:1.3rem;letter-spacing:.5px;border:4px solid;}
+.verdict.no{color:var(--bad);border-color:var(--bad);background:#FCF3F1;}
+.verdict.yes{color:var(--good);border-color:var(--good);background:#EAF6F1;}
+.verdict small{display:block;font-family:'Inter',sans-serif;font-weight:500;font-size:.82rem;
+  letter-spacing:0;margin-top:.25rem;color:var(--ink2);}
+
+/* ---------- CLOCK STRIP ---------- */
+.clock{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:.6rem;}
+.clockrow{display:flex;align-items:stretch;border-bottom:1px solid var(--line);}
+.clockrow:last-child{border-bottom:none;}
+.clockrow .day{width:5.5rem;flex:none;background:var(--sand);padding:.5rem .55rem;font-weight:700;
+  font-size:.82rem;color:var(--deep);display:flex;align-items:center;}
+.bars{flex:1;display:flex;}
+.bars span{flex:1;font-size:.6rem;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:700;border-right:1px solid rgba(255,255,255,.35);min-height:2.2rem;text-align:center;line-height:1.1;}
+.b-hot{background:var(--good);} .b-mid{background:#7FAFA4;} .b-low{background:#D7E4E0;color:var(--ink2) !important;}
+.b-no{background:#3B3B3B;}
+.clocklegend{display:flex;gap:.8rem;flex-wrap:wrap;font-size:.8rem;color:var(--ink2);margin-bottom:.5rem;}
+.clocklegend i{display:inline-block;width:.85rem;height:.85rem;border-radius:3px;vertical-align:-1px;margin-right:.25rem;}
+
+/* ---------- HOUSE SCAN ---------- */
+.house{background:var(--sand);border:1px solid var(--line);border-radius:12px;padding:.7rem;}
+.house svg{width:100%;height:auto;max-height:19rem;display:block;}
+.hot{cursor:pointer;}
+.hot circle{fill:var(--coral);stroke:#fff;stroke-width:3;}
+.hot text{fill:#fff;font-size:15px;font-weight:700;font-family:Inter,sans-serif;}
+.hot.sel circle{fill:var(--deep);}
+.readout{margin-top:.6rem;background:#fff;border:2px solid var(--coral);border-radius:10px;padding:.7rem .85rem;min-height:4rem;}
+.readout b{display:block;font-family:'Source Serif 4',Georgia,serif;font-size:1.05rem;color:var(--deep);margin-bottom:.2rem;}
+.readout p{font-size:.9rem;color:var(--ink2);}
+
+.url{font-family:'IBM Plex Mono',monospace;font-size:.78rem;font-weight:600;background:#FBEDE7;
+  color:#A8482C;padding:.1rem .4rem;border-radius:5px;display:inline-block;word-break:break-all;border:1px solid #F0CDBF;}
+.pill{display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+  padding:.12rem .5rem;border-radius:12px;margin-right:.25rem;}
+.pill.now{background:var(--good);color:#fff;}
+.pill.soon{background:var(--amber);color:#fff;}
+.pill.later{background:#9CBDB5;color:#fff;}
+/* ---------- CAR ---------- */
+.car{background:var(--sand);border:1px solid var(--line);border-radius:12px;padding:.7rem;}
+.car svg{width:100%;height:auto;max-height:21rem;display:block;}
+/* ---------- FLOW ---------- */
+.flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:.4rem;align-items:stretch;margin-bottom:.6rem;}
+@media(max-width:760px){.flow{grid-template-columns:1fr;}.flow .arw{transform:rotate(90deg);padding:.1rem 0;}}
+.bin{border-radius:12px;padding:.75rem .8rem;border:3px solid;background:#fff;}
+.bin .h{font-family:'Source Serif 4',Georgia,serif;font-weight:700;font-size:1.05rem;margin-bottom:.2rem;}
+.bin p{font-size:.87rem;color:var(--ink2);}
+.bin.b1{border-color:var(--coral);} .bin.b1 .h{color:var(--coral);}
+.bin.b2{border-color:var(--teal);} .bin.b2 .h{color:var(--teal);}
+.bin.b3{border-color:var(--ink2);} .bin.b3 .h{color:var(--ink2);}
+.arw{display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:var(--ink2);font-weight:700;}
+.naming{font-family:'IBM Plex Mono',monospace;font-size:.85rem;background:var(--deep);color:#9CBDB5;
+  padding:.6rem .75rem;border-radius:8px;line-height:1.8;overflow-x:auto;white-space:pre;}
+.naming b{color:#fff;}
+/* ---------- SCRIPTS ---------- */
+.toggles{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.8rem;}
+.tg{font-size:.8rem;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:.5rem .85rem;
+  border:2px solid var(--deep);border-radius:20px;background:#fff;color:var(--deep);cursor:pointer;}
+.tg.on{background:var(--deep);color:#fff;}
+.tg.drill.on{background:var(--coral);border-color:var(--coral);}
+.scene{border:1px solid var(--line);border-radius:12px;margin-bottom:.7rem;overflow:hidden;}
+.scene>h4{background:var(--deep);color:#fff;font-family:'Source Serif 4',Georgia,serif;font-weight:700;
+  font-size:1rem;padding:.55rem .85rem;}
+.scene .body{padding:.85rem;}
+.line{margin-bottom:.7rem;}
+.who{display:block;font-size:.68rem;letter-spacing:1px;text-transform:uppercase;color:var(--ink2);font-weight:700;margin-bottom:.15rem;}
+.say{font-size:1.08rem;font-weight:500;border-left:5px solid var(--teal);padding:.35rem 0 .35rem .7rem;}
+.say.es{border-left-color:var(--coral);font-style:italic;}
+.say.masked{background:repeating-linear-gradient(45deg,#E7F1EE,#E7F1EE 8px,#DDE9E5 8px,#DDE9E5 16px);
+  color:transparent;border-radius:6px;cursor:pointer;position:relative;font-style:normal;}
+.say.masked:after{content:"say it in Spanish — tap to check";position:absolute;left:.7rem;top:50%;
+  transform:translateY(-50%);color:var(--ink2);font-size:.8rem;font-weight:600;font-style:normal;}
+.hide{display:none !important;}
+
+/* ---------- RETURN COMPARE ---------- */
+.rets{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;}
+@media(max-width:700px){.rets{grid-template-columns:1fr;}}
+.ret{border-radius:12px;padding:.85rem;position:relative;overflow:hidden;}
+.ret.good{background:#F0F8F5;border:2px solid var(--good);}
+.ret.bad{background:#FCF3F1;border:2px solid var(--bad);}
+.ret .stamp{position:absolute;top:.6rem;right:.5rem;font-family:'Source Serif 4',Georgia,serif;font-weight:700;
+  font-size:.85rem;letter-spacing:1.5px;padding:.2rem .5rem;border:3px solid;border-radius:5px;transform:rotate(-9deg);opacity:.85;}
+.ret.good .stamp{color:var(--good);border-color:var(--good);}
+.ret.bad .stamp{color:var(--bad);border-color:var(--bad);}
+.ret q{display:block;font-size:.92rem;color:var(--ink);margin:1.4rem 0 .5rem;line-height:1.5;}
+.ret .why{font-size:.85rem;color:var(--ink2);}
+
+/* ---------- CALC ---------- */
+.calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:.5rem;margin-bottom:.6rem;}
+.fld label{display:block;font-size:.72rem;letter-spacing:.5px;text-transform:uppercase;color:var(--ink2);font-weight:700;margin-bottom:.2rem;}
+.fld input{width:100%;font-family:'IBM Plex Mono',monospace;font-size:1.1rem;font-weight:600;
+  padding:.45rem .55rem;border:2px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);}
+.fld input:focus{outline:none;border-color:var(--teal);}
+.out{display:grid;grid-template-columns:repeat(auto-fit,minmax(8rem,1fr));gap:.5rem;}
+.res{background:var(--deep);color:#fff;border-radius:10px;padding:.55rem .65rem;}
+.res span{display:block;font-size:.68rem;letter-spacing:.8px;text-transform:uppercase;color:#9CBDB5;font-weight:700;}
+.res strong{font-family:'IBM Plex Mono',monospace;font-size:1.25rem;font-weight:600;}
+.res.g{background:var(--good);} .res.r{background:var(--bad);}
+button.rst{font-size:.8rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;background:var(--coral);
+  color:#fff;border:none;border-radius:20px;padding:.55rem 1.2rem;cursor:pointer;margin-top:.6rem;}
+
+/* ---------- CHECKLIST ---------- */
+.ck{display:flex;gap:.6rem;align-items:flex-start;padding:.45rem .5rem;border-bottom:1px solid var(--line);font-size:.93rem;}
+.ck input{width:1.3rem;height:1.3rem;flex:none;margin-top:.1rem;accent-color:var(--teal);}
+.ck.done label{text-decoration:line-through;color:#9AB2AC;}
+.foot{font-size:.82rem;color:var(--ink2);margin-top:1rem;padding-top:.7rem;border-top:1px solid var(--line);}
+
+/* ============================================================
+   iPad LANDSCAPE — sidebar navigation, wide content, less scroll
+   ============================================================ */
+@media (min-width:1000px){
+  body{padding:.7rem 1rem;}
+  .wrap{display:grid;grid-template-columns:14rem 1fr;gap:.8rem;align-items:start;}
+  .mast{grid-column:1/-1;margin-bottom:0;display:grid;grid-template-columns:1fr 22rem;
+        gap:1.2rem;align-items:center;padding:.85rem 1.2rem;}
+  .mast .top{margin:0;}
+  .mast h1{font-size:1.65rem;}
+  .sizebar{margin-top:0;padding-top:0;border-top:none;border-left:1px solid #2A544C;padding-left:1.2rem;}
+
+  /* tabs become a sticky left rail */
+  .tabs{flex-direction:column;gap:.25rem;margin:0;position:sticky;top:.7rem;}
+  .tab{border-radius:10px 0 0 10px;border:1px solid var(--line);border-right:none;
+       padding:.62rem .8rem;font-size:.8rem;text-align:left;white-space:normal;line-height:1.25;}
+  .tab.on{box-shadow:inset 5px 0 0 var(--coral);padding-top:.62rem;padding-left:1rem;
+          border-bottom:1px solid var(--line);border-right:none;}
+  .pane{border-radius:12px;padding:1.15rem 1.35rem;min-height:calc(100vh - 7rem);}
+
+  /* wider grids */
+  .g2{grid-template-columns:repeat(2,1fr);}
+  .g3{grid-template-columns:repeat(3,1fr);}
+  .g4{grid-template-columns:repeat(4,1fr);}
+
+  /* diagrams sit beside their readout instead of above it */
+  .house,.car{display:grid;grid-template-columns:1.5fr 1fr;gap:.8rem;align-items:start;}
+  .house svg,.car svg{max-height:24rem;}
+  .readout{margin-top:0;align-self:stretch;}
+
+  /* scripts: English and Spanish side by side */
+  .scene .body{padding:1rem 1.1rem;}
+  .line{display:grid;grid-template-columns:repeat(auto-fit,minmax(19rem,1fr));gap:.7rem;align-items:start;}
+  .line .who{grid-column:1/-1;margin-bottom:0;}
+  .say{margin:0;}
+  .say.masked:after{font-size:.78rem;}
+
+  /* two-up reference blocks */
+  .rets{grid-template-columns:1fr 1fr;}
+  .prongs{grid-template-columns:repeat(3,1fr);}
+  .out{grid-template-columns:repeat(4,1fr);}
+  .calc{grid-template-columns:repeat(7,1fr);}
+  .clockrow .day{width:7rem;}
+  .bars span{font-size:.68rem;}
+
+  /* long ordered lists read better in two columns on a wide screen */
+  ol.steps{columns:2;column-gap:2rem;}
+  ol.steps li{break-inside:avoid;margin-bottom:.55rem;}
+  .naming{columns:1;}
+}
+@media (min-width:1400px){
+  .wrap{grid-template-columns:15rem 1fr;}
+  .g4{grid-template-columns:repeat(4,1fr);}
+  .line{grid-template-columns:repeat(auto-fit,minmax(24rem,1fr));}
+}
+@media print{.tabs,button,.toggles,.sizebar{display:none;}.pane{display:block !important;page-break-after:always;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="mast">
+  <div class="top">
+    <div>
+      <h1>The Serve Book</h1>
+      <div class="sub">Field manual · Certified Process Server · Ninth Judicial Circuit · Jazmin Aguayo</div>
+    </div>
+    <div class="seal">Certified · Bonded</div>
+  </div>
+  <div class="sizebar">
+    <label for="fs">Text size</label>
+    <input type="range" id="fs" min="15" max="26" step="1" value="18">
+    <div class="val" id="fsv">18px</div>
+  </div>
+</div>
+
+<div class="tabs" role="tablist">
+  <div class="tab on" data-p="p1" tabindex="0" role="tab">1 · Tricks</div>
+  <div class="tab" data-p="pS" tabindex="0" role="tab">2 · Set Up Shop</div>
+  <div class="tab" data-p="p2" tabindex="0" role="tab">3 · The Law</div>
+  <div class="tab" data-p="p3" tabindex="0" role="tab">4 · The Knock</div>
+  <div class="tab" data-p="p4" tabindex="0" role="tab">5 · Best Times</div>
+  <div class="tab" data-p="p5" tabindex="0" role="tab">6 · Apps</div>
+  <div class="tab" data-p="p6" tabindex="0" role="tab">7 · Paperwork</div>
+  <div class="tab" data-p="p7" tabindex="0" role="tab">8 · Money</div>
+  <div class="tab" data-p="p8" tabindex="0" role="tab">9 · Safety</div>
+  <div class="tab" data-p="p9" tabindex="0" role="tab">10 · Week One</div>
+</div>
+
+<!-- ============ 1 TRICKS ============ -->
+<div class="pane on" id="p1">
+  <h2>Tricks of the trade</h2>
+  <p class="lede">None of this is in the statute or the class. It's the difference between 5 serves out of 8 stops and 2.</p>
+
+  <h3>Read the house before you knock</h3>
+  <p class="lede">Tap each marker. Ten seconds of looking saves a whole return trip — and every one of these becomes a line in your attempt log.</p>
+  <div class="house">
+    <svg viewBox="0 0 640 330" xmlns="http://www.w3.org/2000/svg" aria-label="House scan diagram">
+      <rect x="0" y="0" width="640" height="330" fill="#F3F9F7"/>
+      <rect x="0" y="262" width="640" height="68" fill="#D7E4E0"/>
+      <!-- house body -->
+      <rect x="150" y="120" width="300" height="145" fill="#FFFFFF" stroke="#0E3A33" stroke-width="4"/>
+      <polygon points="130,122 300,40 470,122" fill="#0E3A33"/>
+      <!-- door -->
+      <rect x="272" y="180" width="58" height="85" fill="#0E6B5C" stroke="#0E3A33" stroke-width="3"/>
+      <circle cx="320" cy="224" r="4" fill="#F3F9F7"/>
+      <!-- windows -->
+      <rect x="180" y="155" width="62" height="52" fill="#C6D9D3" stroke="#0E3A33" stroke-width="3"/>
+      <line x1="180" y1="168" x2="242" y2="168" stroke="#0E3A33" stroke-width="3"/>
+      <line x1="180" y1="181" x2="242" y2="181" stroke="#0E3A33" stroke-width="3"/>
+      <rect x="358" y="155" width="62" height="52" fill="#C6D9D3" stroke="#0E3A33" stroke-width="3"/>
+      <!-- driveway + car -->
+      <rect x="470" y="215" width="150" height="50" fill="#C6D9D3"/>
+      <rect x="492" y="225" width="105" height="32" rx="7" fill="#4E6862"/>
+      <rect x="512" y="212" width="62" height="20" rx="5" fill="#4E6862"/>
+      <rect x="524" y="252" width="40" height="11" rx="3" fill="#D2694A"/>
+      <!-- mailbox -->
+      <rect x="72" y="205" width="9" height="60" fill="#4E6862"/>
+      <rect x="52" y="182" width="50" height="28" rx="5" fill="#D2694A"/>
+      <!-- AC unit -->
+      <rect x="98" y="228" width="42" height="37" fill="#9CBDB5" stroke="#0E3A33" stroke-width="3"/>
+      <line x1="104" y1="238" x2="134" y2="238" stroke="#0E3A33" stroke-width="2"/>
+      <line x1="104" y1="248" x2="134" y2="248" stroke="#0E3A33" stroke-width="2"/>
+      <!-- trash can -->
+      <rect x="452" y="228" width="34" height="37" rx="4" fill="#7FAFA4" stroke="#0E3A33" stroke-width="3"/>
+      <rect x="447" y="221" width="44" height="9" rx="3" fill="#0E3A33"/>
+      <!-- toy -->
+      <circle cx="215" cy="253" r="12" fill="#C98A1E"/>
+      <!-- doorbell cam -->
+      <rect x="340" y="192" width="13" height="22" rx="4" fill="#12211E"/>
+      <!-- hotspots -->
+      <g class="hot" data-k="mail"><circle cx="77" cy="163" r="17"/><text x="77" y="169" text-anchor="middle">1</text></g>
+      <g class="hot" data-k="ac"><circle cx="119" cy="290" r="17"/><text x="119" y="296" text-anchor="middle">2</text></g>
+      <g class="hot" data-k="tag"><circle cx="545" cy="290" r="17"/><text x="545" y="296" text-anchor="middle">3</text></g>
+      <g class="hot" data-k="trash"><circle cx="469" cy="290" r="17"/><text x="469" y="296" text-anchor="middle">4</text></g>
+      <g class="hot" data-k="blinds"><circle cx="211" cy="130" r="17"/><text x="211" y="136" text-anchor="middle">5</text></g>
+      <g class="hot" data-k="toy"><circle cx="215" cy="292" r="17"/><text x="215" y="298" text-anchor="middle">6</text></g>
+      <g class="hot" data-k="cam"><circle cx="380" cy="110" r="17"/><text x="380" y="116" text-anchor="middle">7</text></g>
+      <g class="hot" data-k="door"><circle cx="301" cy="292" r="17"/><text x="301" y="298" text-anchor="middle">8</text></g>
+    </svg>
+    <div class="readout" id="hr"><b>Tap a number</b><p>Each marker is something you should clock before your knuckles hit the door.</p></div>
+  </div>
+
+  <h3>Getting the door to open</h3>
+  <div class="grid g3">
+    <div class="tile ok"><b>Look like a delivery</b><p>Papers folded or in a plain envelope, held low at your side. A legal-size stack visible through a peephole is why doors don't open.</p></div>
+    <div class="tile ok"><b>Knock in threes, then step back</b><p>Three firm knocks, then one step back and look relaxed. Pressed against the door reads as police. Stepping back reads as harmless.</p></div>
+    <div class="tile ok"><b>Ring AND knock</b><p>Doorbells get ignored, knocks get investigated. Both together reads as "someone with a package."</p></div>
+    <div class="tile ok"><b>Park down the street</b><p>An unfamiliar car out front tips them off before you reach the door. Two houses down, then walk.</p></div>
+    <div class="tile ok"><b>Never block the driveway</b><p>It announces you, it traps you, and it starts the conversation with them already annoyed.</p></div>
+    <div class="tile ok"><b>Speak first, fast</b><p>The second the door cracks, use their name warmly. Hesitation reads as threat; confidence reads as routine.</p></div>
+  </div>
+
+  <h3>When they're dodging</h3>
+  <div class="grid g2">
+    <div class="tile"><b>The wrong-name test</b><p>Ask for a made-up person: "Is Robert here?" A dodger who yells "wrong house, this is the Ramirez place" just confirmed the address without meaning to.</p></div>
+    <div class="tile"><b>Change the vehicle</b><p>If they've clocked your car, borrow a different one for attempt three. Costs nothing, works constantly.</p></div>
+    <div class="tile"><b>Knock next door first</b><p>Neighbors will give you the schedule — "she works nights, home around 8" — if you're just looking for someone. Never mention papers.</p></div>
+    <div class="tile"><b>Go to work instead</b><p>People who dodge at home rarely dodge at work, and Florida law requires the employer to give you a private area. <span class="cite">§48.031(1)(b)</span></p></div>
+    <div class="tile"><b>The car is the tell</b><p>Same plate at the address on three separate attempts is the strongest fact in a diligent-search affidavit. Photograph it every time.</p></div>
+    <div class="tile"><b>Stop guessing, start charging</b><p>After 3–4 documented attempts, quote a skip trace or a stakeout. Free trips out of pride are unpaid work, not diligence.</p></div>
+  </div>
+
+  <h3>Apartments, gates, and complexes</h3>
+  <div class="grid g3">
+    <div class="tile warn"><b>Leasing offices won't confirm — but they'll correct</b><p>"I have a delivery for Ramirez in 214" often gets "she's in 412." Let them fix your wrong information.</p></div>
+    <div class="tile warn"><b>Maintenance knows everything</b><p>They know who actually lives where and whose car is whose — and they're not trained to stonewall.</p></div>
+    <div class="tile warn"><b>Read the callbox directory</b><p>Names in the gate directory confirm residency for free, before you spend an attempt.</p></div>
+    <div class="tile warn"><b>Gate guards: paper beats argument</b><p>Hand them the printed statute instead of debating. Still refused? Get the guard's name, company, and time, and tell the attorney. <span class="cite">§48.031(7)</span></p></div>
+    <div class="tile warn"><b>Stack the complex</b><p>Before driving to any large complex, check every open job for that same community. One trip, three serves.</p></div>
+    <div class="tile warn"><b>Catch the mail carrier</b><p>Carriers know who's still receiving mail there. Ask casually mid-route.</p></div>
+  </div>
+
+  <h3>Speed tricks — where the hours actually go</h3>
+  <ol class="steps">
+    <li><b>Pre-fill the return before you leave the house.</b> Everything except date, time, and manner. Forty seconds instead of six minutes.</li>
+    <li><b>Stamp every packet the night before.</b> Name and CPS number pre-stamped; only date, time, and initials get handwritten at the door.</li>
+    <li><b>Dictate, don't type.</b> Voice-memo your observations the second you're back in the car. Details evaporate in ten minutes.</li>
+    <li><b>Sticky note on each packet</b> with description, vehicle, and best time. You won't remember which defendant is which by stop five.</li>
+    <li><b>Highlight the deadline on the outside</b> of the packet, where you see it while flipping — not buried inside.</li>
+    <li><b>Carry two copies of everything.</b> Papers get torn, dropped, rained on, thrown back. A second set saves the trip.</li>
+    <li><b>Do the return in the car.</b> The 15 minutes you "save" becomes an hour of reconstructing your day at 10 PM.</li>
+    <li><b>Never leave a zone half-finished</b> to chase a rush across town. Crossing 192 at 5 PM costs you a serve.</li>
+  </ol>
+
+  <h3>Client tricks — this is how you get called again</h3>
+  <div class="grid g3">
+    <div class="tile ok"><b>Text the moment it's served</b><p>"Ramirez served personally, 8/14 6:42 AM, return tonight." Attorneys forgive a slow serve. They don't forgive silence.</p></div>
+    <div class="tile ok"><b>Report failure early and loud</b><p>Two failed attempts with a deadline five days out? Email tonight. A client blindsided on the due date never calls back.</p></div>
+    <div class="tile ok"><b>Invoice the same day</b><p>Attach the return. Paid returns get filed faster and remembered better.</p></div>
+    <div class="tile ok"><b>Ask "when do you need it by"</b><p>Not "is this a rush" — everyone says no to that. A real date lets you price and sequence it right.</p></div>
+    <div class="tile ok"><b>Lead with the Spanish</b><p>In Osceola County, "I serve in Spanish" wins work over servers with ten years on you. First line of your intro, not the last.</p></div>
+    <div class="tile ok"><b>Be the 4 PM person</b><p>Whoever takes a rush at 4 PM on a Friday owns that firm's business. Worth more than any rate cut.</p></div>
+  </div>
+
+  <h3>Florida gear</h3>
+  <div class="grid g4">
+    <div class="tile"><b>Cooler in the trunk</b><p>Water and a cold towel. Heat exhaustion ends the day.</p></div>
+    <div class="tile"><b>Closed shoes, always</b><p>Fire ants, glass, dog runs. Never sandals.</p></div>
+    <div class="tile"><b>Battery pack</b><p>Your phone is GPS, camera, timestamp, and evidence.</p></div>
+    <div class="tile"><b>Gallon bags</b><p>Wet papers can't be served. Bag every packet.</p></div>
+    <div class="tile"><b>Cash in the console</b><p>Gates, lots, situations. $20 solves things.</p></div>
+    <div class="tile"><b>Two phone mounts</b><p>One navigating, one recording. Fumbling looks unsafe.</p></div>
+    <div class="tile"><b>Printed §48.031(7)</b><p>For gate guards. Hand it over instead of arguing.</p></div>
+    <div class="tile"><b>Hardest address first</b><p>Do the scary one while you're fresh. Fear compounds if you save it.</p></div>
+  </div>
+
+  <h3>The five habits that protect your certification</h3>
+  <div class="tile hot"><ul>
+    <li><b>Never sign a return you're unsure about.</b> A willfully false return is a third-degree felony and a permanent statewide ban. A re-attempt costs $20. <span class="cite">§48.31(2)</span></li>
+    <li><b>Never serve on a Sunday.</b> Void service, and you're personally liable for damages as if you had no process at all. <span class="cite">§48.20</span></li>
+    <li><b>Never serve a case you have a stake in.</b> You must be disinterested.</li>
+    <li><b>Never imply you're law enforcement.</b> It's a crime and it voids the serve you just worked for.</li>
+    <li><b>Never let the bond or ID card lapse.</b> An expired card is something opposing counsel can attack.</li>
+  </ul></div>
+</div>
+
+<!-- ============ SETUP ============ -->
+<div class="pane" id="pS">
+  <h2>Set up shop</h2>
+  <p class="lede">Build the system once, before your first job, and you never lose a paper. Build it while you're already busy and you will.</p>
+
+  <h3>The car build — tap a zone</h3>
+  <p class="lede">Your car is your office. Every item has one home, and the back seat stays empty.</p>
+  <div class="car">
+    <svg viewBox="0 0 640 340" xmlns="http://www.w3.org/2000/svg" aria-label="Car organization layout">
+      <rect x="0" y="0" width="640" height="340" fill="#F3F9F7"/>
+      <!-- car outline, top-down -->
+      <rect x="120" y="20" width="400" height="300" rx="70" fill="#FFFFFF" stroke="#0E3A33" stroke-width="5"/>
+      <!-- windshield -->
+      <path d="M150 90 Q320 55 490 90 L470 120 Q320 92 170 120 Z" fill="#C6D9D3"/>
+      <!-- dash -->
+      <rect x="150" y="120" width="340" height="26" rx="8" fill="#9CBDB5"/>
+      <!-- seats -->
+      <rect x="175" y="160" width="105" height="105" rx="16" fill="#DDE9E5" stroke="#0E3A33" stroke-width="3"/>
+      <rect x="360" y="160" width="105" height="105" rx="16" fill="#DDE9E5" stroke="#0E3A33" stroke-width="3"/>
+      <text x="227" y="218" text-anchor="middle" font-family="Inter" font-size="13" font-weight="700" fill="#4E6862">DRIVER</text>
+      <!-- console -->
+      <rect x="292" y="170" width="56" height="80" rx="10" fill="#C6D9D3" stroke="#0E3A33" stroke-width="3"/>
+      <!-- glovebox -->
+      <rect x="380" y="126" width="80" height="16" rx="5" fill="#0E6B5C"/>
+      <!-- passenger footwell -->
+      <rect x="368" y="276" width="90" height="34" rx="7" fill="#D2694A"/>
+      <!-- trunk -->
+      <rect x="150" y="278" width="150" height="34" rx="7" fill="#7FAFA4"/>
+      <text x="225" y="300" text-anchor="middle" font-family="Inter" font-size="12" font-weight="700" fill="#FFFFFF">TRUNK / HATCH</text>
+      <!-- hotspots -->
+      <g class="hot" data-c="dash"><circle cx="320" cy="133" r="17"/><text x="320" y="139" text-anchor="middle">1</text></g>
+      <g class="hot" data-c="seat"><circle cx="412" cy="212" r="17"/><text x="412" y="218" text-anchor="middle">2</text></g>
+      <g class="hot" data-c="foot"><circle cx="413" cy="293" r="17"/><text x="413" y="299" text-anchor="middle">3</text></g>
+      <g class="hot" data-c="console"><circle cx="320" cy="210" r="17"/><text x="320" y="216" text-anchor="middle">4</text></g>
+      <g class="hot" data-c="glove"><circle cx="480" cy="134" r="17"/><text x="480" y="140" text-anchor="middle">5</text></g>
+      <g class="hot" data-c="trunk"><circle cx="225" cy="295" r="17"/><text x="225" y="301" text-anchor="middle">6</text></g>
+      <g class="hot" data-c="door"><circle cx="140" cy="200" r="17"/><text x="140" y="206" text-anchor="middle">7</text></g>
+      <g class="hot" data-c="back"><circle cx="320" cy="60" r="17"/><text x="320" y="66" text-anchor="middle">8</text></g>
+    </svg>
+    <div class="readout" id="cr"><b>Tap a number</b><p>Eight zones. If an item doesn't have a zone, it doesn't come in the car.</p></div>
+  </div>
+
+  <h3>The three-bin rule — why you'll never lose a paper</h3>
+  <p class="lede">Every document in your possession is in exactly one of three places. There is no fourth place. Nothing loose, ever.</p>
+  <div class="flow">
+    <div class="bin b1"><div class="h">1 · INBOX</div><p>New jobs, not yet processed. A single folder on the passenger seat. <b>Emptied every night</b> — nothing sleeps in the inbox.</p></div>
+    <div class="arw">→</div>
+    <div class="bin b2"><div class="h">2 · ACTIVE</div><p>The accordion file in the passenger footwell. One slot per open job, tabbed by <b>due date</b>, not client. Front slot = due this week.</p></div>
+    <div class="arw">→</div>
+    <div class="bin b3"><div class="h">3 · CLOSED</div><p>A box at home, filed by month. Signed return, invoice, attempt log. Kept 7 years to match your taxes.</p></div>
+  </div>
+  <div class="note"><b>The test:</b> pick up any piece of paper in your car right now. If you can't say which bin it belongs to in two seconds, your system has already broken. Fix it that night, not next week.</div>
+
+  <h3>Day one — build this before your first job</h3>
+  <ol class="steps">
+    <li><b>Separate business checking account and debit card.</b> Every serve fee lands here. Every gas fill and supply run comes out of here. Mixing this with household money is the mistake that makes taxes impossible.</li>
+    <li><b>One cloud folder tree.</b> Google Drive or Dropbox, mirrored to your iPad, with an exact naming convention you never break:</li>
+  </ol>
+  <div class="naming"><b>/ServeBook</b>
+  <b>/Active</b>
+    2026SC004578_RAMIREZ/
+      01_documents.pdf
+      02_attempt_2026-08-14_0642.jpg
+      03_return_signed.pdf
+      04_invoice.pdf
+  <b>/Closed</b>
+    /2026-08/
+  <b>/Templates</b>
+    return_template.pdf
+    invoice_template.pdf
+    intake_form.pdf
+    statute_48-031-7.pdf</div>
+  <div class="note"><b>Case number first, then last name.</b> Always. It sorts chronologically, it matches what the attorney says on the phone, and it means you can find any file in four seconds from the driver's seat.</div>
+  <ol class="steps" start="3">
+    <li><b>A dedicated work email</b> with a signature block: your name, "Certified Process Server, Ninth Judicial Circuit," your CPS number, phone. That number in your signature is what makes attorneys take you seriously.</li>
+    <li><b>Your master board.</b> One spreadsheet, one row per job. Columns: <i>Case # · Defendant · Address · Client · Received date · Serve-by date · Attempt 1 · Attempt 2 · Attempt 3 · Status · Fee · Invoiced · Paid.</i> Sort by serve-by date. This single sheet is your whole business until volume forces software.</li>
+    <li><b>Two calendar alarm types.</b> A <b>5-day warning</b> and a <b>2-day warning</b> on every serve-by date, set the moment you accept the job. Deadlines don't sneak up on people who set both.</li>
+    <li><b>Phone setup.</b> Contacts for attorneys prefixed <span class="kbd">ATTY —</span> so they sort together. A photo album per case. Timestamp camera app installed and permissions granted <i>before</i> you're standing at a door.</li>
+    <li><b>Templates built and saved.</b> Return of service, invoice, intake form, and a diligent-search affidavit. Build them once from your mentor's versions.</li>
+    <li><b>Mileage app on automatic tracking.</b> Turn it on day one and forget it.</li>
+    <li><b>Self-inking stamp ordered.</b> Your name and CPS number. Everything else at the door is handwritten.</li>
+  </ol>
+
+  <h3>The rhythm — what a working day actually looks like</h3>
+  <div class="grid g4">
+    <div class="tile"><b>Night before</b><p>Print and stamp packets. Sticky note each with description, vehicle, best time. Build the route. Load the accordion in due-date order.</p></div>
+    <div class="tile ok"><b>6:00–9:00 AM</b><p>Prime block. 6–8 stops, hardest defendant first. Return written in the car after each serve.</p></div>
+    <div class="tile"><b>Midday</b><p>Skip tracing, calls to clients, invoicing, new intake. This is desk time, not driving time.</p></div>
+    <div class="tile ok"><b>6:00–9:00 PM</b><p>Second block. Different addresses than the morning, or the same ones at a different hour.</p></div>
+  </div>
+  <div class="note"><b>Then the 15-minute close-out, every single night:</b> log attempts, upload photos, send returns, flag anything at risk, rebuild tomorrow's route, log miles. The servers who quit are the ones who skipped this for two weeks and then couldn't dig out.</div>
+
+  <h3>The weekly reset — Sunday, 30 minutes</h3>
+  <p class="lede">You can't serve on Sunday anyway. Use it.</p>
+  <div class="grid g3">
+    <div class="tile"><b>Purge the accordion</b><p>Anything served and returned moves to the closed box. The accordion should only ever hold live work.</p></div>
+    <div class="tile"><b>Chase the money</b><p>Scan the master board for anything invoiced over 30 days. One polite email each. This is how solos avoid getting stiffed.</p></div>
+    <div class="tile"><b>Look at next week</b><p>Any serve-by date inside 7 days with zero attempts logged gets scheduled into Monday's prime block right now.</p></div>
+  </div>
+
+  <h3>What "successful" looks like at 30, 90, and 365 days</h3>
+  <table>
+    <tr><th>Mark</th><th>What you should have</th></tr>
+    <tr><td><b>30 days</b></td><td>System built. First solo serves done. One return your mentor would sign. Two clients who've used you more than once. Mileage and a separate account running from day one.</td></tr>
+    <tr><td><b>90 days</b></td><td>A recurring base — one property manager or eviction firm sending you weekly work. Your own rate sheet. A serve rate above 70% within the deadline. You've stopped needing the script card.</td></tr>
+    <tr><td><b>365 days</b></td><td>Renewal done on time without scrambling. Enough volume to justify real software. A second circuit certification if you want the territory. And a non-serve rate you can defend, because every attempt is documented.</td></tr>
+  </table>
+  <div class="note"><b>The one number that matters:</b> percentage served within the client's deadline. Not serves per week, not revenue. Attorneys hire on that number and nothing else, and it's the number your reputation in a circuit this size is built on.</div>
+</div>
+
+<!-- ============ 2 LAW ============ -->
+<div class="pane" id="p2">
+  <h2>Florida Chapter 48 — the working cheat sheet</h2>
+  <p class="lede">This is what separates a $65 serve from a motion to quash.</p>
+
+  <h3>Substitute service — tap all three prongs</h3>
+  <p class="lede">Courts require <b>strict compliance</b> and construe it strictly against you. All three or nothing.</p>
+  <div class="prongs">
+    <div class="prong" data-p="1" tabindex="0" role="button">
+      <div class="num">PRONG 1</div>
+      <div class="t">Usual place of abode</div>
+      <div class="d">Where they actually live right now. Not a mailing address, not the license address, not last month's apartment.</div>
+    </div>
+    <div class="prong" data-p="2" tabindex="0" role="button">
+      <div class="num">PRONG 2</div>
+      <div class="t">Resident, 15 or older</div>
+      <div class="d">Must <i>live there.</i> A visiting mother-in-law, babysitter, or contractor is not a resident. Ask, and record the answer.</div>
+    </div>
+    <div class="prong" data-p="3" tabindex="0" role="button">
+      <div class="num">PRONG 3</div>
+      <div class="t">Informed of contents</div>
+      <div class="d">A spoken act you actually perform and then swear to. Say it out loud, every single time.</div>
+    </div>
+  </div>
+  <div class="verdict no" id="verdict">SERVICE FAILS<small>Tap the prongs you completed.</small></div>
+  <div class="note"><span class="cite">§48.031(1)(a)</span> &nbsp;Personal service is simpler: hand the process <b>plus</b> the complaint or initial pleading directly to the named person. Done.</div>
+
+  <h3>Situations you'll hit in month one</h3>
+  <table>
+    <tr><th>Situation</th><th>What the law says</th><th>Cite</th></tr>
+    <tr><td><b>Gated community</b><br>guard won't let you in</td><td>A gated community, condo association, or co-op <b>shall grant unannounced entry</b> to someone serving a defendant or witness inside. They may not announce you and may not turn you away.</td><td><span class="cite">§48.031(7)</span></td></tr>
+    <tr><td><b>Serving at a workplace</b></td><td>The employer <b>must</b> let you serve in a private area they designate. Refusing is a noncriminal violation, fine up to $1,000.</td><td><span class="cite">§48.031(1)(b)</span></td></tr>
+    <tr><td><b>Sole proprietor at their business</b></td><td>After <b>two attempts</b> on the owner at the business, serve the person in charge during regular business hours.</td><td><span class="cite">§48.031(2)(b)</span></td></tr>
+    <tr><td><b>Only address is a mailbox store or virtual office</b></td><td>Serve the person in charge of that location — but only after you <b>determine</b> the defendant actually maintains a box there. Ask, and document it.</td><td><span class="cite">§48.031(6)</span></td></tr>
+    <tr><td><b>Minor defendant</b> (never married)</td><td>Serve a <b>parent or guardian</b>, or the appointed guardian / guardian ad litem. Do not serve the child.</td><td><span class="cite">§48.041</span></td></tr>
+    <tr><td><b>Spouse substitute</b></td><td>Allowed anywhere in the county if it's not adversarial between them, the spouse requests it or is also a party, and they live together.</td><td><span class="cite">§48.031(2)(a)</span></td></tr>
+    <tr><td><b>Registered agent not at the office</b></td><td>If the agent is a natural person and isn't present, you may serve <b>any employee present</b> — even on the first attempt.</td><td><span class="cite">§48.091(4)(b)</span></td></tr>
+    <tr><td><b>LLC or corporation</b></td><td>Registered agent first. If they've ceased to exist or can't be served after <b>one good-faith attempt</b>, go to a manager/member or officer. Secretary of State only after due diligence.</td><td><span class="cite">§48.062 · §48.081</span></td></tr>
+    <tr><td><b>Criminal witness subpoena</b><br>for a court appearance</td><td>May be <b>posted at the residence</b> after <b>three failed attempts at different times on different dates</b>, posted at least 5 days before the appearance.</td><td><span class="cite">§48.031(3)(b)</span></td></tr>
+    <tr><td><b>Criminal witness subpoena</b><br>for a deposition</td><td>May be posted after just <b>one</b> failed attempt.</td><td><span class="cite">§48.031(3)(b)</span></td></tr>
+  </table>
+
+  <h3>Evictions — your highest-volume work</h3>
+  <div class="grid g2">
+    <div class="tile warn"><b>Posting a residential eviction summons</b><p>If the tenant can't be found in the county, or nobody 15+ resides there, post the summons conspicuously on the property — but only after <b>two attempts at least 6 hours apart.</b></p><p style="margin-top:.4rem">Log both times to the minute. That 6-hour gap is the single most-challenged fact in eviction service. <span class="cite">§48.183(1)</span></p></div>
+    <div class="tile warn"><b>Unknown parties in possession</b><p><b>Three attempts</b>, spread across: once during business hours, once during non-business hours, once on a weekend. You must also <b>ask the occupant's name</b> and put it on the return — or state that you asked and couldn't get it. <span class="cite">§48.184(3)</span></p></div>
+  </div>
+
+  <h3>What a judge means by "due diligence"</h3>
+  <div class="tile"><p>You've used due diligence when you made <b>diligent inquiry</b>, made an <b>honest and conscientious effort appropriate to the circumstances</b>, used the knowledge reasonably available to you, and made an <b>appropriate number of attempts at times and places the person is reasonably likely to be found.</b></p>
+  <p style="margin-top:.4rem">In plain terms: <b>varied days, varied times, documented, plus at least one records check.</b> Three attempts at 2 PM on weekdays is not diligence, and an attorney will tell you so. <span class="cite">§48.161(5)</span></p></div>
+</div>
+
+<!-- ============ 3 KNOCK ============ -->
+<div class="pane" id="p3">
+  <h2>The knock — every scene, English and Spanish</h2>
+  <p class="lede">Practice out loud in the car. Turn on <b>Drill mode</b> to hide the Spanish and test yourself.</p>
+
+  <div class="toggles">
+    <button class="tg on" data-lang="en">English</button>
+    <button class="tg on" data-lang="es">Español</button>
+    <button class="tg drill" id="drill">Drill mode</button>
+  </div>
+
+  <div class="tile"><b>Before you knock — the 10-second reset</b><p>Papers in your <b>non-dominant</b> hand. ID clipped and visible. Phone recording or timestamping. Stand <b>to the side</b> of the door, never centered. Read the name once more so you say it right the first time. Then three firm knocks.</p></div>
+
+  <div class="scene"><h4>Scene 1 · Correct person answers</h4><div class="body">
+    <div class="line"><span class="who">You — opening</span>
+      <div class="say en">Good morning. Are you Maria Ramirez?</div>
+      <div class="say es">Buenos días. ¿Es usted María Ramírez?</div></div>
+    <div class="line"><span class="who">You — the handoff</span>
+      <div class="say en">I have legal documents for you from the Osceola County court. These are for you.</div>
+      <div class="say es">Tengo documentos legales para usted del tribunal del condado de Osceola. Estos son para usted.</div></div>
+    <div class="line"><span class="who">You — the close</span>
+      <div class="say en">You've been served. The papers explain what this is about and the deadline to respond. Have a good day.</div>
+      <div class="say es">Ha sido notificada oficialmente. Los papeles explican de qué se trata y la fecha límite para responder. Que tenga buen día.</div></div>
+    <div class="note"><b>Then leave.</b> Don't linger, don't explain, don't answer legal questions. Note the exact time before you reach your car — memory degrades within minutes.</div>
+  </div></div>
+
+  <div class="scene"><h4>Scene 2 · Someone else answers — building substitute service</h4><div class="body">
+    <div class="line"><span class="who">You — confirm the abode</span>
+      <div class="say en">Hi — does Maria Ramirez live here?</div>
+      <div class="say es">Hola — ¿vive aquí María Ramírez?</div></div>
+    <div class="line"><span class="who">You — confirm THEY reside there (the prong people miss)</span>
+      <div class="say en">And do you live here too? Are you 15 or older?</div>
+      <div class="say es">¿Y usted también vive aquí? ¿Tiene 15 años o más?</div></div>
+    <div class="line"><span class="who">You — inform of contents, out loud, always</span>
+      <div class="say en">I'm leaving these with you. They are legal documents for Maria — a summons and complaint from the court. Please give them to her.</div>
+      <div class="say es">Le voy a dejar estos documentos. Son documentos legales para María — una citación y una demanda del tribunal. Por favor entrégueselos a ella.</div></div>
+    <div class="line"><span class="who">You — get the name for your return</span>
+      <div class="say en">Can I get your first name and your relationship to her? It goes on the court's form.</div>
+      <div class="say es">¿Me puede dar su nombre y su relación con ella? Es para el formulario del tribunal.</div></div>
+    <div class="note"><b>If they say they don't live there</b> — stop. Do not leave the papers. Log it as an attempt with who you spoke to and what they said.</div>
+  </div></div>
+
+  <div class="scene"><h4>Scene 3 · "What is this about?"</h4><div class="body">
+    <div class="line"><span class="who">You</span>
+      <div class="say en">I'm not able to give legal advice and I don't know the details of the case. The first page has the case number and the court. The attorney's name and phone number are on the front, or you can call the clerk of court.</div>
+      <div class="say es">No puedo dar consejos legales y no conozco los detalles del caso. La primera página tiene el número del caso y el tribunal. El nombre y el teléfono del abogado están en la primera página, o puede llamar a la secretaría del tribunal.</div></div>
+    <div class="note">Never speculate. "It looks like a credit card thing" is legal advice from a stranger, and it will end up in a deposition.</div>
+  </div></div>
+
+  <div class="scene"><h4>Scene 4 · They refuse to take the papers</h4><div class="body">
+    <div class="line"><span class="who">You — after identity is confirmed</span>
+      <div class="say en">That's completely fine. I'm placing them right here. You have been served.</div>
+      <div class="say es">Está bien, no hay problema. Los dejo aquí mismo. Usted ha sido notificado oficialmente.</div></div>
+    <div class="note"><b>The rule:</b> once you've identified the right person and told them what the papers are, refusal doesn't defeat service. Set them down in near proximity — at their feet, on the threshold, in the door — and write in your return that you identified them, informed them, they refused, and you left the documents in their presence. <b>Never</b> do this without confirmed identity.</div>
+  </div></div>
+
+  <div class="scene"><h4>Scene 5 · They won't open but you can hear them</h4><div class="body">
+    <div class="line"><span class="who">You — through the door</span>
+      <div class="say en">Miss Ramirez, I'm a certified process server. I have court documents for you. I'm going to leave them at your door.</div>
+      <div class="say es">Señora Ramírez, soy servidora de procesos certificada. Tengo documentos del tribunal para usted. Los voy a dejar en su puerta.</div></div>
+    <div class="note"><b>Careful.</b> A voice through a door is usually <b>not</b> confirmed identity. Unless you saw them or they answered to their name and you can swear to who they are, log this as an <b>attempt</b>, not a serve, and come back at a different hour. This is exactly where new servers get burned.</div>
+  </div></div>
+
+  <div class="scene"><h4>Scene 6 · Gate guard or front desk</h4><div class="body">
+    <div class="line"><span class="who">You</span>
+      <div class="say en">Good morning. I'm a certified process server for the Ninth Judicial Circuit — here's my ID and my server number. Florida Statute 48.031(7) requires a gated community to grant unannounced entry for service of process. I'm not asking you to call ahead. I just need the gate.</div>
+      <div class="say es">Buenos días. Soy servidora de procesos certificada del Noveno Circuito Judicial — aquí está mi identificación y mi número. El Estatuto de Florida 48.031(7) requiere que una comunidad con portón permita la entrada sin anunciar para la entrega de documentos legales. No le pido que llame. Solo necesito que abra el portón.</div></div>
+    <div class="note">Keep §48.031(7) printed in your door bag. Hand it over instead of arguing. Still refused? Get the guard's name, company, and time, then let the attorney handle it. Never force a gate.</div>
+  </div></div>
+
+  <div class="scene"><h4>Scene 7 · Serving at a workplace</h4><div class="body">
+    <div class="line"><span class="who">You — to the manager</span>
+      <div class="say en">Hi, I'm a certified process server. I need to serve one of your employees with legal documents. Florida law requires you to let me do that in a private area — and I'd rather do it discreetly than in front of customers. Where would you like to put us?</div>
+      <div class="say es">Hola, soy servidora de procesos certificada. Necesito entregarle documentos legales a uno de sus empleados. La ley de Florida requiere que me permita hacerlo en un área privada — y prefiero hacerlo con discreción, no frente a los clientes. ¿Dónde prefiere que lo hagamos?</div></div>
+    <div class="note">Framing it as protecting <i>them</i> from a scene gets you a back office almost every time. The statute is your backup, not your opener.</div>
+  </div></div>
+
+  <div class="scene"><h4>Scene 8 · Hostile or yelling</h4><div class="body">
+    <div class="line"><span class="who">You — flat, calm, already stepping back</span>
+      <div class="say en">I'm not with the police and I'm not here to argue. I'm a certified process server. I don't know anything about your case — I just deliver the documents. Everything you need is inside. Have a good day.</div>
+      <div class="say es">No soy policía y no vine a discutir. Soy servidora de procesos certificada. No sé nada de su caso — solo entrego los documentos. Toda la información está adentro. Que tenga buen día.</div></div>
+    <div class="note">Say it once, then <b>leave.</b> Walk backward two steps, turn, go. You don't get a second serve if you're injured.</div>
+  </div></div>
+
+  <div class="scene"><h4>Scene 9 · Confirming identity when they're evasive</h4><div class="body">
+    <div class="line"><span class="who">The wrong-detail method</span>
+      <div class="say en">I have a delivery for a Maria Ramirez with a middle initial J — is that you, or do I have the wrong unit?</div>
+      <div class="say es">Tengo una entrega para María Ramírez con la inicial J — ¿es usted, o tengo la unidad equivocada?</div></div>
+    <div class="line"><span class="who">The spelling method</span>
+      <div class="say en">Can you spell the last name for me so I mark this correctly?</div>
+      <div class="say es">¿Me puede deletrear el apellido para marcarlo correctamente?</div></div>
+    <div class="note"><b>The line you don't cross:</b> confirming identity is fine. Pretending to be UPS, a florist, a cop, or a utility worker is not — it can void your service and cost your certification, and impersonating law enforcement is a crime. Be creative about <i>timing</i>, not about <i>who you are.</i></div>
+  </div></div>
+
+  <div class="tile warn"><b>Spanish notes for practice</b><ul>
+    <li><b>Notificado / notificada</b> — "no-tee-fee-CAH-do." Use <b>-a</b> for a woman, <b>-o</b> for a man. This is the word that makes you sound like you belong.</li>
+    <li><b>Citación</b> = summons · <b>demanda</b> = complaint · <b>tribunal</b> or <b>corte</b> = court · <b>fecha límite</b> = deadline.</li>
+    <li>Stay in <b>usted</b>, never <b>tú</b>. Formality keeps it professional and protects you.</li>
+    <li>Osceola is heavily Puerto Rican — <b>"Que tenga buen día"</b> lands warmer than anything from a translation app.</li>
+    <li>Run out of Spanish mid-conversation? <b>"Disculpe, mi español es limitado — toda la información está en los papeles."</b> Honest beats fluent.</li>
+  </ul></div>
+</div>
+
+<!-- ============ 4 TIMING ============ -->
+<div class="pane" id="p4">
+  <h2>Best times to serve</h2>
+  <p class="lede">Serving is 20% knocking and 80% deciding <b>when</b> to knock. Nothing else moves your hit rate this much — not effort, not persistence, not luck.</p>
+
+  <h3>The week at a glance</h3>
+  <div class="clocklegend">
+    <span><i style="background:#0E6B5C"></i>Prime — hit your hardest defendants here</span>
+    <span><i style="background:#7FAFA4"></i>Good</span>
+    <span><i style="background:#D7E4E0"></i>Low yield</span>
+    <span><i style="background:#3B3B3B"></i>Service is void</span>
+  </div>
+  <div class="clock" id="clock"></div>
+  <div class="note"><b>Sunday is blacked out for a reason.</b> Service or execution on Sunday is void and you're personally liable to the aggrieved party for damages, as if you had no process at all. You <i>can</i> drive by on Sunday to scout — photograph tags, confirm someone lives there — then serve Monday at 6:30 AM. <span class="cite">§48.20</span></div>
+
+  <h3>Hour by hour — what each window is actually good for</h3>
+  <table>
+    <tr><th>Window</th><th>Who you catch</th><th>Rating</th></tr>
+    <tr><td><b>5:30 – 6:15 AM</b></td><td>Early shift workers, construction, hospital day shift, anyone with a long commute. They're up but haven't left.</td><td><b>Good</b> — only for defendants you know leave early</td></tr>
+    <tr><td><b>6:15 – 7:45 AM</b></td><td>Almost everybody. Cars still in driveways, kids not yet at school, nobody is dodging before coffee.</td><td><b>PRIME</b> — the best window in Florida</td></tr>
+    <tr><td><b>7:45 – 8:30 AM</b></td><td>The school-run window. Parents are physically outside their homes.</td><td><b>Strong</b> if there are kids</td></tr>
+    <tr><td><b>8:30 – 11:00 AM</b></td><td>Retirees, remote workers, night-shift workers just home, stay-at-home parents. Also the best window for <b>businesses and registered agents.</b></td><td><b>Good for business serves</b>, weak for residential</td></tr>
+    <tr><td><b>11:00 AM – 2:00 PM</b></td><td>Almost nobody at home. This is your <b>desk block</b> — skip tracing, calls, invoicing, intake.</td><td><b>Weak</b> — don't waste attempts here</td></tr>
+    <tr><td><b>2:00 – 4:00 PM</b></td><td>School pickup, second-shift workers before they leave. Thin.</td><td><b>Weak to fair</b></td></tr>
+    <tr><td><b>4:00 – 6:00 PM</b></td><td>People arriving home, but you're fighting traffic and everyone's guard is up.</td><td><b>Fair</b> — travel time kills the economics</td></tr>
+    <tr><td><b>6:00 – 9:00 PM</b></td><td>Nearly everyone is home. Lights on tells you before you knock.</td><td><b>PRIME</b> — your second-best window</td></tr>
+    <tr><td><b>After 9:00 PM</b></td><td>Legal, but people are hostile and frightened by late knocks. Rarely worth it.</td><td><b>Avoid</b> unless the client asks</td></tr>
+  </table>
+  <div class="note"><b>The rule that comes out of this table:</b> your day has <b>two serving blocks</b> — early morning and evening — with a desk block in the middle. Trying to serve all day long is the single most common way new servers burn fuel for nothing.</div>
+
+  <h3>Match the window to the person</h3>
+  <div class="grid g3">
+    <div class="tile"><b>Office / 9-to-5</b><p>6:15–7:45 AM or 6–9 PM. Or skip the house entirely and serve them at work, where Florida law requires the employer to give you a private area.</p></div>
+    <div class="tile"><b>Shift worker (hospital, hospitality, theme parks)</b><p>Osceola is full of these. Shifts commonly start at 6–7 AM or 2–3 PM. Try <b>mid-morning</b> — night-shift workers are home asleep, and that's a window nobody else tries.</p></div>
+    <div class="tile"><b>Construction / trades</b><p>Gone by 6 AM, home by 4 PM. Catch them <b>before 5:45 AM</b> or <b>4:30–6 PM</b>. Look for a work truck in the driveway.</p></div>
+    <div class="tile"><b>Retiree</b><p>Mid-morning, 9–11 AM. Easiest serves you'll get and often the most polite.</p></div>
+    <div class="tile"><b>Parent with school-age kids</b><p>7:20–8:10 AM, dead reliable. Look for car seats, toys, chalk on the driveway.</p></div>
+    <div class="tile"><b>Server / bartender / hospitality</b><p>Works nights, sleeps mornings. <b>10 AM–noon</b> is your window — the exact hours everyone else skips.</p></div>
+    <div class="tile"><b>Unemployed / home most of day</b><p>Any hour, but they're also the most likely to be actively dodging. Vary aggressively and watch for the blinds.</p></div>
+    <div class="tile"><b>Business / registered agent</b><p>Regular business hours only, and mid-morning beats mid-afternoon. Avoid Monday morning and Friday afternoon.</p></div>
+    <div class="tile"><b>Apartment dweller</b><p>Evenings are strongest. Gate access is also easier at shift change and when residents are streaming in.</p></div>
+  </div>
+  <div class="note"><b>Ask at intake:</b> "Do you know where they work or what hours they keep?" Half of clients know and never think to tell you. That one question can turn a four-attempt job into a one-attempt job.</div>
+
+  <h3>The bonus windows — free hit rate</h3>
+  <div class="grid g3">
+    <div class="tile ok"><b>Trash collection morning</b><p>Look up the collection day for that street. People come outside voluntarily, in pajamas, without checking the peephole.</p></div>
+    <div class="tile ok"><b>Right after a hard rain</b><p>Florida afternoon storms park everyone at home. A 4 PM downpour is a free hour of high-probability serves.</p></div>
+    <div class="tile ok"><b>The 1st and the 15th</b><p>Payday and rent day. People are home and moving around.</p></div>
+    <div class="tile ok"><b>Friday 5–8 PM</b><p>Weekend starts. High home rate, and people answer expecting food delivery.</p></div>
+    <div class="tile ok"><b>Saturday 9 AM – 1 PM</b><p>Catches shift workers and weekend-only residents. Required anyway for unknown-occupant evictions.</p></div>
+    <div class="tile ok"><b>The day after a holiday</b><p>People are home, relaxed, and not expecting anyone.</p></div>
+  </div>
+
+  <h3>When NOT to go</h3>
+  <div class="grid g2">
+    <div class="tile hot"><b>Sunday — never</b><p>Service or execution on Sunday is <b>void</b>, and you are personally liable to the aggrieved party for damages as if you had no process at all. Not a gray area, not a judgment call. <span class="cite">§48.20</span></p>
+    <p style="margin-top:.4rem"><b>But you can scout.</b> Drive by, photograph tags, confirm someone lives there. Then serve Monday at 6:30 AM. Sunday is for reconnaissance and your weekly reset.</p></div>
+    <div class="tile hot"><b>Bad timing that isn't illegal, just bad</b><ul>
+      <li><b>After 9 PM</b> — frightens people and makes hostility likely</li>
+      <li><b>Major holidays</b> — Thanksgiving, Christmas, Easter. Legal, but it will go badly and clients don't need it</li>
+      <li><b>Midday weekdays</b> for residential — you're burning fuel on empty houses</li>
+      <li><b>The same hour you already failed at</b> — that's not a new attempt</li>
+      <li><b>Monday 8–9 AM</b> at a law office or business — everyone's in a meeting</li>
+    </ul></div>
+  </div>
+
+  <h3>The attempt ladder</h3>
+  <table>
+    <tr><th>#</th><th>When</th><th>Why it works</th></tr>
+    <tr><td><b>1</b></td><td><b>Weekday 6:15–7:45 AM</b></td><td>Highest hit rate in Florida. Nobody dodges before coffee and the cars are still in the driveway. Spend it on your hardest defendant, not your easiest.</td></tr>
+    <tr><td><b>2</b></td><td><b>Weekday 7–9 PM</b></td><td>Second best. Different day of the week than attempt 1. Lights on means someone's home.</td></tr>
+    <tr><td><b>3</b></td><td><b>Saturday 9 AM–1 PM</b></td><td>Catches shift workers and weekend-only residents. Required for unknown-occupant evictions anyway.</td></tr>
+    <tr><td><b>4</b></td><td><b>An hour you haven't tried</b></td><td>Three attempts at the same time of day isn't three attempts — it's one attempt repeated. Change the hour before you change the strategy.</td></tr>
+  </table>
+  <div class="note"><b>Bonus windows:</b> trash-collection morning (people come outside without checking the peephole) · right after a hard afternoon rain (everyone's home) · Friday 5–8 PM · the 1st and the 15th.</div>
+
+  <h3>Record this at every attempt</h3>
+  <div class="grid g4">
+    <div class="tile"><b>Time</b><p>To the minute. Not "morning."</p></div>
+    <div class="tile"><b>GPS</b><p>Auto-captured. Verify it landed.</p></div>
+    <div class="tile"><b>Photo</b><p>House number and front door, timestamped.</p></div>
+    <div class="tile"><b>Observations</b><p>Vehicles and tags, lights, mail, dogs, toys, AC running, blinds moving.</p></div>
+  </div>
+  <div class="note">Those observations become a diligent-search affidavit that survives a challenge — and they're what an attorney remembers when deciding who to call next. "No answer" three times is a return that gets your invoice questioned.</div>
+
+  <h3>Building the route around those windows</h3>
+  <ol class="steps">
+    <li><b>Batch by geography, not by client.</b> Osceola splits into St. Cloud/Narcoossee, Kissimmee core (192), Poinciana, Buenaventura Lakes, Celebration/Four Corners. Orange splits into downtown/Parramore, east (UCF/Alafaya), south (Hunter's Creek/Meadow Woods), west (Ocoee/Winter Garden), north (Apopka).</li>
+    <li><b>Don't cross the 192 corridor at rush hour.</b> Finish a zone before you leave it. One wasted crossing is 25 minutes and half a serve.</li>
+    <li><b>Anchor on rush jobs.</b> Deadline jobs come first in the sequence, not first on the map.</li>
+    <li><b>Cap at 6–8 stops per block.</b> More than that and you rush knocks, which is when returns get sloppy.</li>
+    <li><b>Sequence within a zone:</b> gated communities early (guard shift changes are friendlier), apartments mid-block, single-family last.</li>
+    <li><b>Leave one flex slot.</b> Something always takes 40 minutes instead of 8.</li>
+    <li><b>Log the return in the car</b>, before you pull off.</li>
+  </ol>
+
+  <h3>Skip tracing when the address is dead</h3>
+  <div class="grid g3">
+    <div class="tile ok"><b>Free first</b><ul><li>Osceola / Orange <b>property appraiser</b></li><li><b>Clerk of court</b> case search — other cases, other addresses</li><li><b>Sunbiz.org</b> — businesses, agents, officer addresses</li><li>Florida voter registration lookup</li><li>Facebook / Instagram — employer, neighborhood, cars in photos</li></ul></div>
+    <div class="tile"><b>Paid, when it's worth it</b><ul><li><b>TLOxp</b> or <b>IRBsearch</b> — industry standard, requires credentialing</li><li><b>Tracers</b> or <b>Delvepoint</b> — cheaper entry for solos</li><li>Charge a skip-trace fee. Don't eat it.</li></ul></div>
+    <div class="tile warn"><b>The neighbor knock</b><p>"Hi — I'm trying to reach the Ramirez family, do they still live in that unit?" Do <b>not</b> say you're serving papers. You're allowed to look for someone; you're not allowed to broadcast their litigation to the block.</p></div>
+  </div>
+</div>
+
+<!-- ============ 5 APPS ============ -->
+<div class="pane" id="p5">
+  <h2>Apps &amp; tools</h2>
+  <p class="lede">Start free. Add paid tools only when volume forces it. Verify current pricing before subscribing — it moves.</p>
+
+  <h3>Case management — pick exactly one</h3>
+  <table>
+    <tr><th>Tool</th><th>What it does</th><th>Who it's for</th></tr>
+    <tr><td><b>Proof</b><br>proofserve.com</td><td>Marketplace plus app. They send <i>you</i> jobs. GPS and photo proof built in.</td><td><b>Start here.</b> Job flow while you have no clients.</td></tr>
+    <tr><td><b>ServeManager</b></td><td>The category standard. Intake, GPS attempt logging, photo attachments, auto-generated affidavits, client portal, invoicing.</td><td>The default once you're taking work from multiple attorneys.</td></tr>
+    <tr><td><b>ABC Legal</b></td><td>National network. High volume, lower per-serve pay, steady.</td><td>Filling empty routes. Volume, not margin.</td></tr>
+    <tr><td><b>Trackops · ServeTrack · Crosstrax</b></td><td>Similar features, different pricing tiers.</td><td>Comparison shop past ~40 serves/month.</td></tr>
+    <tr><td><b>Google Sheets</b></td><td>Free, and honestly fine.</td><td>Your first 60 days.</td></tr>
+  </table>
+  <div class="note"><b>Don't pay for software before you have jobs.</b> A $79/month subscription against 4 serves a week is a hole. Subscribe when the tool is cheaper than your time.</div>
+
+  <h3>The rest of the stack</h3>
+  <div class="grid g3">
+    <div class="tile"><b>Routing</b><ul><li><b>Circuit Route Planner</b> — best multi-stop app on a phone</li><li><b>RoadWarrior</b> — solid free tier</li><li><b>Google Maps</b> — free, caps around 9–10 stops</li></ul><p style="margin-top:.3rem">You already have this muscle from delivery driving. Same skill, better pay per stop.</p></div>
+    <div class="tile"><b>Timestamp + GPS photos</b><ul><li><b>Timestamp Camera</b> — burns date, time, and GPS into the image</li><li><b>Solocator</b> — adds compass direction</li></ul><p style="margin-top:.3rem">Non-negotiable. A photo without embedded time and coordinates proves nothing.</p></div>
+    <div class="tile"><b>Documents</b><ul><li><b>Adobe Scan</b> or the iPhone Notes scanner</li><li><b>PDF Expert</b> or <b>Adobe Fill &amp; Sign</b> for returns on the iPad</li><li>One cloud folder per case: <span class="kbd">CASE#_LASTNAME</span></li></ul></div>
+    <div class="tile"><b>Filing</b><ul><li><b>Florida ePortal</b> — myflcourtaccess.com, if you file returns yourself</li><li>Most attorneys file their own. Ask upfront who files.</li></ul></div>
+    <div class="tile"><b>Mileage &amp; money</b><ul><li><b>Stride</b> (free) or <b>MileIQ</b></li><li><b>Wave</b> (free) or <b>Found</b> for invoicing and separate books</li></ul><p style="margin-top:.3rem">Track from job one. Reconstructing mileage in April is misery.</p></div>
+    <div class="tile"><b>Physical kit</b><ul><li>Clipboard with storage box</li><li><b>Self-inking stamp</b>: name + CPS number</li><li>Accordion file, one slot per open case</li><li>Body cam or dash cam</li><li>Flashlight, bug spray, water, battery pack</li></ul></div>
+  </div>
+</div>
+
+<!-- ============ 6 PAPERWORK ============ -->
+<div class="pane" id="p6">
+  <h2>The paper system</h2>
+  <p class="lede">One rule above all: <b>a document never sits loose.</b> It's in a case folder, in the accordion, or in the client's hands.</p>
+
+  <h3>Intake checklist — run this the second a job comes in</h3>
+  <div id="intake"></div>
+
+  <h3>Two returns, same serve</h3>
+  <div class="rets">
+    <div class="ret good"><div class="stamp">SERVED</div>
+      <q>On 8/14/2026 at 6:42 AM, I served Maria J. Ramirez by leaving a copy of the Summons and Complaint at 1428 Blossom Ct, St. Cloud, FL 34769, her usual place of abode, with Carlos Ramirez, her adult son, age 24, who resides therein, and informed him of the contents thereof.</q>
+      <div class="why"><b>Why it holds:</b> abode named, resident named, age stated, residency stated, contents informed, documents listed, date and time exact.</div></div>
+    <div class="ret bad"><div class="stamp">QUASHED</div>
+      <q>Served at the residence with a family member.</q>
+      <div class="why"><b>Four fatal gaps in nine words:</b> which family member? Did they reside there? How old were they? Were they informed of the contents? And was it actually the abode?</div></div>
+  </div>
+
+  <h3>Required fields on every return</h3>
+  <div class="tile hot"><ul>
+    <li><b>Date and time the process came to hand</b> — when you received it. People forget this one constantly.</li>
+    <li><b>Date and time it was served</b></li>
+    <li><b>Manner of service</b> — personal, substitute, posting, corporate</li>
+    <li><b>Name of the person served</b></li>
+    <li><b>Their position or capacity</b> if served in a representative role</li>
+    <li><b>A list of every pleading and document served</b></li>
+    <li><b>Your signature</b> — electronic is permitted</li>
+  </ul>
+  <p style="margin-top:.4rem">Missing facts or a missing signature <b>invalidates the service</b> — but the return is amendable on application to the court. Fix it fast and don't hide it. <span class="cite">§48.21</span></p></div>
+  <div class="note">Separately: on the <b>first page of at least one process</b>, write the date, the time, your initials or signature, and your ID number. That's statutory, not a formality. <span class="cite">§48.031(5) · §48.29(6)</span></div>
+
+  <h3>Filing — three layers, that's it</h3>
+  <div class="grid g3">
+    <div class="tile"><b>1 · The car (active)</b><p>One accordion file, one slot per open job, tabbed by <b>due date</b> — not by client. Front slot is due this week. Served jobs leave the accordion that same day.</p></div>
+    <div class="tile"><b>2 · The phone (evidence)</b><p>Photos and GPS auto-upload to <span class="kbd">CASE#_LASTNAME</span> the same day. Phones die and get stolen.</p></div>
+    <div class="tile"><b>3 · The box (closed)</b><p>Signed return, invoice, and attempt log, filed by month. Keep <b>7 years</b> to match your tax records.</p></div>
+  </div>
+
+  <h3>The daily close-out — 15 minutes, every working day</h3>
+  <ol class="steps">
+    <li><b>Log every attempt</b> with times. Even the no-answers.</li>
+    <li><b>Upload photos</b> to the right case folders.</li>
+    <li><b>Draft, sign, and send returns</b> for anything served today.</li>
+    <li><b>Flag anything at risk</b> — a deadline inside 5 days with no successful attempt gets an email <i>tonight</i>.</li>
+    <li><b>Rebuild tomorrow's route</b> from what's left.</li>
+    <li><b>Log your miles.</b></li>
+  </ol>
+  <div class="note">This close-out <i>is</i> the job. Servers lose clients not because they can't serve, but because attorneys can't get a status update.</div>
+</div>
+
+<!-- ============ 7 MONEY ============ -->
+<div class="pane" id="p7">
+  <h2>Money</h2>
+  <p class="lede">Typical Central Florida ranges for 2026. Confirm against what Ninth Circuit servers actually charge — ask your mentor for his sheet.</p>
+
+  <h3>What the work pays</h3>
+  <table>
+    <tr><th>Service</th><th>Typical range</th><th>Notes</th></tr>
+    <tr><td><b>Routine serve</b> (5–7 days)</td><td>$45 – $75</td><td>The sheriff's statutory fee anchors the low end. You compete on speed and communication, not price.</td></tr>
+    <tr><td><b>Rush</b> (48–72 hrs)</td><td>$85 – $150</td><td>Where the margin actually lives.</td></tr>
+    <tr><td><b>Same-day / emergency</b></td><td>$125 – $250</td><td>Charge for the disruption. Attorneys pay it against a deadline.</td></tr>
+    <tr><td><b>Eviction posting</b></td><td>$45 – $80</td><td>High volume, predictable, repeatable. Great base load.</td></tr>
+    <tr><td><b>Non-service + diligent search affidavit</b></td><td>$40 – $70</td><td><b>Always charge this.</b> You did the work. Giving it away trains clients to expect free failures.</td></tr>
+    <tr><td><b>Skip trace add-on</b></td><td>$25 – $75</td><td>Separate line item, quoted before you start.</td></tr>
+    <tr><td><b>Stakeout</b></td><td>$60 – $100/hr</td><td>Two-hour minimum, billed whether or not you get the serve.</td></tr>
+    <tr><td><b>Extra defendant, same address</b></td><td>$15 – $25</td><td>Never serve a second person free.</td></tr>
+    <tr><td><b>Mileage past your radius</b></td><td>$0.75 – $1.25/mi</td><td>Set your free radius at 15–20 miles from St. Cloud.</td></tr>
+  </table>
+
+  <h3>Run your numbers</h3>
+  <p class="lede">Edit any field. Everything recalculates live.</p>
+  <div class="calc">
+    <div class="fld"><label>Serves / week</label><input type="number" id="c1" value="12" min="0" step="1"></div>
+    <div class="fld"><label>Avg fee ($)</label><input type="number" id="c2" value="65" min="0" step="5"></div>
+    <div class="fld"><label>Attempts / serve</label><input type="number" id="c3" value="2.2" min="1" step="0.1"></div>
+    <div class="fld"><label>Miles / attempt</label><input type="number" id="c4" value="11" min="0" step="1"></div>
+    <div class="fld"><label>Fuel $ / mile</label><input type="number" id="c5" value="0.14" min="0" step="0.01"></div>
+    <div class="fld"><label>Tools / month ($)</label><input type="number" id="c6" value="0" min="0" step="5"></div>
+    <div class="fld"><label>Tax set-aside (%)</label><input type="number" id="c7" value="28" min="0" max="60" step="1"></div>
+  </div>
+  <div class="out">
+    <div class="res"><span>Gross / week</span><strong id="o1">—</strong></div>
+    <div class="res"><span>Gross / month</span><strong id="o2">—</strong></div>
+    <div class="res r"><span>Fuel + tools</span><strong id="o3">—</strong></div>
+    <div class="res r"><span>Tax set-aside</span><strong id="o4">—</strong></div>
+    <div class="res g"><span>Take-home / mo</span><strong id="o5">—</strong></div>
+    <div class="res g"><span>Take-home / yr</span><strong id="o6">—</strong></div>
+    <div class="res"><span>Miles / month</span><strong id="o7">—</strong></div>
+    <div class="res"><span>Real $ / attempt</span><strong id="o8">—</strong></div>
+  </div>
+  <button class="rst" id="reset">Reset to defaults</button>
+
+  <h3>Getting clients — in the order that works</h3>
+  <ol class="steps">
+    <li><b>Your mentor's overflow.</b> That's your entire first month. Be the person he can hand a rush to at 4 PM and stop thinking about.</li>
+    <li><b>Proof and ABC Legal.</b> Fills dead space in routes you're already driving. Low pay, zero sales effort.</li>
+    <li><b>Eviction firms and property managers.</b> Osceola and Orange both run high eviction volume, and it's <b>recurring</b>. One good property management company is a steady weekly base. Go get two.</li>
+    <li><b>Small family-law and collections firms.</b> One-page intro email with your CPS number and your turnaround promise, then follow up in person. Solo attorneys respond to faces.</li>
+    <li><b>Bilingual as the differentiator.</b> In Osceola County, "serves in Spanish" is a real competitive edge. First line, not last.</li>
+  </ol>
+
+  <h3>Taxes — set this up now, not in April</h3>
+  <div class="grid g3">
+    <div class="tile warn"><b>You're 1099</b><p>Schedule C self-employment. Clients issue 1099-NEC over $600. Nobody withholds anything for you.</p></div>
+    <div class="tile warn"><b>Set aside 25–30%</b><p>Every payment, the day it lands, moves to a separate account. This one habit keeps gig income from becoming a tax bill.</p></div>
+    <div class="tile warn"><b>Deduct</b><p>Mileage (check the current IRS standard rate), bond, certification and renewal fees, software, phone %, printing, supplies.</p></div>
+  </div>
+  <div class="note">Quarterly estimated payments may apply once this income is meaningful. Worth an hour with a tax preparer before your first quarter closes — I'm not a tax professional and the thresholds shift.</div>
+</div>
+
+<!-- ============ 8 SAFETY ============ -->
+<div class="pane" id="p8">
+  <h2>Safety</h2>
+  <p class="lede">You're handing strangers the worst news of their week, alone, at their home. Take it seriously without being afraid of it.</p>
+
+  <h3>The approach — muscle memory</h3>
+  <div class="grid g3">
+    <div class="tile"><b>Park for exit</b><p>Nose out. Never blocked in a driveway, never behind another car in a narrow lot.</p></div>
+    <div class="tile"><b>Stand off-center</b><p>Never directly in front of the door. Hinge side, one step back.</p></div>
+    <div class="tile"><b>Hands free</b><p>Papers in the non-dominant hand. Dominant hand empty. Nothing in your pockets.</p></div>
+    <div class="tile"><b>Scan first</b><p>Dogs, cameras, open garage, people sitting in cars, second exit.</p></div>
+    <div class="tile"><b>Knock, don't pound</b><p>A hammering fist reads as police and puts people on defense before the door opens.</p></div>
+    <div class="tile"><b>Tell someone</b><p>Share your route with your partner or your oldest. Live location on, check-in text when the block is done.</p></div>
+  </div>
+
+  <h3>De-escalation, in order</h3>
+  <ol class="steps">
+    <li><b>Lower your voice.</b> People match volume. Going quieter pulls them down with you.</li>
+    <li><b>Drop the "I."</b> "The court is requiring this" beats "I'm serving you." You're the mail carrier, not the sender.</li>
+    <li><b>Give them the out.</b> "The attorney's number is on the front page." People calm down when handed a next step.</li>
+    <li><b>Don't defend, explain, or correct.</b> You will not win a legal argument in a doorway and you don't get paid to.</li>
+    <li><b>Leave while it's still calm.</b> The best moment to exit is one beat before you think you need to.</li>
+  </ol>
+
+  <h3>Hard rules</h3>
+  <div class="grid g2">
+    <div class="tile hot"><b>Never</b><ul>
+      <li>Enter a home, even if invited, even if it's raining</li>
+      <li>Go past a fence or into a backyard</li>
+      <li>Open an unlocked gate with a dog behind it</li>
+      <li>Argue, follow someone, or chase a car</li>
+      <li>Return alone to an address that already went bad</li>
+      <li>Serve with your kids in the car</li>
+      <li>Say or imply you're law enforcement</li>
+    </ul></div>
+    <div class="tile ok"><b>Always</b><ul>
+      <li>ID visible before the door opens</li>
+      <li>Phone recording or timestamping</li>
+      <li>Doors locked the second you're back in the car</li>
+      <li>Drive one block before you write anything down</li>
+      <li>Report a threat to the client and flag the address in your system</li>
+      <li>Call 911 and file a report if you're threatened — that report protects the case and you</li>
+    </ul></div>
+  </div>
+
+  <h3>Dogs</h3>
+  <div class="tile warn"><p>A loose dog in the yard means <b>no attempt.</b> Log it: "Attempt aborted — unsecured dog in front yard." That's a legitimate, billable, documented attempt. Nobody expects you to fight a dog for $65. Keep the gate between you, and if a dog charges, stand still and turn sideways rather than running — running triggers chase drive.</p></div>
+
+  <h3>On carrying</h3>
+  <div class="tile"><p>Plenty of Florida servers carry; plenty don't. If you go that route, get the license properly and understand that a visible weapon changes every doorway interaction you have, and that a serve is never worth a use-of-force decision. Some client contracts and some properties prohibit it outright. Ask your mentor what he does and why — <b>before</b> your first hostile door, not after.</p></div>
+</div>
+
+<!-- ============ 9 WEEK ONE ============ -->
+<div class="pane" id="p9">
+  <h2>Week one with your mentor</h2>
+  <p class="lede">Show up with these written down. Nothing makes a mentor invest in you faster than realizing you did homework.</p>
+
+  <h3>Ask him these, in this order</h3>
+  <ol class="steps">
+    <li><b>Can I see three of your returns of service?</b> Two good, one that got challenged. Copy his format exactly. Highest-value thing you can get from him.</li>
+    <li><b>What's your rate sheet, and what do you charge for a non-serve?</b> You need the real local number, not a range from the internet.</li>
+    <li><b>Which attorneys and property managers in Osceola actually pay on time?</b> And who should I not take work from?</li>
+    <li><b>Who files the return — you or the attorney?</b></li>
+    <li><b>Walk me through the last serve you had quashed.</b> Failures teach faster than successes.</li>
+    <li><b>What's your intake form?</b> Ask for a copy.</li>
+    <li><b>Can I ride along for a full morning block before I run solo?</b> Watch how he opens and how fast he leaves.</li>
+    <li><b>Will you take my overflow calls the first month?</b> Ask directly. Worst answer is no.</li>
+    <li><b>What does the Ninth Circuit specifically care about at renewal?</b> Circuit habits aren't in the statute.</li>
+    <li><b>How do you handle a defendant who's clearly dodging?</b> Get his real playbook, not the textbook one.</li>
+  </ol>
+
+  <h3>Your first-30-days checklist</h3>
+  <div id="wk"></div>
+
+  <h3>How you'll know week one went well</h3>
+  <div class="grid g3">
+    <div class="tile ok"><b>You served someone</b><p>Even one. The first serve breaks the fear and everything after it is technique.</p></div>
+    <div class="tile ok"><b>You wrote a return he'd sign</b><p>If your return matches his format, you're employable to any attorney in the circuit.</p></div>
+    <div class="tile ok"><b>You have a next job</b><p>One scheduled serve for next week means the pipeline started. That's the whole goal.</p></div>
+  </div>
+
+  <div class="foot"><b>Verified against the 2025 Florida Statutes, Chapter 48</b> (current as of August 2026) and the Ninth Judicial Circuit's published process server requirements. Statutes move — Chapter 48 was heavily amended in 2022 and again in 2025, and further amendments to §48.062 take effect July 1, 2026. Re-check §48.031, §48.183, and §48.21 at flsenate.gov every year at renewal. This is a working reference, not legal advice; when a serve is close to the line, ask the attorney who hired you.</div>
+</div>
+
+</div>
+
+<script>
+(function(){
+  /* ---- text size ---- */
+  var fs=document.getElementById('fs'),fsv=document.getElementById('fsv');
+  function size(){document.documentElement.style.fontSize=fs.value+'px';fsv.textContent=fs.value+'px';}
+  fs.addEventListener('input',size);size();
+
+  /* ---- tabs ---- */
+  var tabs=document.querySelectorAll('.tab');
+  function go(id){
+    document.querySelectorAll('.pane').forEach(function(p){p.classList.toggle('on',p.id===id);});
+    tabs.forEach(function(t){t.classList.toggle('on',t.dataset.p===id);});
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  tabs.forEach(function(t){
+    t.addEventListener('click',function(){go(t.dataset.p);});
+    t.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();go(t.dataset.p);}});
+  });
+
+  /* ---- house scan ---- */
+  var HS={
+    mail:['The mailbox','Overflowing box or flyers stuck in the door means they moved out or are traveling. An empty box at 5 PM means somebody collected it today.'],
+    ac:['The AC unit','Running in Florida heat means somebody is home right now. Dead silent in August means vacant, or gone all day. This is the most reliable tell in the state.'],
+    tag:['The tag','Photograph every plate at the address, every attempt. The same car on three separate visits is the strongest fact you can put in a diligent-search affidavit.'],
+    trash:['Trash cans','At the curb on the wrong day, or never brought back in, means nobody is living there. Cans out on the right night means someone was home last night.'],
+    blinds:['Blinds and lights','Blinds that move while you are knocking means they are home and refusing. Log that in detail — it changes your whole strategy from "not home" to "dodging."'],
+    toy:['Kid evidence','Toys, a car seat, sidewalk chalk. Children mean predictable hours. Hit the school-run window, 7:20 to 8:10 AM.'],
+    cam:['Doorbell camera','Assume you are recorded and behave accordingly. Also assume they saw you and will avoid that exact time slot tomorrow — so change your hour.'],
+    door:['The door itself','Approach from the hinge side, never centered. Three firm knocks, then one step back. Papers low and folded in your non-dominant hand.']
+  };
+  var hr=document.getElementById('hr');
+  document.querySelectorAll('.hot[data-k]').forEach(function(g){
+    g.addEventListener('click',function(){
+      document.querySelectorAll('.hot[data-k]').forEach(function(x){x.classList.remove('sel');});
+      g.classList.add('sel');
+      var d=HS[g.dataset.k];
+      hr.innerHTML='<b>'+d[0]+'</b><p>'+d[1]+'</p>';
+    });
+  });
+
+  /* ---- car zones ---- */
+  var CS={
+    dash:['1 · The dash','Two phone mounts. One running navigation, one recording or ready to shoot a timestamped photo. Fumbling for a phone at a door looks unprofessional and it is genuinely unsafe.'],
+    seat:['2 · Passenger seat — the active board','A clipboard box holding TODAY only, in route order. Top packet is your next stop. Nothing else lives on this seat, ever.'],
+    foot:['3 · Passenger footwell — the accordion','Every open job, one slot each, tabbed by due date rather than client. Front slot is due this week. This is the heart of the whole system.'],
+    console:['4 · Center console','Pens that work, your self-inking stamp, a highlighter, sticky notes, and $20 cash. Small things you reach for without looking.'],
+    glove:['5 · Glovebox — the proof kit','Copy of your certification, backup of your ID card, bond copy, printed 48.031(7) for gate guards, and blank return forms. This drawer is what you open when someone challenges you.'],
+    trunk:['6 · Trunk','Cooler with water and a cold towel, spare closed-toe shoes, umbrella, gallon bags for wet papers, bug spray, first aid kit, and a paper backstock.'],
+    door:['7 · Driver door pocket','Battery pack and cable, hand sanitizer, sunglasses. Things you want without leaning across the car.'],
+    back:['8 · The back seat — EMPTY','This is a rule, not a suggestion. The moment papers start living in the back seat, you have lost the system. If it does not have a zone, it does not come in the car.']
+  };
+  var cr=document.getElementById('cr');
+  document.querySelectorAll('.hot[data-c]').forEach(function(g){
+    g.addEventListener('click',function(){
+      document.querySelectorAll('.hot[data-c]').forEach(function(x){x.classList.remove('sel');});
+      g.classList.add('sel');
+      var d=CS[g.dataset.c];
+      cr.innerHTML='<b>'+d[0]+'</b><p>'+d[1]+'</p>';
+    });
+  });
+
+  /* ---- prong checker ---- */
+  var got={};
+  var v=document.getElementById('verdict');
+  document.querySelectorAll('.prong').forEach(function(p){
+    function tog(){
+      p.classList.toggle('on');got[p.dataset.p]=p.classList.contains('on');
+      var n=[1,2,3].filter(function(i){return got[i];}).length;
+      if(n===3){v.className='verdict yes';v.innerHTML='VALID SUBSTITUTE SERVICE<small>All three prongs met. Now write every one of them into your return, by name and by age.</small>';}
+      else{v.className='verdict no';v.innerHTML='SERVICE FAILS<small>'+(3-n)+' of 3 prongs missing. Any one missing and the service can be quashed.</small>';}
+    }
+    p.addEventListener('click',tog);
+    p.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();tog();}});
+  });
+
+  /* ---- clock strip ---- */
+  var slots=['6a','8a','10a','12p','2p','4p','6p','8p'];
+  var week=[
+    ['Mon–Thu',['hot','mid','low','low','low','mid','hot','hot']],
+    ['Friday', ['hot','mid','low','low','mid','hot','hot','mid']],
+    ['Saturday',['mid','hot','hot','hot','mid','mid','mid','low']],
+    ['Sunday', ['no','no','no','no','no','no','no','no']]
+  ];
+  var lab={hot:'PRIME',mid:'GOOD',low:'',no:'VOID'};
+  document.getElementById('clock').innerHTML=week.map(function(r){
+    return '<div class="clockrow"><div class="day">'+r[0]+'</div><div class="bars">'+
+      r[1].map(function(c,i){return '<span class="b-'+c+'">'+(lab[c]||slots[i])+'</span>';}).join('')+
+      '</div></div>';
+  }).join('');
+
+  /* ---- language + drill ---- */
+  document.querySelectorAll('.tg[data-lang]').forEach(function(b){
+    b.addEventListener('click',function(){
+      b.classList.toggle('on');
+      var on=b.classList.contains('on');
+      document.querySelectorAll('.say.'+b.dataset.lang).forEach(function(s){s.classList.toggle('hide',!on);});
+    });
+  });
+  var drill=document.getElementById('drill');
+  drill.addEventListener('click',function(){
+    drill.classList.toggle('on');
+    var on=drill.classList.contains('on');
+    document.querySelectorAll('.say.es').forEach(function(s){s.classList.toggle('masked',on);});
+  });
+  document.querySelectorAll('.say.es').forEach(function(s){
+    s.addEventListener('click',function(){if(s.classList.contains('masked'))s.classList.remove('masked');});
+  });
+
+  /* ---- calculator ---- */
+  var ids=['c1','c2','c3','c4','c5','c6','c7'],def={c1:12,c2:65,c3:2.2,c4:11,c5:0.14,c6:0,c7:28};
+  function m(n){return '$'+Math.round(n).toLocaleString();}
+  function calc(){
+    var v={};ids.forEach(function(i){v[i]=parseFloat(document.getElementById(i).value)||0;});
+    var gw=v.c1*v.c2,gm=gw*52/12,att=v.c1*v.c3,mi=att*v.c4*52/12,
+        cost=mi*v.c5+v.c6,tax=Math.max(0,gm-cost)*(v.c7/100),net=gm-cost-tax,
+        per=att>0?gw/att:0;
+    document.getElementById('o1').textContent=m(gw);
+    document.getElementById('o2').textContent=m(gm);
+    document.getElementById('o3').textContent=m(cost);
+    document.getElementById('o4').textContent=m(tax);
+    document.getElementById('o5').textContent=m(net);
+    document.getElementById('o6').textContent=m(net*12);
+    document.getElementById('o7').textContent=Math.round(mi).toLocaleString();
+    document.getElementById('o8').textContent='$'+per.toFixed(2);
+  }
+  ids.forEach(function(i){document.getElementById(i).addEventListener('input',calc);});
+  document.getElementById('reset').addEventListener('click',function(){
+    ids.forEach(function(i){document.getElementById(i).value=def[i];});calc();});
+  calc();
+
+  /* ---- checklists ---- */
+  function build(el,items,pre){
+    el.innerHTML=items.map(function(t,i){
+      return '<div class="ck"><input type="checkbox" id="'+pre+i+'"><label for="'+pre+i+'">'+t+'</label></div>';}).join('');
+    el.querySelectorAll('input').forEach(function(cb){
+      cb.addEventListener('change',function(){cb.closest('.ck').classList.toggle('done',cb.checked);});});
+  }
+  build(document.getElementById('intake'),[
+    '<b>Deadline confirmed</b> — serve-by date, and is there a hearing date?',
+    '<b>Case number and court</b> recorded, and matching the papers in your hand',
+    '<b>Every defendant named</b> — count them; multi-defendant jobs get missed constantly',
+    '<b>Documents complete</b> — summons AND complaint. A summons alone is a defective serve',
+    '<b>Address verified</b> against a second source before you drive out',
+    '<b>Description, photo, or vehicle</b> requested from the client',
+    '<b>Best times</b> — does the client know their work schedule?',
+    '<b>Fee agreed in writing</b>, including the non-serve fee',
+    '<b>Who files the return</b> — you or the attorney?',
+    '<b>Date and time it came to hand</b> logged — this goes on the return'
+  ],'ik');
+  build(document.getElementById('wk'),[
+    'Photograph your ID card and certification; store in the cloud',
+    'Calendar your renewal with 60-day and 30-day alerts',
+    'Order a self-inking stamp with your name and CPS number',
+    'Open a separate business checking account',
+    'Start mileage tracking on day one',
+    'Buy the accordion file, clipboard box, and a timestamp camera app',
+    'Sign up with Proof and ABC Legal to fill empty route time',
+    'Build a return template modeled on your mentor\'s',
+    'Write your one-page intro email; send to 10 Osceola firms',
+    'Call 3 property management companies about eviction posting work',
+    'Print §48.031(7) for the door bag',
+    'Ride along for one full morning block before serving solo',
+    'Do your first solo serve, then write the return in the car',
+    'Set up the 25–30% tax set-aside transfer'
+  ],'wk');
+})();
+</script>
+</body>
+</html>
